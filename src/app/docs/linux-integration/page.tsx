@@ -21,6 +21,7 @@ import {
   Monitor,
   Bell,
   AlertTriangle,
+  ShieldCheck,
   XCircle,
   CheckCircle2,
   Link2,
@@ -164,13 +165,12 @@ const BRIDGE_CHANNELS: [string, string, string][] = [
 // Registered by src/lib/linux-integration.js and then again by main.js, so the
 // second registration throws. Ordered as they appear in main.js, which is the
 // order in which they are attempted.
-const DUPLICATE_HANDLERS = [
-  "linux:notify",
-  "linux:create-shortcut",
-  "linux:install-gnome-shortcut",
-  "linux:create-launcher",
-  "linux:register-protocol",
-];
+// Was five channels. setupLinuxIPCHandlers() registered each of them and
+// main.js then registered it again, which made ipcMain.handle throw at module
+// top level on Linux and stopped the main process before the window opened.
+// The module's copies are gone; main.js's copies are the ones kept, because
+// they carry the platform guard that answers { error: 'Not Linux' } elsewhere.
+const DUPLICATE_HANDLERS: string[] = [];
 
 // Registered by the module and never invoked by the preload bridge. The module
 // and main.js name the same features two different ways, and the bridge only
@@ -501,36 +501,66 @@ export default function LinuxIntegrationPage() {
                 </table>
               </div>
 
-              {/* The duplicate registration */}
-              <div className="p-6 rounded-2xl bg-rose-500/[0.05] border border-rose-500/30">
+              {/* The duplicate registration, now fixed */}
+              <div className="p-6 rounded-2xl bg-emerald-500/[0.05] border border-emerald-500/30">
                 <div className="flex items-center gap-3 mb-4">
-                  <AlertTriangle className="w-6 h-6 text-rose-400" />
-                  <h3 className="text-xl font-bold text-rose-300">
-                    On Linux, main.js registers five channels a second time
+                  <ShieldCheck className="w-6 h-6 text-emerald-400" />
+                  <h3 className="text-xl font-bold text-emerald-300">
+                    The Linux startup crash is fixed
                   </h3>
                 </div>
 
                 <div className="space-y-4 text-zinc-300">
                   <p>
-                    The module registers these ten channels in{" "}
-                    <code className="font-mono text-orange-300">setupLinuxIPCHandlers()</code>.{" "}
-                    <code className="font-mono text-orange-300">main.js</code> calls that at line
-                    752, inside its <code className="font-mono text-orange-300">platform === &apos;linux&apos;</code>{" "}
-                    guard, and then registers eleven{" "}
-                    <code className="font-mono text-orange-300">linux:</code> channels of its own
-                    starting at line 757. Five names appear in both lists.
+                    This page used to report that the app could not start on Linux at all.{" "}
+                    <code className="font-mono text-orange-300">setupLinuxIPCHandlers()</code>{" "}
+                    registered five <code className="font-mono text-orange-300">linux:</code> channels
+                    that <code className="font-mono text-orange-300">main.js</code> then registered
+                    again at module scope. Electron&apos;s{" "}
+                    <code className="font-mono text-orange-300">ipcMain.handle</code> throws on a
+                    second registration, the call was not wrapped, and it ran at module top level —
+                    so on Linux the main process stopped before the window was created. macOS and
+                    Windows were unaffected, because the setup call sits inside a{" "}
+                    <code className="font-mono text-orange-300">process.platform === &apos;linux&apos;</code>{" "}
+                    guard, which is why it survived as long as it did.
+                  </p>
+
+                  <p>
+                    Each channel is now registered exactly once. The five{" "}
+                    <code className="font-mono text-orange-300">main.js</code> copies were kept
+                    rather than the module&apos;s, and that choice matters: they carry a{" "}
+                    <code className="font-mono text-orange-300">process.platform !== &apos;linux&apos;</code>{" "}
+                    check that answers{" "}
+                    <code className="font-mono text-orange-300">{"{ error: &apos;Not Linux&apos; }"}</code>{" "}
+                    on the other two platforms. Removing those instead would have left every call
+                    to them rejecting with{" "}
+                    <code className="font-mono text-orange-300">No handler registered</code> instead
+                    of returning an error.
+                  </p>
+
+                  <p>
+                    A test calls the real setup function against an Electron stub whose{" "}
+                    <code className="font-mono text-orange-300">ipcMain.handle</code> throws on a
+                    duplicate, exactly as the real one does, and requires the registration not to
+                    throw. That test could not exist before: the module named a parameter{" "}
+                    <code className="font-mono text-orange-300">interface</code>, which is a
+                    reserved word in strict mode, so Jest could not load the file at all.
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-4 font-mono text-sm">
                     <div className="p-4 rounded-xl bg-black/30 border border-zinc-700/50">
                       <div className="text-zinc-500 mb-2 text-xs uppercase tracking-wider">
-                        Registered twice
+                        Registered twice — now none
                       </div>
-                      {DUPLICATE_HANDLERS.map((channel) => (
-                        <div key={channel} className="text-rose-300 py-0.5">
-                          {channel}
-                        </div>
-                      ))}
+                      {DUPLICATE_HANDLERS.length === 0 ? (
+                        <div className="text-emerald-300 py-0.5">none</div>
+                      ) : (
+                        DUPLICATE_HANDLERS.map((channel) => (
+                          <div key={channel} className="text-rose-300 py-0.5">
+                            {channel}
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className="p-4 rounded-xl bg-black/30 border border-zinc-700/50">
                       <div className="text-zinc-500 mb-2 text-xs uppercase tracking-wider">
@@ -544,29 +574,10 @@ export default function LinuxIntegrationPage() {
                     </div>
                   </div>
 
-                  <p>
-                    Electron&apos;s{" "}
-                    <code className="font-mono text-orange-300">ipcMain.handle</code> throws{" "}
-                    <code className="font-mono text-orange-300">
-                      Attempted to register a second handler
-                    </code>{" "}
-                    for a channel that already has one. Because the module runs first, the throw
-                    comes from the second registration —{" "}
-                    <code className="font-mono text-orange-300">main.js:781</code>, the{" "}
-                    <code className="font-mono text-orange-300">linux:notify</code> line. It is not
-                    wrapped in a{" "}
-                    <code className="font-mono text-orange-300">try</code>, so main.js stops
-                    executing there and the four registrations after it never happen either.
-                  </p>
-
                   <p className="text-zinc-400">
-                    This is why the defect is invisible: it is guarded by{" "}
-                    <code className="font-mono text-orange-300">process.platform === &apos;linux&apos;</code>{" "}
-                    and nothing in this repository registers any of these channels on macOS or
-                    Windows, so both of those platforms are unaffected. Nothing in this page was
-                    verified by running it on Linux; the claim is read off the two registration
-                    sites and Electron&apos;s implementation, and a test asserts that the overlap
-                    is exactly the five channels listed above.
+                    The orphan list is a separate finding and the fix did not change it: those five
+                    channels are still registered by the module and still invoked by nothing in the
+                    repository. Fixing the crash removed the duplication, not the dead channels.
                   </p>
                 </div>
               </div>
