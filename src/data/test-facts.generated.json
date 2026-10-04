@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T12:03:34.414Z",
+  "generatedAt": "2026-10-04T13:11:44.677Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 40,
-    "passed": 39,
+    "total": 54,
+    "passed": 53,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1047,
-    "passed": 1021,
+    "declared": 1322,
+    "passed": 1296,
     "skipped": 26,
     "failed": 0
   },
@@ -59,6 +59,13 @@
       "declared": 61
     },
     {
+      "suite": "research-pipeline",
+      "passed": 60,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 60
+    },
+    {
       "suite": "extraction",
       "passed": 58,
       "skipped": 0,
@@ -80,11 +87,11 @@
       "declared": 51
     },
     {
-      "suite": "docs-platform-integration-match-source",
-      "passed": 46,
+      "suite": "page-scripts-forms",
+      "passed": 48,
       "skipped": 0,
       "failed": 0,
-      "declared": 46
+      "declared": 48
     },
     {
       "suite": "local-server-auth",
@@ -92,6 +99,13 @@
       "skipped": 0,
       "failed": 0,
       "declared": 44
+    },
+    {
+      "suite": "docs-platform-integration-match-source",
+      "passed": 43,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 43
     },
     {
       "suite": "security-validator",
@@ -129,6 +143,20 @@
       "declared": 36
     },
     {
+      "suite": "agent-api-bridge-tools",
+      "passed": 35,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 35
+    },
+    {
+      "suite": "web-search-service",
+      "passed": 30,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 30
+    },
+    {
       "suite": "webauthn-service",
       "passed": 26,
       "skipped": 0,
@@ -141,6 +169,27 @@
       "skipped": 0,
       "failed": 0,
       "declared": 24
+    },
+    {
+      "suite": "research-progress-plumbing",
+      "passed": 24,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 24
+    },
+    {
+      "suite": "snapshot-ref-binding",
+      "passed": 24,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 24
+    },
+    {
+      "suite": "file-paths",
+      "passed": 22,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 22
     },
     {
       "suite": "approval-ticket-security",
@@ -220,6 +269,13 @@
       "declared": 10
     },
     {
+      "suite": "citation-links",
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 7
+    },
+    {
       "suite": "docs-shortcuts-match-source",
       "passed": 7,
       "skipped": 0,
@@ -255,7 +311,28 @@
       "declared": 6
     },
     {
+      "suite": "pairing-auth",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
       "suite": "snapshot",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "sync-handlers-window",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "wifi-sync-pairing",
       "passed": 6,
       "skipped": 0,
       "failed": 0,
@@ -283,6 +360,13 @@
       "declared": 4
     },
     {
+      "suite": "ai-command-parser-plan",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 4
+    },
+    {
       "suite": "home-intelligence",
       "passed": 4,
       "skipped": 0,
@@ -295,6 +379,13 @@
       "skipped": 0,
       "failed": 0,
       "declared": 4
+    },
+    {
+      "suite": "approval-gate",
+      "passed": 3,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 3
     },
     {
       "suite": "autofill.vault",
@@ -312,6 +403,13 @@
     },
     {
       "suite": "extensions.permission-analyzer",
+      "passed": 3,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 3
+    },
+    {
+      "suite": "markdown-render",
       "passed": 3,
       "skipped": 0,
       "failed": 0,
