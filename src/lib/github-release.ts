@@ -8,6 +8,23 @@ export interface GitHubRelease {
   assets: GitHubReleaseAsset[];
 }
 
+/**
+ * Whether a parsed response body is actually a release.
+ *
+ * GitHub answers an unauthenticated request over its 60/hour per-IP limit with
+ * HTTP 403 and a JSON *error* body. That body parses fine, so `res.json()`
+ * resolves and `.catch()` never fires — which means an error object can reach
+ * state that is typed as a release. The 403 body has no `tag_name` and no
+ * `assets`, and code that trusted the type read them anyway and threw.
+ *
+ * Check this before storing anything from `api.github.com`.
+ */
+export function isGitHubRelease(value: unknown): value is GitHubRelease {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.tag_name === "string" && candidate.tag_name.length > 0 && Array.isArray(candidate.assets);
+}
+
 export interface ReleaseDownloadLink {
   key: string;
   label: string;
