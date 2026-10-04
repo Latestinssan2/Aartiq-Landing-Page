@@ -514,12 +514,13 @@ export const ci = {
    * "manual or tag push"; the real split is below.
    */
   workflows: {
-    count: 13,
+    count: 14,
     manualOnly: 11,
     tagPush: 1,
-    pushToMain: 1,
+    pushToMain: 2,
+    pullRequest: 1,
     note:
-      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main for a path filter, and the remaining eleven are workflow_dispatch.",
+      "release.yml fires on version tag push, sync-component-docs.yml and docs-gate.yml fire on push to main, docs-gate.yml also runs on pull_request, and the remaining eleven are workflow_dispatch.",
   },
   /**
    * jest.yml declares only `workflow_dispatch`. There is no `push:` and no
