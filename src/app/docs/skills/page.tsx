@@ -106,8 +106,28 @@ const sections = [
       },
       {
         h: "Tool surface",
-        p: "Tools are grouped into Security, Agents, Snapshots, Forms, Extensions, Theme, Navigation, Tabs, and System categories, registered via registerAllTools.",
-        refs: ["src/lib/agent-api/tools.ts:192-197"],
+        p: "36 tools across 11 categories, registered via registerAllTools. Security (4): security_scan, security_audit, security_killswitch, trust_list. Agents (4): agent_register, agent_list, agent_revoke, tab_handoff. Snapshots (5): snapshot, click_ref, fill_ref, type_ref, element_action. Page (3): page_find, dom_query, get_page_text. Search (3): web_search, news_search, search_providers. Forms (5): fill_form, form_submit, autofill_match, vault_list, vault_unlock. Extensions (4), Theme (2), Navigation (1), Tabs (3), System (2).",
+        refs: ["src/lib/agent-api/tools.ts:416-418"],
+      },
+      {
+        h: "Reading one page instead of searching for it",
+        p: "page_find searches a page that is already open — no network request, no other tab touched. mode=\"tree\" (default) matches the accessible name, value, href or role of every node in the current snapshot and returns refs you can pass straight to click_ref / fill_ref; it finds nodes nested inside structural wrappers, and actionable-only filtering does not hide them. mode=\"text\" scans rendered prose and returns context snippets. This exists because a search is real egress: it sends the user's query to a third party and returns somebody else's page, when the answer may already be on screen.",
+        refs: ["src/lib/agent-api/tools.ts:143-170", "tests/agent-api-bridge-tools.test.js#pageFind searches the in-memory snapshot without touching the page"],
+      },
+      {
+        h: "Search: API-first, and it tells you when it had to scrape",
+        p: "Tavily is the recommended single key (1,000 free credits/month, no card). SerpAPI (250/month) and Brave (card + attribution) also work. Google Custom Search JSON is deprecated — closed to new customers, existing keys end 2027-01-01. With no key configured, search still runs by scraping a search engine's HTML: rate-limited, slower, breaks without warning when the markup changes, and carries no publication dates. search_providers reports which provider is live, whether it scrapes, and whether it has a news index. news_search returns real publication dates; web_search does not — which is what makes \"which source is most recent\" answerable at all.",
+        refs: ["src/lib/agent-api/tools.ts:200-266", "src/lib/web-search-service.js:162-192", "tests/web-search-service.test.js"],
+      },
+      {
+        h: "Filling a form is not submitting one",
+        p: "fill_form and form_submit are two tools rather than one tool with a submit flag, so the side effect cannot be reached by passing a parameter. fill_form carries the `input` verb and never submits; form_submit is `sideEffecting` and goes through the approval gate. Refs bind by a data-aartiq-ax stamp the collector writes onto actionable nodes (backendNodeId is first-priority identity), so a stale ref fails loudly instead of addressing a different element after the page shifts.",
+        refs: ["src/lib/agent-api/tools.ts:267-320", "tests/page-scripts-forms.test.js", "tests/snapshot-ref-binding.test.js#never puts a bare ref into a script"],
+      },
+      {
+        h: "Deep Research pipeline",
+        p: "A bounded plan -> search -> fetch -> extract -> cross-verify -> rank -> generate job, with the search provider, page fetcher and progress emitter injected so the whole pipeline tests without network access. Claims are keyed on subject|verb, so \"450 million dollars\" and \"450 million euros\" remain one claim with two conflicting figures rather than being matched into agreement. Corroboration needs >=2 distinct domains, re-derived from each claim's own URL, so news.reuters.com and uk.reuters.com cannot pass as two sources. A last source is named only when publication timestamps are reliable; otherwise the answer is unknown with the reason attached. Progress streams over the research-progress channel to a 'Sources disagree' panel.",
+        refs: ["src/lib/research-pipeline.ts:474-678", "src/lib/researchState.ts:153-201", "tests/research-pipeline.test.js", "tests/research-progress-plumbing.test.js"],
       },
     ],
   },
