@@ -303,7 +303,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Agent API (MCP + HTTP tools)",
         description:
-          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. 28 tools across 9 categories. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
+          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. 36 tools across 11 categories. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
         icon: Cpu,
         color: "from-emerald-500 to-teal-400",
         refs: [
@@ -350,7 +350,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Research that checks whether sources agree",
         description:
-          "A bounded plan -> search -> fetch -> extract -> cross-verify -> rank -> generate job, with dependencies injected so it tests without network access. Claims are keyed on subject|verb so '450 million dollars' and '450 million euros' stay one claim with two conflicting figures. Corroboration needs >=2 distinct domains re-derived from each claim's URL, so subdomains cannot fake independence. A last source is named only when timestamps are reliable; otherwise it reports unknown with the reason attached.",
+          "A bounded plan -> search -> fetch -> extract -> cross-verify -> rank -> generate job, with dependencies injected so it tests without network access. Claims are keyed on subject|verb so '450 million dollars' and '450 million euros' stay one claim with two conflicting figures. Corroboration needs >=2 distinct domains re-derived from each claim's URL, so subdomains cannot fake independence. A last source is named only when timestamps are reliable; otherwise it reports unknown with the reason attached. Known limit: only numeric claims with a named subject are extracted, so the coverage percentage is numeric agreement specifically and disputed qualitative findings never reach the panel.",
         icon: Scale,
         color: "from-rose-500 to-pink-400",
         refs: [
