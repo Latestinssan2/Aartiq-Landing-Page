@@ -34,7 +34,11 @@ const syncTypes = [
       "clipboard-sync",
       "clipboard-sync-request",
       "execute-command",
-      "desktop-control"
+      "desktop-control",
+      "session-sync-request",
+      "session-sync-response",
+      "permission-relay-request",
+      "permission-relay-response"
     ],
     requirements: [
       "Same local network (WiFi)",
@@ -174,6 +178,24 @@ const securityFeatures = [
     description: "End-to-end encryption covers the cloud path: data is encrypted client-side with your sync passphrase before upload, and decrypted on the device that pulls it. The local WiFi WebSocket is not additionally encrypted by this layer",
     icon: Lock,
     source: "src/lib/crypto-utils.ts"
+  },
+  {
+    title: "Permanent token authentication",
+    description: "After the initial handshake, paired devices store a 256-bit cryptographic permanent token for seamless re-connection across app restarts without re-entering pairing codes",
+    icon: Lock,
+    source: "src/lib/WiFiSyncService.ts"
+  },
+  {
+    title: "Master PIN in OS Keychain",
+    description: "PBKDF2-SHA256 (100k iterations) PIN stored in native OS Keychain (Apple Keychain / Windows DPAPI / Secret Service) and Android Keystore (encryptedSharedPreferences) with 5-attempt lockout",
+    icon: Key,
+    source: "src/lib/MasterPINService.ts"
+  },
+  {
+    title: "Dual-gate mobile approval relay",
+    description: "High-risk desktop execution plans are delegated to mobile, requiring both Gate 1 (Master PIN) and Gate 2 (Screen Lock / Biometrics) to approve",
+    icon: Smartphone,
+    source: "src/lib/PermissionRelayService.ts"
   },
   {
     title: "What is not here",

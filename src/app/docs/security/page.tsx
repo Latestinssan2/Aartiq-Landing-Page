@@ -913,6 +913,65 @@ export default function SecurityPage() {
         </div>
       </motion.section>
 
+      {/* Master PIN & Dual-Gate Mobile Biometrics */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45 }}
+      >
+        <div className="mb-16">
+          <p className="mb-4 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+            Hardware-Backed Credentials &amp; Biometrics
+          </p>
+          <h2 className="text-4xl font-black uppercase tracking-tighter sm:text-5xl">
+            Master PIN &amp; <span className="text-white/20">Dual-Gate Biometrics</span>
+          </h2>
+          <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
+            Aartiq protects high-risk approvals with a hardware-backed Master PIN stored in the OS Keychain
+            (Apple Keychain, Windows DPAPI, Linux Secret Service) and Android Keystore, paired with dual-gate
+            mobile verification.
+          </p>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
+            <Lock size={36} className="mb-6 text-emerald-400" />
+            <h3 className="mb-3 text-lg font-black uppercase tracking-wider">PBKDF2-SHA256 Master PIN</h3>
+            <p className="text-sm leading-relaxed text-white/50">
+              Configured on desktop or mobile with 100,000 iterations of PBKDF2-SHA256 and a 32-byte derived key.
+              Encrypted at rest using native OS Keychain via Electron <code className="text-emerald-300">safeStorage</code> and Android Keystore (<code className="text-emerald-300">encryptedSharedPreferences</code>).
+            </p>
+            <div className="mt-6 border-t border-white/5 pt-4 text-xs text-white/40">
+              Raw PIN is never saved or transmitted over the wire; sync payloads carry salt and hash only. 5 consecutive failed attempts enforce a 10-minute lockout.
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
+            <Smartphone size={36} className="mb-6 text-sky-400" />
+            <h3 className="mb-3 text-lg font-black uppercase tracking-wider">Dual-Gate Mobile Approval</h3>
+            <p className="text-sm leading-relaxed text-white/50">
+              Desktop execution plans can be delegated to paired mobile devices with one click via the <code className="text-sky-300">📱 Mobile</code> button in <code className="text-sky-300">AutomationPlanApproval</code>.
+            </p>
+            <div className="mt-6 space-y-2 text-xs text-white/40">
+              <div><strong className="text-white">Gate 1:</strong> Master PIN verification</div>
+              <div><strong className="text-white">Gate 2:</strong> Device Screen Lock / Biometrics (<code className="text-sky-300">local_auth</code> via <code className="text-sky-300">FlutterFragmentActivity</code>)</div>
+              <div>Desktop promises resolve in real-time upon mobile confirmation.</div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
+            <Key size={36} className="mb-6 text-purple-400" />
+            <h3 className="mb-3 text-lg font-black uppercase tracking-wider">Permanent 256-Bit Tokens</h3>
+            <p className="text-sm leading-relaxed text-white/50">
+              Initial pairing exchanges a 256-bit cryptographic permanent token. Subsequent connections across Wi-Fi WebSocket and cloud relays automatically authenticate without prompting for pairing codes again.
+            </p>
+            <div className="mt-6 border-t border-white/5 pt-4 text-xs text-white/40">
+              Paired devices maintain real hardware names and visual device illustrations (MacBook, iMac, Android, iPhone) in the sync ledger.
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
       {/* Remote Device Security */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
