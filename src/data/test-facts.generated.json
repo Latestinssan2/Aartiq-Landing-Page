@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T05:46:28.635Z",
+  "generatedAt": "2026-10-04T06:10:02.075Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -14,8 +14,8 @@
     "skipped": 1
   },
   "tests": {
-    "declared": 869,
-    "passed": 843,
+    "declared": 876,
+    "passed": 850,
     "skipped": 26,
     "failed": 0
   },
@@ -39,10 +39,10 @@
   "perSuite": [
     {
       "suite": "shell-command-tiers",
-      "passed": 189,
+      "passed": 193,
       "skipped": 0,
       "failed": 0,
-      "declared": 189
+      "declared": 193
     },
     {
       "suite": "sandbox-security",
@@ -80,18 +80,18 @@
       "declared": 51
     },
     {
+      "suite": "local-server-auth",
+      "passed": 44,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 44
+    },
+    {
       "suite": "security-validator",
       "passed": 42,
       "skipped": 0,
       "failed": 0,
       "declared": 42
-    },
-    {
-      "suite": "local-server-auth",
-      "passed": 41,
-      "skipped": 0,
-      "failed": 0,
-      "declared": 41
     },
     {
       "suite": "security-fixes",
