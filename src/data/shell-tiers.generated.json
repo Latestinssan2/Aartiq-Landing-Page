@@ -1,0 +1,835 @@
+{
+  "generatedAt": "2026-10-04T05:45:57.892Z",
+  "source": "aartiq-browser/src/lib/shell-command-tiers.js",
+  "tiers": {
+    "LOW": "low",
+    "MEDIUM": "medium",
+    "HIGH": "high",
+    "CRITICAL": "critical"
+  },
+  "capabilities": {
+    "READ_FILES": "read-files",
+    "WRITE_FILES": "write-files",
+    "NETWORK": "network",
+    "RUN_CODE": "run-code",
+    "CHANGE_PERMISSIONS": "change-permissions",
+    "CONTROL_PROCESSES": "control-processes",
+    "CHANGE_SYSTEM": "change-system-state"
+  },
+  "invariants": [
+    "No command that can write, reach the network, run code or change permissions is low.",
+    "A destructive pattern raises the tier and never lowers one.",
+    "An unknown binary is medium, never low.",
+    "A URL anywhere in the arguments rules out low."
+  ],
+  "autoApprove": {
+    "setting": "autoApproveLowRiskShell",
+    "defaultValue": false,
+    "legacyAlias": "autoApproveLowRisk",
+    "tiers": [
+      "LOW"
+    ],
+    "appliesTo": "shell commands only",
+    "doesNotApply": "autoApproveMidRisk no longer reaches the shell path; it still applies to MCP tool actions."
+  },
+  "alwaysGrant": {
+    "scope": "the full normalised command line",
+    "note": "Keyed on the whole command, not the first word. Withheld for network-capable, script-capable and destructive commands, and for any command with a URL in its arguments. Allow Once is always available.",
+    "neverEligible": [
+      "bash",
+      "bun",
+      "chmod",
+      "chown",
+      "command",
+      "curl",
+      "dd",
+      "doas",
+      "env",
+      "eval",
+      "exec",
+      "fish",
+      "git",
+      "halt",
+      "java",
+      "kill",
+      "killall",
+      "mount",
+      "node",
+      "npm",
+      "npx",
+      "open",
+      "osascript",
+      "perl",
+      "php",
+      "pip",
+      "pip3",
+      "pkill",
+      "pnpm",
+      "poweroff",
+      "python",
+      "python3",
+      "reboot",
+      "rsync",
+      "ruby",
+      "scp",
+      "sftp",
+      "sh",
+      "shred",
+      "shutdown",
+      "ssh",
+      "su",
+      "sudo",
+      "truncate",
+      "umount",
+      "wget",
+      "xargs",
+      "yarn",
+      "zsh"
+    ]
+  },
+  "blockedCommands": [
+    "chgrp",
+    "passwd",
+    "rm",
+    "su",
+    "sudo"
+  ],
+  "counts": {
+    "commandsInTable": 80,
+    "low": 31,
+    "medium": 35,
+    "high": 14,
+    "critical": 0,
+    "blocked": 5
+  },
+  "entries": [
+    {
+      "binary": "bash",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "bat",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "bun",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "cat",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "chmod",
+      "tier": "high",
+      "caps": [
+        "change-permissions"
+      ]
+    },
+    {
+      "binary": "chown",
+      "tier": "high",
+      "caps": [
+        "change-permissions"
+      ]
+    },
+    {
+      "binary": "cp",
+      "tier": "medium",
+      "caps": [
+        "read-files",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "curl",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "date",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "dd",
+      "tier": "high",
+      "caps": [
+        "change-system-state",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "df",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "dig",
+      "tier": "medium",
+      "caps": [
+        "network"
+      ]
+    },
+    {
+      "binary": "dir",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "du",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "echo",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "egrep",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "fgrep",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "file",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "find",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "fish",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "git",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "grep",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "halt",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "head",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "host",
+      "tier": "medium",
+      "caps": [
+        "network"
+      ]
+    },
+    {
+      "binary": "hostname",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "java",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "kill",
+      "tier": "high",
+      "caps": [
+        "control-processes"
+      ]
+    },
+    {
+      "binary": "killall",
+      "tier": "high",
+      "caps": [
+        "control-processes"
+      ]
+    },
+    {
+      "binary": "less",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "ll",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "ln",
+      "tier": "medium",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "ls",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "mkdir",
+      "tier": "medium",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "more",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "mount",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "mv",
+      "tier": "medium",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "node",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code"
+      ]
+    },
+    {
+      "binary": "npm",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "npx",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code"
+      ]
+    },
+    {
+      "binary": "nslookup",
+      "tier": "medium",
+      "caps": [
+        "network"
+      ]
+    },
+    {
+      "binary": "open",
+      "tier": "medium",
+      "caps": [
+        "control-processes",
+        "run-code"
+      ]
+    },
+    {
+      "binary": "osascript",
+      "tier": "medium",
+      "caps": [
+        "control-processes",
+        "run-code"
+      ]
+    },
+    {
+      "binary": "perl",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "php",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code"
+      ]
+    },
+    {
+      "binary": "ping",
+      "tier": "medium",
+      "caps": [
+        "network"
+      ]
+    },
+    {
+      "binary": "pip",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "pip3",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "pkill",
+      "tier": "high",
+      "caps": [
+        "control-processes"
+      ]
+    },
+    {
+      "binary": "pnpm",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "poweroff",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "printf",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "pwd",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "python",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "python3",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "reboot",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "rg",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "rsync",
+      "tier": "medium",
+      "caps": [
+        "read-files",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "ruby",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "scp",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "read-files",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "sftp",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "read-files",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "sh",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    },
+    {
+      "binary": "shred",
+      "tier": "high",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "shutdown",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "sleep",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "stat",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "tail",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "touch",
+      "tier": "medium",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "tree",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "true",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "truncate",
+      "tier": "high",
+      "caps": [
+        "write-files"
+      ]
+    },
+    {
+      "binary": "type",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "umount",
+      "tier": "high",
+      "caps": [
+        "change-system-state"
+      ]
+    },
+    {
+      "binary": "uname",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "wc",
+      "tier": "low",
+      "caps": [
+        "read-files"
+      ]
+    },
+    {
+      "binary": "wget",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "which",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "whoami",
+      "tier": "low",
+      "caps": []
+    },
+    {
+      "binary": "yarn",
+      "tier": "medium",
+      "caps": [
+        "network",
+        "run-code",
+        "write-files"
+      ]
+    },
+    {
+      "binary": "zsh",
+      "tier": "medium",
+      "caps": [
+        "run-code"
+      ]
+    }
+  ],
+  "probes": [
+    {
+      "command": "ls -la",
+      "tier": "low",
+      "reason": "table:ls",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "cat notes.md",
+      "tier": "low",
+      "reason": "table:cat",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "pwd",
+      "tier": "low",
+      "reason": "table:pwd",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "find . -name '*.md'",
+      "tier": "low",
+      "reason": "table:find",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "grep -r pattern .",
+      "tier": "low",
+      "reason": "table:grep",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "echo hello",
+      "tier": "low",
+      "reason": "table:echo",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "cp notes.md notes.bak",
+      "tier": "medium",
+      "reason": "table:cp",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "mv a b",
+      "tier": "medium",
+      "reason": "table:mv",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "mkdir new-dir",
+      "tier": "medium",
+      "reason": "table:mkdir",
+      "knownBinary": true,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "chmod 644 file",
+      "tier": "high",
+      "reason": "destructive-pattern",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "npm install left-pad",
+      "tier": "medium",
+      "reason": "table:npm",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "git clone https://example.com/repo",
+      "tier": "medium",
+      "reason": "url-argument",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "curl https://example.com",
+      "tier": "medium",
+      "reason": "url-argument",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "wget https://example.com/file",
+      "tier": "medium",
+      "reason": "url-argument",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "osascript -e 'tell application Finder to activate'",
+      "tier": "medium",
+      "reason": "table:osascript",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "node script.js",
+      "tier": "medium",
+      "reason": "table:node",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "open -a Calculator",
+      "tier": "medium",
+      "reason": "table:open",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "some-tool --version",
+      "tier": "medium",
+      "reason": "unknown-binary",
+      "knownBinary": false,
+      "alwaysGrantEligible": true
+    },
+    {
+      "command": "find . -delete",
+      "tier": "high",
+      "reason": "destructive-pattern",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "kill -9 1234",
+      "tier": "high",
+      "reason": "destructive-pattern",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "dd if=/dev/zero of=/dev/sda",
+      "tier": "high",
+      "reason": "destructive-pattern",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    },
+    {
+      "command": "cat https://example.com/page.html",
+      "tier": "medium",
+      "reason": "url-argument",
+      "knownBinary": true,
+      "alwaysGrantEligible": false
+    }
+  ]
+}
