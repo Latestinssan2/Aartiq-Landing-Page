@@ -303,7 +303,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Agent API (MCP + HTTP tools)",
         description:
-          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. 36 tools across 11 categories. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
+          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. 28 tools across 9 categories. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
         icon: Cpu,
         color: "from-emerald-500 to-teal-400",
         refs: [

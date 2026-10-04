@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T10:38:32.295Z",
+  "generatedAt": "2026-10-04T10:46:03.210Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 36,
-    "passed": 35,
+    "total": 37,
+    "passed": 36,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1006,
-    "passed": 980,
+    "declared": 1019,
+    "passed": 993,
     "skipped": 26,
     "failed": 0
   },
@@ -183,6 +183,13 @@
       "skipped": 7,
       "failed": 0,
       "declared": 14
+    },
+    {
+      "suite": "docs-listener-claims-match-source",
+      "passed": 13,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 13
     },
     {
       "suite": "windows-job-sandbox",
