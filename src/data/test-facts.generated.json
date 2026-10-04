@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T02:31:28.419Z",
+  "generatedAt": "2026-10-04T06:10:02.075Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 26,
-    "passed": 25,
+    "total": 29,
+    "passed": 28,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 577,
-    "passed": 551,
+    "declared": 876,
+    "passed": 850,
     "skipped": 26,
     "failed": 0
   },
@@ -38,11 +38,25 @@
   ],
   "perSuite": [
     {
+      "suite": "shell-command-tiers",
+      "passed": 193,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 193
+    },
+    {
       "suite": "sandbox-security",
       "passed": 64,
       "skipped": 0,
       "failed": 0,
       "declared": 64
+    },
+    {
+      "suite": "shell-approval-defaults",
+      "passed": 61,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 61
     },
     {
       "suite": "extraction",
@@ -66,6 +80,13 @@
       "declared": 51
     },
     {
+      "suite": "local-server-auth",
+      "passed": 44,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 44
+    },
+    {
       "suite": "security-validator",
       "passed": 42,
       "skipped": 0,
@@ -73,14 +94,14 @@
       "declared": 42
     },
     {
-      "suite": "dom-engine",
-      "passed": 40,
+      "suite": "security-fixes",
+      "passed": 41,
       "skipped": 0,
       "failed": 0,
-      "declared": 40
+      "declared": 41
     },
     {
-      "suite": "security-fixes",
+      "suite": "dom-engine",
       "passed": 40,
       "skipped": 0,
       "failed": 0,

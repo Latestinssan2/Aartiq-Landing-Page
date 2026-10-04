@@ -10,6 +10,7 @@ import {
   Wrench, 
   BookOpen, 
   Shield, 
+  AlertTriangle,
   ArrowRight,
   ExternalLink,
   Calendar,
@@ -182,6 +183,30 @@ export default function ChangelogPage() {
                     </ul>
                   </div>
                 )}
+
+                {release.superseded?.map((note) => (
+                  <div
+                    key={note.notedOn}
+                    className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6"
+                  >
+                    <h3 className="flex items-center gap-2 text-lg font-black uppercase tracking-wider text-amber-400 mb-1">
+                      <AlertTriangle size={20} /> Since corrected
+                    </h3>
+                    <p className="mb-4 text-xs text-white/40">
+                      Noted {note.notedOn}
+                      {note.changedIn ? ` · behaviour changed in ${note.changedIn}` : ''}. The
+                      entries above are left as they were written for this release.
+                    </p>
+                    <ul className="space-y-3">
+                      {note.items.map((item, i) => (
+                        <li key={i} className="flex items-start gap-3 text-white/60">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             ) : (
               <p className="text-white/40 italic">Initial release</p>

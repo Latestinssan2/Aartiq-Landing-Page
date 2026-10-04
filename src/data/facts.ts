@@ -11,13 +11,35 @@
 
 import testFactsJson from "./test-facts.generated.json";
 import repoFactsJson from "./repo-facts.generated.json";
-import type { GeneratedTestFacts, GeneratedRepoFacts } from "./project-facts";
+import shellTiersJson from "./shell-tiers.generated.json";
+import type {
+  GeneratedTestFacts,
+  GeneratedRepoFacts,
+  GeneratedShellTiers,
+} from "./project-facts";
 import { benchmarks, platforms, network } from "./project-facts";
 
 export * from "./project-facts";
 
 export const tests = testFactsJson as unknown as GeneratedTestFacts;
 export const repoStats = repoFactsJson as unknown as GeneratedRepoFacts;
+
+/**
+ * The shell risk table, read out of the classifier that enforces it.
+ *
+ * `scripts/gen-shell-tiers.ts` writes shell-tiers.generated.json from
+ * `aartiq-browser/src/lib/shell-command-tiers.js` — the same module the runtime
+ * reads — so the numbers a page publishes are the numbers the code uses. This
+ * exists because the previous tier table was hand-written, and it described
+ * defaults the code had already moved away from: it said low and medium were
+ * auto-approved by a startup session grant, and that medium was the default tier
+ * for anything not matching a destructive pattern, which held only because the
+ * classifier had no `low` tier at all.
+ *
+ * Import this instead of counting commands or restating a tier. `npm run
+ * docs:check` fails when the generated file is stale.
+ */
+export const shellTiers = shellTiersJson as unknown as GeneratedShellTiers;
 
 /**
  * Ports and bind addresses, resolved once.

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { net, platforms } from "@/data/facts";
+import { net, platforms, security, shellTiers } from "@/data/facts";
 
 const BASE = 'https://aartiq.ponsrischool.in';
 
@@ -150,12 +150,20 @@ Aartiq uses a six-layer defense-in-depth model:
 
 ### Risk tiers
 
-Each capability carries a risk label that determines approval behaviour:
+Each capability carries a risk label that determines approval behaviour. Rendered from the single source of truth, not typed here:
 
-1. **low**: auto-approved by default (session grant created at startup).
-2. **medium**: auto-approved by default (same session grant).
-3. **high**: explicit confirmation required, unless a grant or an explicit auto-approve entry covers it.
-4. **critical**: denied at the policy gate; a plain Allow/Deny prompt is then shown. No registry assigns this tier.
+${security.riskTiers
+  .map(
+    (t, i) =>
+      `${i + 1}. **${t.id}**: ${t.approvalMethod} Auto-approve: ${t.autoApprove}` +
+      (t.examples.length ? ` Examples: ${t.examples.join(", ")}.` : "") +
+      `\n   Limit: ${t.limit}`,
+  )
+  .join("\n")}
+
+The shell classifier assigns ${shellTiers.counts.commandsInTable} table entries: ${shellTiers.counts.low} low, ${shellTiers.counts.medium} medium, ${shellTiers.counts.high} high, with ${shellTiers.counts.blocked} commands blocked outright. Shell auto-approval exists only behind the \`${shellTiers.autoApprove.setting}\` setting, which defaults to ${shellTiers.autoApprove.defaultValue ? "on" : "off"}. ${shellTiers.alwaysGrant.note}
+
+${shellTiers.invariants.map((r) => `- ${r}`).join("\n")}
 
 ### Security Features
 - AES-256-GCM encryption for data at rest

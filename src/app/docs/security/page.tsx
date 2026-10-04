@@ -965,8 +965,8 @@ export default function SecurityPage() {
               {[
                 "Shutdown, restart, sleep, and lock require QR/PIN approval",
                 "Remote shell commands are validated by SecurityValidator, routed through the capability controller, and executed via execFile (no shell interpretation)",
-                `The agent API and native bridge bind to ${net.agentApi.defaultBindAddress} only; the ${net.mcpBridge.name} (port ${net.mcpBridge.port}) listens on every interface — see Known Limits`,
-                "Pairing tokens expire after 10 minutes"
+                `The agent API and native bridge bind to ${net.agentApi.defaultBindAddress} only; the ${net.mcpBridge.name} (port ${net.mcpBridge.port}) also binds to ${net.mcpBridge.defaultBindAddress} by default and needs an explicit setting to listen beyond loopback`,
+                "Every local listener requires a per-process token on each request, so a client that has not been given it is refused rather than connected. The token does not expire while Aartiq runs, and a new one is generated on each start"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle2 size={18} className="mt-0.5 text-emerald-400" />
