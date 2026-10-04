@@ -72,8 +72,8 @@ export const searchIndex: SearchIndex = {
     {
       id: "mcp-agent-api",
       title: "Aartiq MCP Server & Agent API",
-      description: "Real implemented MCP server (aartiq-mcp, MIT) — 60+ tools across 11 categories for Claude Desktop and any MCP client — plus an Agent API over HTTP. The ToolRegistry runs a fail-closed pipeline (verb gate, tab lock, handler, prompt-injection scan); the agent API and native bridge are loopback-only while the MCP SSE bridge listens on every interface.",
-      content: "MCP Model Context Protocol aartiq-mcp Claude Desktop agent API ToolRegistry stdio HTTP bridge loopback all-interfaces 60+ tools 11 categories panels settings bookmarks history permissions security scheduling video system clipboard app-knowledge send_ai_prompt fail-closed verb gate tab lock injection scan defaultTrust limited setup mcpb bundle MIT source lines",
+      description: "Real implemented MCP server (aartiq-mcp, MIT) — 64 tools across 11 categories for Claude Desktop and any MCP client — plus an Agent API over HTTP (28 tools, 9 categories). The ToolRegistry runs a fail-closed pipeline (verb gate, tab lock, handler, prompt-injection scan); the agent API, the native bridge and the MCP SSE bridge all bind loopback by default — the MCP bridge behind the security_mcpBridgeRemote setting, off by default.",
+      content: "MCP Model Context Protocol aartiq-mcp Claude Desktop agent API ToolRegistry stdio HTTP bridge loopback 64 tools 11 categories 28 tools 9 categories panels settings bookmarks history permissions security scheduling video system clipboard app-knowledge send_ai_prompt fail-closed verb gate tab lock injection scan defaultTrust limited setup mcpb bundle MIT source lines",
       url: "/mcp-settings",
       keywords: ["MCP", "Model Context Protocol", "Claude Desktop", "agent API", "ToolRegistry", "stdio", "HTTP bridge", "aartiq-mcp", "tools"],
       type: "page"

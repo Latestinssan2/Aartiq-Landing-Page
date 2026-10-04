@@ -542,19 +542,12 @@ export default function OverviewPage() {
         </h2>
         <div className="space-y-5 text-base font-medium leading-relaxed text-white/40">
           <p>
-            This project started as a simple experiment called Comet-AI — a question about what AI could become.
-            Over time, that question evolved into Aartiq™, an AI-native browser built around the idea that AI
-            should not only answer questions, but help execute tasks while keeping humans in control.
-          </p>
-          <p>
-            After five months of building Aartiq independently, including its AI systems, security architecture,
-            MCP integration, synchronization features, and multi-platform releases, I am taking a temporary pause
-            to focus on my studies and recharge after balancing development with academics.
-          </p>
-          <p>
-            Development, feature work, and issue responses will be limited until my exams are over. The repository
-            will remain public, and existing releases will continue to be available. Once the exam is completed,
-            development will resume with new features, improvements, and bug fixes.
+            Aartiq is a solo project maintained in an AI-assisted rhythm: AI agents handle day-to-day issue
+            triage, analysis, and fix preparation, and a human reviews and approves every change to security,
+            permissions, user data, or releases before it ships. Development currently runs at a limited pace
+            around academic commitments — feature work pauses and resumes in bursts rather than on a fixed
+            schedule. The repository stays public, existing releases stay available, and bug reports go to
+            GitHub issues, triaged in the order things break.
           </p>
         </div>
 
