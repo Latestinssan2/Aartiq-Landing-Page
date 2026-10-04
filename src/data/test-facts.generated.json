@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T13:11:44.677Z",
+  "generatedAt": "2026-10-04T14:56:45.127Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 54,
-    "passed": 53,
+    "total": 58,
+    "passed": 57,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1322,
-    "passed": 1296,
+    "declared": 1368,
+    "passed": 1342,
     "skipped": 26,
     "failed": 0
   },
@@ -227,6 +227,20 @@
       "declared": 16
     },
     {
+      "suite": "sensitive-paths-deny",
+      "passed": 15,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 15
+    },
+    {
+      "suite": "sync-auth-tokens",
+      "passed": 15,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 15
+    },
+    {
       "suite": "linux-bwrap-sandbox",
       "passed": 7,
       "skipped": 7,
@@ -269,6 +283,13 @@
       "declared": 10
     },
     {
+      "suite": "remote-shell-approval",
+      "passed": 9,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 9
+    },
+    {
       "suite": "citation-links",
       "passed": 7,
       "skipped": 0,
@@ -277,6 +298,13 @@
     },
     {
       "suite": "docs-shortcuts-match-source",
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 7
+    },
+    {
+      "suite": "native-approval-biometrics",
       "passed": 7,
       "skipped": 0,
       "failed": 0,
