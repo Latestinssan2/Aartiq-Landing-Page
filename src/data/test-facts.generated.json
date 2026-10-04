@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T11:47:51.006Z",
+  "generatedAt": "2026-10-04T12:03:34.414Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 39,
-    "passed": 38,
+    "total": 40,
+    "passed": 39,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1035,
-    "passed": 1009,
+    "declared": 1047,
+    "passed": 1021,
     "skipped": 26,
     "failed": 0
   },
@@ -197,6 +197,13 @@
       "skipped": 5,
       "failed": 0,
       "declared": 13
+    },
+    {
+      "suite": "permission-store-system-root",
+      "passed": 12,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 12
     },
     {
       "suite": "approval-gate-concurrency",
