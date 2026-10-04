@@ -1,0 +1,51 @@
+RED — landing page: a GitHub 403 takes down the home page
+commit: 208f845 (docs: stop restating an expired test count in the platform-variance note (#2))
+date:  2026-10-04T11:19:05Z
+cmd:   node --test tests/release-fetch-resilience.test.ts
+
+(node:56578) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///private/var/folders/71/2rd90h256tv_bt_rk5841wcm0000gn/T/opencode/gh-403-fix/tests/release-fetch-resilience.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /private/var/folders/71/2rd90h256tv_bt_rk5841wcm0000gn/T/opencode/gh-403-fix/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ a rate-limited GitHub response does not take down the home page (1.191167ms)
+✖ a rate-limited response falls back to the version the build knows (0.528458ms)
+✔ a real release still renders its tag (0.945666ms)
+✔ a release object is not required to have assets to render a version (0.40825ms)
+✖ no browser code fetches api.github.com directly (1.510042ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 2
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 103.191416
+✖ failing tests:
+test at tests/release-fetch-resilience.test.ts:63:1
+✖ a rate-limited GitHub response does not take down the home page (1.191167ms)
+  TypeError: Cannot read properties of undefined (reading 'replace')
+test at tests/release-fetch-resilience.test.ts:72:1
+✖ a rate-limited response falls back to the version the build knows (0.528458ms)
+  TypeError: Cannot read properties of undefined (reading 'replace')
+test at tests/release-fetch-resilience.test.ts:89:1
+✖ no browser code fetches api.github.com directly (1.510042ms)
+  AssertionError [ERR_ASSERTION]: these pages call api.github.com from the browser, so the 60/hour per-IP limit is spent per visitor:
+    app/page.tsx
+    app/downloads/page.tsx
+    app/docs/contributing/page.tsx
+  + actual - expected
+  
+  + [
+  +   'app/page.tsx',
+  +   'app/downloads/page.tsx',
+  +   'app/docs/contributing/page.tsx'
+  + ]
+  - []
+  
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'app/page.tsx', 'app/downloads/page.tsx', 'app/docs/contributing/page.tsx' ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

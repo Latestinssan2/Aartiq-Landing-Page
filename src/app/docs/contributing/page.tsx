@@ -159,19 +159,20 @@ export default function ContributingPage() {
   const [githubStats, setGithubStats] = useState({ stars: 0, pull_requests: 0, contributors: 0 });
 
   useEffect(() => {
-    Promise.all([
-      fetch("https://api.github.com/repos/Latestinssan/Aartiq").then(res => res.json()),
-      fetch("https://api.github.com/repos/Latestinssan/Aartiq/contributors").then(res => res.json()),
-      fetch("https://api.github.com/search/issues?q=repo:Latestinssan/Aartiq+is:pr").then(res => res.json())
-    ])
-    .then(([repoData, contributorsData, prData]) => {
-      setGithubStats({
-        stars: repoData?.stargazers_count || 0,
-        contributors: Array.isArray(contributorsData) ? contributorsData.length : 0,
-        pull_requests: prData?.total_count || 0
-      });
-    })
-    .catch(err => console.error("Stats fetch failed:", err));
+    // Read the cached server snapshot rather than calling api.github.com from the
+    // browser. This page already survived a failed fetch by showing zeroes, but
+    // each of those calls spent from the shared 60/hour per-IP budget.
+    fetch("/api/github")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data?.stats) return;
+        setGithubStats({
+          stars: data.stats.stars,
+          contributors: data.stats.contributors,
+          pull_requests: data.stats.pull_requests
+        });
+      })
+      .catch(err => console.error("Stats fetch failed:", err));
   }, []);
 
   return (
