@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T10:46:03.210Z",
+  "generatedAt": "2026-10-04T11:10:24.644Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 37,
-    "passed": 36,
+    "total": 38,
+    "passed": 37,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1019,
-    "passed": 993,
+    "declared": 1029,
+    "passed": 1003,
     "skipped": 26,
     "failed": 0
   },
@@ -204,6 +204,13 @@
       "skipped": 0,
       "failed": 0,
       "declared": 11
+    },
+    {
+      "suite": "network-listener-hardening",
+      "passed": 10,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 10
     },
     {
       "suite": "docs-shortcuts-match-source",
