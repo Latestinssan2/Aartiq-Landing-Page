@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T06:10:02.075Z",
+  "generatedAt": "2026-10-04T10:38:32.295Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 29,
-    "passed": 28,
+    "total": 36,
+    "passed": 35,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 876,
-    "passed": 850,
+    "declared": 1006,
+    "passed": 980,
     "skipped": 26,
     "failed": 0
   },
@@ -80,6 +80,13 @@
       "declared": 51
     },
     {
+      "suite": "docs-platform-integration-match-source",
+      "passed": 46,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 46
+    },
+    {
       "suite": "local-server-auth",
       "passed": 44,
       "skipped": 0,
@@ -129,11 +136,32 @@
       "declared": 26
     },
     {
+      "suite": "apple-intelligence-genmoji",
+      "passed": 24,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 24
+    },
+    {
       "suite": "approval-ticket-security",
       "passed": 21,
       "skipped": 0,
       "failed": 0,
       "declared": 21
+    },
+    {
+      "suite": "docs-deep-links-match-source",
+      "passed": 19,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 19
+    },
+    {
+      "suite": "docs-sync-match-source",
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 17
     },
     {
       "suite": "automation",
@@ -164,6 +192,20 @@
       "declared": 13
     },
     {
+      "suite": "approval-gate-concurrency",
+      "passed": 11,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 11
+    },
+    {
+      "suite": "docs-shortcuts-match-source",
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 7
+    },
+    {
       "suite": "guardrails.origin-guard",
       "passed": 6,
       "skipped": 0,
@@ -172,6 +214,13 @@
     },
     {
       "suite": "guardrails.prompt-injection",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "linux-ipc-registration",
       "passed": 6,
       "skipped": 0,
       "failed": 0,
