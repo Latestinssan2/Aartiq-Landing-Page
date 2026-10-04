@@ -65,6 +65,55 @@ export interface NetworkServer {
   note?: string;
 }
 
+/**
+ * Shape of src/data/shell-tiers.generated.json, written by
+ * scripts/gen-shell-tiers.ts from aartiq-browser/src/lib/shell-command-tiers.js.
+ *
+ * The published tier table is this file's contents, not a hand-typed copy. See
+ * `security.shellTiers` for how it is used.
+ */
+export interface GeneratedShellTiers {
+  generatedAt: string;
+  /** Repo-relative path of the module this was read from. */
+  source: string;
+  tiers: Record<string, string>;
+  capabilities: Record<string, string>;
+  /** The rules the table declares. Asserted in tests, not only published. */
+  invariants: string[];
+  autoApprove: {
+    setting: string;
+    defaultValue: boolean;
+    legacyAlias: string;
+    /** Which tiers the setting covers. */
+    tiers: string[];
+    appliesTo: string;
+    doesNotApply: string;
+  };
+  alwaysGrant: {
+    scope: string;
+    note: string;
+    neverEligible: string[];
+  };
+  blockedCommands: string[];
+  counts: {
+    commandsInTable: number;
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+    blocked: number;
+  };
+  entries: Array<{ binary: string; tier: string; caps: string[]; note?: string }>;
+  /** Real commands classified at generation time, so the numbers are observed. */
+  probes: Array<{
+    command: string;
+    tier: string;
+    reason: string;
+    knownBinary: boolean;
+    alwaysGrantEligible: boolean;
+  }>;
+}
+
 export interface GeneratedTestFacts {
   generatedAt: string;
   environment: {
@@ -241,50 +290,61 @@ export const security = {
     "labelled as such rather than presented as equally strong.",
 
   /**
-   * Verified against src/core/command-validator.js, src/core/capability-controller.js,
-   * src/core/shell-permission-bridge.js, src/lib/SecurityValidator.js, src/lib/permission-store.js.
+   * Verified against src/lib/shell-command-tiers.js, src/core/command-validator.js,
+   * src/lib/permission-store.js and tests/shell-command-tiers.test.js.
    *
-   * Read the `limit` column. Two of these rows are weaker than "approval required"
-   * suggests, and one is stronger.
+   * The per-command numbers behind these rows are generated from the classifier
+   * itself — see `security.shellTiers` — so a tier change in code shows up as a
+   * failing `npm run docs:check` rather than as a page that is quietly wrong.
+   *
+   * Read the `limit` column. Two of these rows are weaker than "approval
+   * required" suggests.
+   *
+   * What changed and why the old text had to go: this table used to say low and
+   * medium were "auto-approved by default" via a session grant created at startup,
+   * and that `medium` was the default tier for anything not matching a destructive
+   * pattern. Both described an earlier state. Startup no longer creates any grant,
+   * and the classifier does have a `low` tier.
    */
   riskTiers: [
     {
       id: "low",
       approvalMethod:
-        "Auto-approved. A session grant for low-risk shell commands is created at startup, so no dialog appears.",
+        "Asked every time, unless you turn on autoApproveLowRiskShell. With it off — the default — a low-risk command shows the same dialog as any other.",
       autoApprove:
-        "Yes, by default — unconditional session grant (8h TTL, not written to disk).",
+        "Only behind the opt-in autoApproveLowRiskShell setting, which defaults to off. Nothing is granted at startup.",
       examples: ["ls", "cat", "pwd", "find", "grep", "echo", "NAVIGATE"],
-      limit: "Auto-approval is the default, not an opt-in. The grant is issued at startup before you choose anything.",
+      limit:
+        "The setting covers the whole low tier rather than named commands, so turning it on is a decision about a category. It is also independent of the MCP tool path: shell commands read autoApproveLowRiskShell from the permission store, MCP tool calls read a separate security_autoApproveLowRisk key, both default to off, and enabling one does not enable the other.",
     },
     {
       id: "medium",
       approvalMethod:
-        "Auto-approved. A session grant for medium-risk shell commands is created at startup alongside the low-risk one.",
-      autoApprove: "Yes, by default — same unconditional session grant.",
-      examples: ["cp", "mv", "mkdir", "chmod", "npm", "git", "curl", "osascript"],
+        "Asked every time. autoApproveMidRisk does not reach shell commands — it still applies to MCP tool actions, which is a separate question.",
+      autoApprove: "No. There is no setting that auto-approves a medium shell command.",
+      examples: ["cp", "mv", "mkdir", "touch", "npm", "git", "node", "python", "curl", "wget", "osascript"],
       limit:
-        "The shell classifier only ever emits medium or high, so medium is the DEFAULT tier for any command that is not a regex-detected destructive pattern.",
+        'An unrecognised command lands here rather than in low, so this tier also means "we have never heard of it". "Allow Always" is withheld for network-capable and script-capable binaries, but a local write like cp or mkdir can still take an exact-match permanent grant.',
     },
     {
       id: "high",
       approvalMethod:
-        "Explicit confirmation. Denied by default, then offered as Allow Once / Always / Deny.",
+        "Asked every time, then offered as Allow Once / Always / Deny.",
       autoApprove:
-        "Only if a SHELL_HIGH or SHELL_ALL grant exists, or the user has explicitly auto-approved that binary.",
-      examples: ["sudo", "rm", "dd", "shutdown", "kill", "mount", "SHELL_COMMAND"],
+        "Only if a grant exists for that exact command line, or a SHELL_HIGH / SHELL_ALL grant was made deliberately.",
+      examples: ["chmod", "find . -delete", "kill", "dd", "mount", "iptables", "shutdown"],
       limit:
-        '"Allow Always" persists on the FIRST WORD of the command, so approving `curl <url>` permanently allowlists `curl` generally.',
+        'A permanent grant is never offered for a destructive command, so the Always button is absent here and Allow Once is the strongest answer available. `chmod` sits in this tier because it matches a destructive pattern, not because it is privileged in the usual sense — it was already high and moving it down would have weakened a default.',
     },
     {
       id: "critical",
       approvalMethod:
         "Denied at the policy gate unconditionally, then offered to the user as an interactive Allow / Deny prompt.",
       autoApprove:
-        "Never. Four independent guards refuse it, and it is unreachable from every permission grant and auto-approve setting.",
+        "Never. Refused before the grant store and the auto-approve settings are consulted, and unreachable from every one of them.",
       examples: [],
       limit:
-        "No registry assigns this tier — it is only synthesised at runtime for commands arriving from a remote device. On the desktop shell path it uses no biometric and no QR confirmation, just a dialog.",
+        "No command in the tier table is assigned this tier. It is only synthesised at runtime for commands arriving from a remote device. On the desktop shell path it uses no biometric and no QR confirmation, just a dialog.",
     },
   ] satisfies RiskTier[],
 
@@ -331,8 +391,9 @@ export const security = {
     },
     commandPolicy: {
       where: "config/command-policy.json",
-      blocks: "24 commands, including curl and wget.",
-      requiresApproval: "~50 more, including package managers, docker, systemctl, diskutil, crontab.",
+      blocks: "25 commands, including wget and curl, plus 36 blocked patterns. Counted from the file.",
+      requiresApproval:
+        "44 entries, and they are prefix patterns rather than bare binaries — `npm install` and `pip install` are listed, bare `npm` and `pip` are not, and the container entries are `docker run` / `docker exec` / `docker compose`. systemctl, service, launchctl, diskutil and crontab are listed. Counted from the file.",
       legacyFallback:
         "src/lib/command-validator.js:45-52 — blocks only 7 commands and requires approval for none. Used only if the policy file fails to load.",
     },
@@ -347,8 +408,12 @@ export const security = {
     "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
     "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
     "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
-    "The MCP bridge and the WiFi sync server bind all network interfaces by default and are reachable from the local network. See network.servers.",
-    "The native bridge accepts an X-Aartiq-Native-Token header but does not verify it; any local process can call its routes.",
+    "The WiFi sync server (3004) still binds every network interface by omission and has no token, Host or Origin check. The background task service (3999) still serves files on 0.0.0.0 with a wildcard CORS header. Neither was changed by the listener-authentication work. See network.servers.",
+    "The session token is per-process, so it changes on every restart. A client configured once — a phone, another machine, a scheduled job — has to be reconfigured, and remote mode is not a finished design because of it.",
+    "The token has to travel in the mcp-remote URL, because mcp-remote accepts a bare URL and nothing else. It can therefore appear in a process argument list and in a client's own logs. See aartiq-browser/docs-audit/issues/pairing-token-in-url.md.",
+    '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching, and a permanent grant has no lifetime. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
+    "A permanent grant is withheld for a fixed deny-list of network-capable, script-capable and destructive binaries. An unrecognised binary is not on that list, so it can still take an exact-match grant even though its tier is medium only because nothing is known about it.",
+    "The native bridge and the Agent API are both configured for port 46203. If both start, one fails to bind and the error is logged and swallowed, so it is not visible which one is answering. TODO(verify) — inferred from call order, not observed at runtime.",
   ],
 } as const;
 
@@ -363,10 +428,11 @@ export const network = {
       name: "MCP browser bridge",
       port: 3001,
       portIsEnvOverridable: true, // MCP_SERVER_PORT
-      defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
-      bindsAllInterfacesWhen: null, // no switch exists to restrict it
-      auth: "None on connect. CORS is '*'. A pairing token exists but SSE auto-confirms it; only per-tool risk approval gates individual calls.",
-      note: "listen(port, cb) is called with no host argument.",
+      defaultBindAddress: "127.0.0.1",
+      bindsAllInterfacesWhen:
+        "the security_mcpBridgeRemote setting is exactly true (defaults to false; no UI control sets it)",
+      auth: "A per-process token, required on every route including SSE. Host must be the loopback host and this listener's own port; any browser Origin must be on an allow-list of the app's own origins.",
+      note: "The token is generated by the server and rotates each start, so a Claude Desktop config written earlier is answered with 401 until Auto-Configure runs again. mcp-remote accepts only a bare URL, so the token travels as a query parameter.",
     },
     {
       id: "wifi-sync",
@@ -374,9 +440,9 @@ export const network = {
       port: 3004,
       portIsEnvOverridable: false,
       defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
-      bindsAllInterfacesWhen: null,
-      auth: "Handshake pairing code only. The command and desktop-control message types are not re-checked against it.",
-      note: "new WebSocketServer({ port }) is constructed with no host option.",
+      bindsAllInterfacesWhen: null, // no host argument is passed at all
+      auth: "Handshake pairing code only. The command and desktop-control message types are not re-checked against it, and no token, Host or Origin check is applied.",
+      note: "Unchanged by the listener-authentication work, and listed as an open issue: new WebSocketServer({ port }) binds every interface by omission, the same shape the MCP bridge had. Tracked in aartiq-browser/docs-audit/issues/wifi-sync-bind-address.md.",
     },
     {
       id: "native-bridge",
@@ -385,7 +451,7 @@ export const network = {
       portIsEnvOverridable: true, // AARTIQ_NATIVE_MAC_UI_PORT
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: null, // host is a hard-coded literal
-      auth: "None. Clients send X-Aartiq-Native-Token; the server never reads it.",
+      auth: "A token required on every route, read from ~/.aartiq-token (mode 0600), plus the same Host and Origin checks.",
       note: "TODO(verify) — this port is also the agent-api default, and the bridge's EADDRINUSE is logged and swallowed. Inferred from call order, not observed at runtime.",
     },
     {
@@ -395,7 +461,7 @@ export const network = {
       portIsEnvOverridable: false,
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: "config.remote === true (defaults to false; no UI, env var, or IPC path sets it)",
-      auth: "None. An anonymous caller is auto-registered as a limited-trust agent.",
+      auth: "A token, required on every HTTP route, plus the same Host and Origin checks. An unknown x-agent-id is still auto-registered, but as a limited-trust agent — it no longer stands in for authentication.",
     },
     {
       id: "background-service",
@@ -405,7 +471,7 @@ export const network = {
       defaultBindAddress: "0.0.0.0",
       bindsAllInterfacesWhen: null,
       auth: "None. Serves ~/Documents/Aartiq/public with Access-Control-Allow-Origin: *.",
-      note: "Started by `npm run service`, not by the browser app itself.",
+      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
     },
   ] satisfies NetworkServer[],
 
