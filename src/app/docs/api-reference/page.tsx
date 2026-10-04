@@ -164,7 +164,8 @@ const ipcCategories = [
       { name: "ollama-import-model", params: "{ modelName, filePath }", returns: "OllamaModel", description: "Import a GGUF model to Ollama" },
       { name: "apple-intelligence-status", returns: "AppleIntelligenceStatus", description: "Check Apple Intelligence runtime readiness and unsupported reasons on macOS" },
       { name: "apple-intelligence-summary", params: "text: string", returns: "AppleSummaryResult", description: "Generate a local summary through Foundation Models when available" },
-      { name: "apple-intelligence-generate-image", params: "{ prompt, outputPath? }", returns: "AppleImageResult", description: "Generate a local image through Apple frameworks when available" },
+      { name: "apple-intelligence-generate-image", params: "{ prompt, outputPath?, style? }", returns: "AppleImageResult", description: "Generate a local image through Image Playground (macOS 15.1+). Returns imagePath, not base64" },
+      { name: "apple-intelligence-genmoji", params: "{ prompt }", returns: "AppleGenmojiResult", description: "Generate a custom emoji from a description (macOS 15.4+). Returns genmojiPath, not base64" },
       { name: "get-ai-memory", returns: "MemoryData", description: "Get AI conversation memory" },
       { name: "save-vector-store", params: "data: VectorData", returns: "void", description: "Save vector store for RAG" }
     ]
@@ -255,79 +256,89 @@ const dataModels = [
       { name: "summaryAvailable", type: "boolean?", description: "Whether Foundation Models summary generation passed readiness checks" },
       { name: "summaryReason", type: "string?", description: "Why summaries are unavailable or blocked" },
       { name: "imageAvailable", type: "boolean?", description: "Whether Apple image generation is available right now" },
-      { name: "imageReason", type: "string?", description: "Why Apple image generation is unavailable" }
+      { name: "imageReason", type: "string?", description: "Why Apple image generation is unavailable" },
+      { name: "genmojiAvailable", type: "boolean?", description: "Whether Genmoji is available right now (macOS 15.4+)" },
+      { name: "genmojiReason", type: "string?", description: "Why Genmoji is unavailable" }
     ]
   }
 ];
 
+// Every example below calls window.electronAPI, the only bridge preload.js
+// exposes. Earlier versions of these examples named a global that no preload
+// creates, so each one threw before doing anything. Channels that map to no
+// preload method were removed rather than renamed.
 const codeExamples = {
-  basicTask: `// Create a scheduled PDF generation task
-const task = await window.electron.invoke('automation:create-task', {
+  basicTask: `// Create a scheduled task.
+const task = await window.electronAPI.scheduleTask({
   name: 'Daily Sales Report',
   type: 'pdf',
   trigger: {
     type: 'cron',
-    schedule: '0 8 * * *',  // Daily at 8 AM
+    schedule: '0 8 * * *',  // five fields: min hour dom mon dow
     timezone: 'America/New_York'
   },
   config: {
-    prompt: 'Generate a daily sales report based on the CRM data',
-    pdfOptions: {
-      template: 'professional',
-      includeCharts: true
-    }
+    prompt: 'Generate a daily sales report based on the CRM data'
   },
-  notifyOnComplete: true,
-  outputDir: '~/Documents/Aartiq/Reports'
+  notifyOnComplete: true
 });`,
 
-  shellExecution: `// Execute a shell command with risk level
-const result = await window.electron.invoke('execute-shell-command', {
+  shellExecution: `// Request a shell command. You do not get to assert that it runs.
+//
+// The handler routes through the capability controller first. An action that
+// is not pre-authorised comes back as a ticket rather than as output:
+//   { success: false, error: 'Approval required',
+//     needsApproval: true, ticketId, metadata }
+const result = await window.electronAPI.executeShellCommand({
   rawCommand: 'ls -la ~/Documents',
-  reason: 'User requested directory listing',
-  riskLevel: 'low',
-  preApproved: false
+  reason: 'User requested directory listing'
 });
 
-if (result.success) {
+if (result.needsApproval) {
+  // Show the ticket to the human. Do not approve it on their behalf.
+  showApprovalDialog(result.ticketId, result.metadata);
+} else if (result.success) {
   console.log('Output:', result.stdout);
 } else {
   console.error('Error:', result.stderr);
-}`,
+}
 
-  browserControl: `// Capture screenshot and find element
-const screenshot = await window.electron.invoke('capture-browser-view-screenshot');
-const clicked = await window.electron.invoke('find-and-click-text', 'Submit Form');
+// There is no preApproved flag documented here on purpose: it is an internal
+// field, and a flag a caller can set to skip human approval is a flag that
+// would eventually be set by something other than a human.`,
+
+  browserControl: `// Capture the active view
+const screenshot = await window.electronAPI.captureBrowserViewScreenshot();
+
+// Find visible text and click it
+const clicked = await window.electronAPI.findAndClickText('Submit Form');
 
 // Native-first OCR capture
-const ocr = await window.electron.invoke('ocr-capture-words');
+const ocr = await window.electronAPI.ocrCaptureWords();
 console.log('OCR provider:', ocr.provider);
 
-// Resolve and click a desktop target
-const crossApp = await window.electron.invoke('ocr-click', {
-  target: 'Run',
-  useAi: true
-});
+// Resolve and click a desktop target outside the app
+const crossApp = await window.electronAPI.ocrClick('Run', true);
 console.log(crossApp);
 
-// Navigate to URL
-await window.electron.invoke('navigate-to', 'https://example.com');
+// Navigate. This one is send(), not invoke(), so it does not resolve.
+window.electronAPI.navigateTo('https://example.com');
 
 // Get all open tabs
-const tabs = await window.electron.invoke('get-open-tabs');
+const tabs = await window.electronAPI.getOpenTabs();
 console.log(\`Open tabs: \${tabs.length}\`);`,
 
   mobileSync: `// Get WiFi sync info
-const syncInfo = await window.electron.invoke('get-wifi-sync-info');
+const syncInfo = await window.electronAPI.getWifiSyncInfo();
 console.log('Connected:', syncInfo.connected);
 console.log('Mobile:', syncInfo.mobileDevice);
 
 // Generate QR for pairing
-const qrData = await window.electron.invoke('get-wifi-sync-qr');
+const qrData = await window.electronAPI.getWifiSyncQr();
 document.getElementById('qr').src = \`data:image/png;base64,\${qrData}\`;`,
 
   aiGeneration: `// Generate content with AI
-const response = await window.electron.invoke('llm-generate-chat-content', [
+const response = await window.electronAPI.generateChatContent([
   { role: 'user', content: 'Summarize the top 5 tech news from today' }
 ], {
   model: 'gemini-2.0-flash',
@@ -336,19 +347,34 @@ const response = await window.electron.invoke('llm-generate-chat-content', [
 });
 
 // Fetch the latest official provider catalog
-const openAIModels = await window.electron.invoke('llm-get-provider-models', 'openai', {
+const openAIModels = await window.electronAPI.getProviderModels('openai', {
   forceRefresh: true
 });
 console.log('Recommended OpenAI model:', openAIModels.recommended?.id);
 
-// Preflight Apple Intelligence before using it on macOS
-const appleStatus = await window.electron.invoke('apple-intelligence-status');
-if (appleStatus.summaryAvailable) {
-  const summary = await window.electron.invoke(
-    'apple-intelligence-summary',
+// Preflight Apple Intelligence before using it on macOS. Each command has its
+// own OS floor, and each reports its own reason when unavailable.
+const appleStatus = await window.electronAPI.getAppleIntelligenceStatus();
+
+if (appleStatus.summaryAvailable) {          // macOS 26.0+
+  const summary = await window.electronAPI.summarizeWithAppleIntelligence(
     'Summarize the active page for me.'
   );
-  console.log(summary.text);
+  console.log(summary.summary);                // the field is .summary
+}
+
+if (appleStatus.imageAvailable) {             // macOS 15.1+
+  const image = await window.electronAPI.generateAppleIntelligenceImage({
+    prompt: 'A cinematic comet over a desktop browser'
+  });
+  console.log(image.imagePath);                // a path, not base64
+}
+
+if (appleStatus.genmojiAvailable) {           // macOS 15.4+
+  const emoji = await window.electronAPI.generateGenmoji({
+    prompt: 'a robot chef'
+  });
+  console.log(emoji.genmojiPath);
 }`
 };
 
@@ -402,7 +428,16 @@ export default function APIReferencePage() {
             IPC <span className="text-white/20">Handlers</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-            All handlers are called via <code className="rounded bg-white/5 px-2 py-1 text-sky-400">window.electron.invoke(channel, ...args)</code>.
+            The bridge is <code className="rounded bg-white/5 px-2 py-1 text-sky-400">window.electronAPI</code>,
+            the single global <code className="rounded bg-white/5 px-2 py-1">contextBridge</code> exposes in{" "}
+            <code className="rounded bg-white/5 px-2 py-1 text-sky-400">preload.js</code>. Each channel is
+            reached through a named method on it, not through a generic invoke.
+          </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/35">
+            Correction: an earlier version of this page stated a{" "}
+            <code className="rounded bg-white/5 px-2 py-1">window.electron</code> global. No preload
+            creates it, so every example written against it threw a TypeError on its first line. The
+            examples above were rewritten against methods verified to exist.
           </p>
         </div>
 

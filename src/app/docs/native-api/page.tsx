@@ -53,7 +53,7 @@ const apiCategories = [
     id: "system",
     name: "System APIs",
     icon: Cpu,
-    fileRef: "src/main/handlers/system.js",
+    fileRef: "src/main/handlers/system-handlers.js",
     color: "from-blue-500/20 to-indigo-500/20",
     borderColor: "border-blue-500/30",
     iconColor: "text-blue-400",
@@ -74,7 +74,7 @@ const apiCategories = [
     id: "window",
     name: "Window Management",
     icon: Monitor,
-    fileRef: "src/main/handlers/window.js",
+    fileRef: "src/main/handlers/app-handlers.js",
     color: "from-emerald-500/20 to-teal-500/20",
     borderColor: "border-emerald-500/30",
     iconColor: "text-emerald-400",
@@ -95,7 +95,7 @@ const apiCategories = [
     id: "input",
     name: "Input Control",
     icon: Keyboard,
-    fileRef: "src/main/handlers/input.js",
+    fileRef: "src/main/handlers/browser-handlers.js",
     color: "from-purple-500/20 to-fuchsia-500/20",
     borderColor: "border-purple-500/30",
     iconColor: "text-purple-400",
@@ -116,7 +116,7 @@ const apiCategories = [
     id: "files",
     name: "File System",
     icon: FolderOpen,
-    fileRef: "src/main/handlers/files.js",
+    fileRef: "src/main/handlers/file-handlers.js",
     color: "from-amber-500/20 to-orange-500/20",
     borderColor: "border-amber-500/30",
     iconColor: "text-amber-400",
@@ -137,7 +137,7 @@ const apiCategories = [
     id: "network",
     name: "Network & URLs",
     icon: Wifi,
-    fileRef: "src/main/handlers/network.js",
+    fileRef: "src/main/handlers/browser-handlers.js",
     color: "from-cyan-500/20 to-sky-500/20",
     borderColor: "border-cyan-500/30",
     iconColor: "text-cyan-400",
@@ -155,7 +155,7 @@ const apiCategories = [
     id: "media",
     name: "Media Control",
     icon: Volume2,
-    fileRef: "src/main/handlers/media.js",
+    fileRef: "src/main/handlers/system-handlers.js",
     color: "from-rose-500/20 to-pink-500/20",
     borderColor: "border-rose-500/30",
     iconColor: "text-rose-400",
@@ -192,133 +192,91 @@ const apiCategories = [
     id: "apple",
     name: "Apple Intelligence",
     icon: Sparkles,
-    fileRef: "src/lib/native-panels/",
+    fileRef: "src/lib/apple-intelligence.js",
     color: "from-sky-500/20 to-violet-500/20",
     borderColor: "border-sky-500/30",
     iconColor: "text-sky-300",
-    description: "macOS-only native AI bridge for Foundation Models, Apple readiness checks, and local image generation.",
+    description: "macOS-only native AI bridge for Foundation Models, Apple readiness checks, and local image and emoji generation. Each command has its own OS floor: status reports all three separately, summary needs 26.0, image needs 15.1, genmoji needs 15.4. Off macOS all four return { success: false, error: 'Apple Intelligence is only available on macOS.' }.",
     apis: [
-      { name: "apple-intelligence-status", desc: "Check if Apple Intelligence is supported, enabled, and ready", returns: "AppleIntelligenceStatus" },
-      { name: "apple-intelligence-summary", desc: "Generate a local summary through Foundation Models", returns: "AppleSummaryResult" },
-      { name: "apple-intelligence-generate-image", desc: "Generate a local image through Apple frameworks", returns: "AppleImageResult" },
+      { name: "apple-intelligence-status", desc: "Report per-command readiness and the reason any command is unavailable", returns: "AppleIntelligenceStatus" },
+      { name: "apple-intelligence-summary", desc: "Summarize a string through Foundation Models (macOS 26.0+)", returns: "AppleSummaryResult" },
+      { name: "apple-intelligence-generate-image", desc: "Generate an image file through Image Playground (macOS 15.1+)", returns: "AppleImageResult" },
+      { name: "apple-intelligence-genmoji", desc: "Generate a custom emoji from a description (macOS 15.4+)", returns: "AppleGenmojiResult" },
       { name: "show-mac-native-panel", desc: "Open native SwiftUI panel modes on macOS", returns: "PanelResult" },
       { name: "update-native-mac-ui-state", desc: "Push state from Electron into native macOS panels", returns: "void" }
     ]
   }
 ];
 
+// Every example below calls a method that exists on window.electronAPI in
+// aartiq-browser/preload.js. Earlier versions of this page routed calls
+// through a global that no preload creates, using channel names that appear
+// in neither the preload bridge nor the main process, so every one of those
+// examples threw on the first line. A method that could not be verified was
+// removed rather than renamed, because a renamed example is still a false
+// example.
+// Correction banner. The rest of this page's tables describe a capability
+// surface that the renderer cannot currently reach, and every code example
+// used to route calls through a global that no preload creates. The examples
+// below were rewritten against methods verified to exist in preload.js. The
+// tables are labelled "documented, not reachable" rather than deleted,
+// because the underlying capability modules may still exist in src/lib/ even
+// though nothing exposes them over the bridge.
+const REACHABILITY_WARNING =
+  "The only bridge preload.js exposes is window.electronAPI. The previous " +
+  "version of this page routed every example through a different global that " +
+  "no preload creates, so each one threw a TypeError before reaching the " +
+  "channel it named.";
+
 const codeExamples = {
-  systemInfo: `// Get comprehensive system information
-const info = await window.electron.invoke('get-system-info');
-console.log(info);
-// {
-//   platform: 'darwin',
-//   arch: 'arm64',
-//   version: '14.2.1',
-//   cpu: { model: 'Apple M2 Pro', cores: 12, speed: 3.5 },
-//   memory: { total: 32768, free: 16384 },
-//   disk: { total: 1000245632000, free: 500122931200 },
-//   uptime: 864000 // seconds
-// }`,
+  system: `// window.electronAPI is the only bridge preload.js exposes.
+// Earlier examples on this page called a different global and threw.
 
-  windowControl: `// Control window positioning
-await window.electron.invoke('set-window-bounds', {
-  windowId: 'main',
-  x: 100,
-  y: 100,
-  width: 1200,
-  height: 800
-});
+const platform = await window.electronAPI.getPlatform();
+// 'darwin' | 'win32' | 'linux'
 
-// Minimize, maximize, close
-await window.electron.invoke('minimize-window', 'main');
-await window.electron.invoke('maximize-window', 'main');
-await window.electron.invoke('close-window', 'main');
+const isOnline = await window.electronAPI.getIsOnline();
+console.log(platform, isOnline);`,
 
-// Set always on top
-await window.electron.invoke('set-window-always-on-top', {
-  windowId: 'main',
-  alwaysOnTop: true
-});`,
+  window: `// Window control is fire-and-forget: send(), not invoke(), so there is
+// nothing to await and nothing to check the result of.
 
-  inputSimulation: `// Type text
-await window.electron.invoke('type-text', 'Hello, World!');
+window.electronAPI.minimizeWindow();
+window.electronAPI.maximizeWindow();
 
-// Press key combinations
-await window.electron.invoke('press-hot-key', {
-  modifiers: ['command'],
-  key: 'a'
-}); // Select all
+// Bring a tab view to the front
+window.electronAPI.activateView({ tabId });`,
 
-await window.electron.invoke('press-hot-key', {
-  modifiers: ['command', 'shift'],
-  key: '4'
-}); // Screenshot selection
+  input: `// Type into the focused element of the active page. typeText takes a
+// selector and the text, and routes through the same input path the
+// automation engine uses.
 
-// Mouse control
-await window.electron.invoke('move-mouse', { x: 500, y: 300 });
-await window.electron.invoke('click-mouse', { button: 'left' });
-await window.electron.invoke('scroll-mouse', { deltaY: -100 });`,
+await window.electronAPI.typeText('#search', 'Hello, World!');
 
-  fileOperations: `// Read a file
-const content = await window.electron.invoke('read-file', {
-  path: '~/Documents/example.txt'
-});
+// There is no exposed press-hot-key, press-key, click-mouse, move-mouse
+// or scroll-mouse method. Those examples were removed: renaming them to a
+// different method would have been a new false claim.`,
 
-// Write to a file
-await window.electron.invoke('write-file', {
-  path: '~/Documents/output.txt',
-  content: 'Hello from Aartiq!'
-});
+  files: `// The renderer bridge has no read-file, write-file, list-directory or
+// create-directory method. File access goes through the sandboxed
+// automation layer and the plugin API, both of which route through
+// capability checks and approval.
 
-// List directory
-const files = await window.electron.invoke('list-directory', {
-  path: '~/Documents'
-});
-console.log(files);
-// [{ name: 'file.txt', isDirectory: false, size: 1024 }, ...]
+await window.electronAPI.pluginApi.readFile(path);
+await window.electronAPI.pluginApi.writeFile(path, content);`,
 
-// Create directory
-await window.electron.invoke('create-directory', {
-  path: '~/Documents/NewFolder'
-});`,
+  network: `// The renderer bridge has no http-request or download-file method.
+// Outbound requests go through the network security layer in the main
+// process, which applies its own policy; there is deliberately no
+// renderer-side passthrough for arbitrary URLs or headers.`,
 
-  networkRequest: `// Make HTTP request
-const response = await window.electron.invoke('http-request', {
-  method: 'GET',
-  url: 'https://api.example.com/data',
-  headers: { 'Authorization': 'Bearer token' }
-});
-console.log(response);
-// { status: 200, data: { ... }, headers: {...} }
+  media: `// Set system output volume, 0-100.
+await window.electronAPI.setVolume(50);
 
-// Download file
-const localPath = await window.electron.invoke('download-file', {
-  url: 'https://example.com/file.pdf',
-  destination: '~/Downloads/'
-});
-
-// Open URL
-await window.electron.invoke('open-url', 'https://example.com');`,
-
-  mediaControl: `// Set volume (0-100)
-await window.electron.invoke('set-volume', 50);
-
-// Mute/unmute
-await window.electron.invoke('mute-audio', true);
-
-// Take screenshot
-const screenshot = await window.electron.invoke('screenshot', {
-  format: 'png',
-  quality: 100
-});
-// Returns base64 encoded image
-
-// Take screenshot of region
-const region = await window.electron.invoke('screenshot', {
-  x: 100, y: 100,
-  width: 800, height: 600,
-  format: 'png'
+// Screenshots go through the capture channels, not a generic 'screenshot'
+const png = await window.electronAPI.captureBrowserViewScreenshot();
+const region = await window.electronAPI.captureScreenRegion({
+  x: 100, y: 100, width: 800, height: 600
 });`,
 
   vision: `// Native-first OCR capture
@@ -346,189 +304,141 @@ console.log(status);
 //   imageReason: 'Apple image generation is not supported or not available right now on this Mac.'
 // }
 
-// Generate a local summary only when summaryAvailable === true
+// Generate a local summary only when summaryAvailable === true (macOS 26.0+)
 const summary = await window.electronAPI.summarizeWithAppleIntelligence(
   "Summarize this browser content for me."
 );
 
-// Generate a local image only when imageAvailable === true
+// Generate a local image only when imageAvailable === true (macOS 15.1+)
 const image = await window.electronAPI.generateAppleIntelligenceImage({
   prompt: "A cinematic comet streaking over a desktop browser UI"
+});
+
+// Generate a custom emoji only when genmojiAvailable === true (macOS 15.4+)
+const emoji = await window.electronAPI.generateGenmoji({
+  prompt: "a robot chef"
 });`,
 
-  nativeApiCall: `// Full example: Open app, type, and save
-async function createDocument() {
-  // Open TextEdit
-  await window.electron.invoke('open-app', 'TextEdit');
-  
-  // Wait for app to focus
-  await delay(500);
-  
-  // Type content
-  await window.electron.invoke('type-text', '# My Document\\n\\n');
-  await window.electron.invoke('type-text', 'This was created by Aartiq!');
-  
-  // Save with Cmd+S
-  await window.electron.invoke('press-hot-key', {
-    modifiers: ['command'],
-    key: 's'
-  });
-  
-  // Wait for save dialog, type filename
-  await delay(300);
-  await window.electron.invoke('type-text', 'my-document');
-  await window.electron.invoke('press-key', 'enter');
-}
+  nativeApiCall: `// Approval is the point, not an obstacle to route around.
+//
+// A risky action does not run. It raises a ticket that the UI shows, and the
+// human decides. The ticket is bound to a hash of the exact action and its
+// arguments, expires after five minutes, and is single-use, so approving one
+// command does not approve a different one afterwards.
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}`
+// Listen for tickets raised by the main process. The callback returns an
+// unsubscribe function; keep it or you leak the listener.
+const stop = window.electronAPI.onApprovalRequired((ticket) => {
+  // ticket carries the action, the arguments, and a risk tier.
+  console.log(ticket.action, ticket.riskTier);
+
+  // Decide. These take a ticket id, not a command: you cannot approve an
+  // action you were not shown.
+  window.electronAPI.approveTicket(ticket.id);
+  // or
+  window.electronAPI.denyTicket(ticket.id, 'not this time');
+});
+
+stop(); // later, when the view unmounts
+
+const pending = await window.electronAPI.getPendingApprovals();
+
+// There is no parameter that skips this on any entry point. Not on a URL,
+// not on an IPC channel, not on the CLI. A command that runs without a
+// ticket did not ask, and that is the bug to report.`
 };
 
+// These four entries used to cite files that do not exist:
+// AppleIntelligenceBridge.swift, and SiriShortcutsIntegration.ts. The Swift
+// entry is now the panel view that exists, and the App Intents entry is the
+// file that actually declares the 20 intents. Writing Tools is marked
+// absent because no code path calls the macOS Writing Tools service.
 const appleAdvancedPaths = [
   {
     title: "Foundation Models",
-    description: "Use Apple's on-device language model for summarization, structured output, and tool-aware generation on supported Macs.",
-    fileRef: "src/lib/native-panels/AppleIntelligenceBridge.swift"
+    description: "Apple's on-device language model. Reached through the compiled helper, gated on macOS 26.0. Not a general-purpose generation API: Aartiq calls it to summarize.",
+    fileRef: "src/lib/apple-intelligence.swift",
+    status: "available"
   },
   {
-    title: "Image Playground / ImageCreator",
-    description: "Use Apple's native image stack for Mac-only creative workflows, either with programmatic generation or Apple-controlled UI.",
-    fileRef: "src/lib/native-panels/AppleIntelligenceBridge.swift"
+    title: "Image Playground",
+    description: "Native image generation, gated on macOS 15.1. Returns a file path, not base64.",
+    fileRef: "src/lib/apple-intelligence.swift",
+    status: "available"
+  },
+  {
+    title: "Genmoji",
+    description: "Custom emoji from a description, gated on macOS 15.4. Same helper, different command.",
+    fileRef: "src/lib/apple-intelligence.swift",
+    status: "available"
+  },
+  {
+    title: "Apple Intelligence panel",
+    description: "The native SwiftUI surface that calls the summary and image endpoints on the loopback bridge.",
+    fileRef: "src/lib/native-panels/AppleIntelligencePanelView.swift",
+    status: "available"
+  },
+  {
+    title: "App Intents",
+    description: "Twenty intents registered for Siri, five of which call a bridge route that is not served. See the Apple integration page for which ones work.",
+    fileRef: "src/lib/native-panels/AppIntents.swift",
+    status: "partial"
   },
   {
     title: "Writing Tools",
-    description: "For richer editor integration, custom AppKit views can expose text directly to Apple's Writing Tools instead of routing everything through chat.",
-    fileRef: "src/lib/native-panels/"
-  },
-  {
-    title: "Assistant Schemas",
-    description: "For deeper Siri and Apple Intelligence integration, App Intents domains and schemas can expose Aartiq actions and content to Apple's assistant layer.",
-    fileRef: "src/lib/SiriShortcutsIntegration.ts"
+    description: "Not implemented. No code path calls the macOS Writing Tools service. The rewrite box in the panel is Aartiq's own prompt box and is not relabelled to cover this row.",
+    fileRef: null,
+    status: "absent"
   }
 ];
 
-const typeDefinitions = `// Type definitions for all Native APIs
+// Shapes transcribed from the implementation, not from the design document.
+const typeDefinitions = `// Response shapes, transcribed from the code.
+//
+// Every field of ResponsePayload in src/lib/apple-intelligence.swift. The
+// optional fields are omitted when the matching command is unavailable, so
+// read the availability flag before the value.
+interface AppleIntelligenceResponse {
+  success: boolean;
+  error?: string;
 
-interface SystemInfo {
-  platform: 'darwin' | 'windows' | 'linux';
-  arch: string;
-  version: string;
-  cpu: { model: string; cores: number; speed: number };
-  memory: { total: number; free: number };
-  disk: { total: number; free: number };
-  uptime: number;
+  // Every command
+  available?: boolean;
+  osVersion?: string;
+
+  // Summaries, via Foundation Models. macOS 26.0+
+  supportsSummaries?: boolean;
+  summaryAvailable?: boolean;
+  summaryReason?: string;   // present when it is unavailable
+  summary?: string;
+
+  // Image Playground. macOS 15.1+
+  supportsImageGeneration?: boolean;
+  imageAvailable?: boolean;
+  imageReason?: string;
+  imagePath?: string;        // a filesystem path, not base64
+  availableStyles?: string[];
+
+  // Genmoji. macOS 15.4+
+  supportsGenmoji?: boolean;
+  genmojiAvailable?: boolean;
+  genmojiReason?: string;
+  genmojiPath?: string;      // a filesystem path, not base64
 }
 
-interface Display {
-  id: number;
-  name: string;
-  bounds: { x: number; y: number; width: number; height: number };
-  isPrimary: boolean;
-  scaleFactor: number;
-}
+// Off macOS, every one of these resolves to exactly:
+//   { success: false, error: APPLE_INTELLIGENCE_UNAVAILABLE }
+// where the message is "Apple Intelligence is only available on macOS."
 
-interface Window {
+// Approval ticket, from src/lib/approval-gate.js: bound to a hash of the
+// exact action and its arguments, five minute TTL, single use.
+interface ApprovalTicket {
   id: string;
-  title: string;
-  app: AppInfo;
-  bounds: { x: number; y: number; width: number; height: number };
-  isMinimized: boolean;
-  isMaximized: boolean;
-}
-
-interface AppInfo {
-  name: string;
-  bundleId: string;
-  pid: number;
-  icon?: string;
-}
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface FileInfo {
-  name: string;
-  path: string;
-  isDirectory: boolean;
-  size: number;
-  modifiedAt: Date;
-}
-
-interface NetworkStatus {
-  connected: boolean;
-  type: 'wifi' | 'ethernet' | 'cellular' | 'none';
-  strength?: number;
-}
-
-interface HttpResponse {
-  status: number;
-  data: any;
-  headers: Record<string, string>;
-}
-
-// API Methods
-
-// System
-invoke('get-system-info'): Promise<SystemInfo>
-invoke('get-displays'): Promise<Display[]>
-invoke('set-display-mode', { displayId, width, height, refreshRate }): Promise<void>
-invoke('get-system-preferences'): Promise<Preferences>
-invoke('set-system-preference', { key, value }): Promise<void>
-invoke('lock-screen'): Promise<void>
-invoke('sleep'): Promise<void>
-invoke('restart'): Promise<void>
-invoke('shutdown'): Promise<void>
-
-// Window
-invoke('get-windows'): Promise<Window[]>
-invoke('focus-window', { windowId }): Promise<void>
-invoke('set-window-bounds', { windowId, x, y, width, height }): Promise<void>
-invoke('minimize-window', { windowId }): Promise<void>
-invoke('maximize-window', { windowId }): Promise<void>
-invoke('close-window', { windowId }): Promise<void>
-invoke('set-window-always-on-top', { windowId, alwaysOnTop }): Promise<void>
-
-// Input
-invoke('type-text', { text }): Promise<void>
-invoke('press-key', { key }): Promise<void>
-invoke('press-hot-key', { modifiers, key }): Promise<void>
-invoke('move-mouse', { x, y }): Promise<void>
-invoke('click-mouse', { button, x?, y? }): Promise<void>
-invoke('scroll-mouse', { deltaX, deltaY }): Promise<void>
-invoke('drag-mouse', { fromX, fromY, toX, toY }): Promise<void>
-invoke('get-mouse-position'): Promise<Point>
-invoke('get-active-app'): Promise<AppInfo>
-
-// Files
-invoke('read-file', { path, encoding? }): Promise<string | Buffer>
-invoke('write-file', { path, content, encoding? }): Promise<void>
-invoke('append-file', { path, content }): Promise<void>
-invoke('delete-file', { path }): Promise<void>
-invoke('move-file', { source, destination }): Promise<void>
-invoke('copy-file', { source, destination }): Promise<void>
-invoke('list-directory', { path }): Promise<FileInfo[]>
-invoke('create-directory', { path }): Promise<void>
-invoke('get-file-info', { path }): Promise<FileInfo>
-
-// Network
-invoke('http-request', { method, url, headers?, body?, timeout? }): Promise<HttpResponse>
-invoke('download-file', { url, destination, filename? }): Promise<string>
-invoke('open-url', { url }): Promise<void>
-invoke('get-local-ip'): Promise<string>
-invoke('ping', { host }): Promise<number>
-invoke('get-network-status'): Promise<NetworkStatus>
-
-// Media
-invoke('set-volume', { level }): Promise<void>
-invoke('get-volume'): Promise<number>
-invoke('mute-audio', { muted }): Promise<void>
-invoke('play-pause-media'): Promise<void>
-invoke('next-track'): Promise<void>
-invoke('prev-track'): Promise<void>
-invoke('screenshot', { x?, y?, width?, height?, format?, quality? }): Promise<string>`;
+  action: string;
+  params: Record<string, unknown>;
+  riskTier: string;
+  expiresAt: number;         // epoch milliseconds
+}`;
 
 export default function NativeAPIPage() {
   const [activeCategory, setActiveCategory] = useState("system");
@@ -562,21 +472,41 @@ export default function NativeAPIPage() {
         </h1>
 
         <p className="max-w-3xl text-xl font-medium leading-relaxed text-white/50">
-          System-level APIs exposed through Electron IPC channels. Handlers are registered in 
-          <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/core/ipc-handlers.js</code> 
-          and organized per domain in 
-          <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/main/handlers/</code>. 
-          All APIs accessible via <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">window.electron.invoke()</code> through the preload bridge.
+          System-level APIs exposed through Electron IPC channels, registered in
+          <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">main.js</code>
+          and organized per domain in
+          <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/main/handlers/</code>.
+          The bridge is <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">window.electronAPI</code>.
         </p>
+
+        <div className="mt-8 max-w-3xl rounded-2xl border border-amber-500/25 bg-amber-500/[0.04] p-6">
+          <p className="text-sm font-bold uppercase tracking-wider text-amber-400/80">
+            Two corrections to this page
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-white/50">
+            {REACHABILITY_WARNING}
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-white/50">
+            The API tables below are a design reference, not a list you can call. Of the 61 methods
+            this page listed, 46 have no IPC channel of that name in either the preload bridge or the
+            main process — there is no <code className="font-mono text-white/70">read-file</code>,
+            no <code className="font-mono text-white/70">http-request</code>, no{" "}
+            <code className="font-mono text-white/70">press-hot-key</code>. The code examples below
+            were rewritten against methods verified to exist; the tables are kept because the
+            capability modules may still live in <code className="font-mono text-white/70">src/lib/</code>{" "}
+            with nothing exposing them. See{" "}
+            <code className="font-mono text-white/70">aartiq-browser/docs-audit/feature-triage.md</code>.
+          </p>
+        </div>
 
         {/* Quick Stats */}
         <div className="mt-12 grid gap-6 sm:grid-cols-4">
           {[
-            { icon: Box, label: "APIs", value: "60+", color: "text-blue-400", border: "border-blue-500/20" },
-            { icon: Cpu, label: "System", value: "9", color: "text-emerald-400", border: "border-emerald-500/20" },
-            { icon: Monitor, label: "Window", value: "9", color: "text-purple-400", border: "border-purple-500/20" },
-            { icon: Eye, label: "Visual", value: "5", color: "text-rose-300", border: "border-rose-500/20" },
-            { icon: Sparkles, label: "Apple AI", value: "5", color: "text-sky-300", border: "border-sky-500/20" }
+            { icon: Box, label: "Documented", value: "61", color: "text-blue-400", border: "border-blue-500/20" },
+            { icon: Cpu, label: "Reachable", value: "15", color: "text-emerald-400", border: "border-emerald-500/20" },
+            { icon: Monitor, label: "Unreachable", value: "46", color: "text-purple-400", border: "border-purple-500/20" },
+            { icon: Eye, label: "Visual", value: "4", color: "text-rose-300", border: "border-rose-500/20" },
+            { icon: Sparkles, label: "Apple AI", value: "4", color: "text-sky-300", border: "border-sky-500/20" }
           ].map((stat) => (
             <div key={stat.label} className={`rounded-2xl border ${stat.border} bg-white/5 p-6 text-center`}>
               <stat.icon size={32} className={`mx-auto mb-4 ${stat.color}`} />
