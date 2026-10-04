@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, ShieldCheck, Cloud, Repeat, Bot, Globe, Database, Terminal, Sparkles, ExternalLink, Layers } from "lucide-react";
+import { Zap, ShieldCheck, Cloud, Repeat, Bot, Globe, Database, Terminal, Sparkles, ExternalLink, Layers, Lock, Fingerprint } from "lucide-react";
 
 const features = [
   {
@@ -51,6 +51,30 @@ const features = [
     description: "Ollama integration for fully private local inference with no cloud dependency — `src/service/ollama-manager.js`, `src/service/model-selector.js`.",
     icon: Database,
     color: "text-indigo-400"
+  },
+  {
+    name: "Master PIN & OS Keychain",
+    description: "PBKDF2-SHA256 (100,000 rounds) Master PIN secured in Native OS Keychains (Apple Keychain, Windows DPAPI, Linux Secret Service) with 5-attempt lockout — `src/lib/MasterPINService.ts`.",
+    icon: Lock,
+    color: "text-emerald-400"
+  },
+  {
+    name: "Dual-Gate Biometrics",
+    description: "Permission relay binding Master PIN and mobile device lock (Android Screen Lock / biometrics) for remote and high-risk action gating — `src/lib/PermissionRelayService.ts`.",
+    icon: Fingerprint,
+    color: "text-cyan-400"
+  },
+  {
+    name: "Unified Sessions",
+    description: "Unified aggregator synchronizing live tabs, history, automation tasks, permissions, and sync snapshots across desktop and mobile — `src/lib/UnifiedSessionManager.ts`.",
+    icon: Repeat,
+    color: "text-violet-400"
+  },
+  {
+    name: "OS-Level Sandboxing",
+    description: "macOS Seatbelt, Linux bubblewrap, and Windows AppContainer + Job Objects with fail-closed directory and network confinement — `src/core/sandbox-executor.js`.",
+    icon: ShieldCheck,
+    color: "text-red-400"
   },
 ];
 
