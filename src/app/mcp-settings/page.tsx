@@ -151,7 +151,7 @@ const architecture: ArchCard[] = [
     color: 'text-sky-400',
     body: 'The stdio server never talks to the browser directly. A BridgeClient forwards each tool call over plain HTTP to the browser process, which alone holds the real capabilities.',
     points: [
-      { text: `Default host ${net.nativeBridge.defaultBindAddress}, default port ${net.nativeBridge.port} — loopback only. Note that both servers default to this same port.`, refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
+      { text: `Default host ${net.nativeBridge.defaultBindAddress}, default port ${net.nativeBridge.port} — loopback only. BridgeClient talks to the native bridge; the agent API moved to ${net.agentApi.port}, so the two no longer share a port.`, refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
       { text: 'BridgeClient class with per-request timeout and AI response polling.', refs: [{ label: 'server/bridge-client.js:9', url: `${GH}/aartiq-mcp/server/bridge-client.js#L9-L12` }] },
     ],
   },
