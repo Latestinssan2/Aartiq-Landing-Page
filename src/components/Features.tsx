@@ -23,7 +23,7 @@ const features = [
     color: "text-green-400"
   },
   {
-    name: "Three-Layer Security",
+    name: "Six-Layer Security",
     description: "Visual sandbox (OCR-only view), syntactic firewall, and human-in-the-loop authorization — `src/lib/Security.ts`, `src/lib/SecurityValidator.js`.",
     icon: Layers,
     color: "text-cyan-400"

@@ -1,5 +1,6 @@
 "use client";
 
+import { net } from "@/data/facts";
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -141,7 +142,7 @@ const architecture: ArchCard[] = [
     points: [
       { text: 'ListTools / CallTool request handlers over the MCP SDK.', refs: [{ label: 'server/index.js:1185-1192', url: `${GH}/aartiq-mcp/server/index.js#L1185-L1192` }] },
       { text: 'Tool dispatch through handleToolCall.', refs: [{ label: 'server/index.js:892', url: `${GH}/aartiq-mcp/server/index.js#L892` }] },
-      { text: 'Bridge host comes from AARTIQ_BRIDGE_PORT, default 46203.', refs: [{ label: 'server/index.js:11-12', url: `${GH}/aartiq-mcp/server/index.js#L11-L12` }] },
+      { text: `Bridge host comes from AARTIQ_BRIDGE_PORT, default ${net.nativeBridge.port}.`, refs: [{ label: 'server/index.js:11-12', url: `${GH}/aartiq-mcp/server/index.js#L11-L12` }] },
     ],
   },
   {
@@ -150,7 +151,7 @@ const architecture: ArchCard[] = [
     color: 'text-sky-400',
     body: 'The stdio server never talks to the browser directly. A BridgeClient forwards each tool call over plain HTTP to the browser process, which alone holds the real capabilities.',
     points: [
-      { text: 'Default host 127.0.0.1, default port 46203 — loopback only, no external exposure.', refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
+      { text: `Default host ${net.nativeBridge.defaultBindAddress}, default port ${net.nativeBridge.port} — loopback only. Note that both servers default to this same port.`, refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
       { text: 'BridgeClient class with per-request timeout and AI response polling.', refs: [{ label: 'server/bridge-client.js:9', url: `${GH}/aartiq-mcp/server/bridge-client.js#L9-L12` }] },
     ],
   },
@@ -171,7 +172,7 @@ const architecture: ArchCard[] = [
     color: 'text-amber-400',
     body: 'The browser also exposes its own tools to MCP clients internally and can register approved external MCP servers (SSE/stdio) as tool providers.',
     points: [
-      { text: 'The app knowledge stores that the browser exposes tools via an MCP server (port 3001).', refs: [{ label: 'aartiq-mcp/server/index.js:700-703', url: `${GH}/aartiq-mcp/server/index.js#L700-L703` }] },
+      { text: `The app knowledge stores that the browser exposes tools via an MCP server (port ${net.mcpBridge.port}).`, refs: [{ label: 'aartiq-mcp/server/index.js:700-703', url: `${GH}/aartiq-mcp/server/index.js#L700-L703` }] },
       { text: 'External MCP servers connect via SSE or stdio through the registry.', refs: [{ label: 'src/lib/mcp-server-registry.js:2-31', url: `${GH}/aartiq-browser/src/lib/mcp-server-registry.js#L2-L31` }] },
       { text: 'In-app MCP server start(port) entry.', refs: [{ label: 'src/lib/mcp-browser-server.js:1455', url: `${GH}/aartiq-browser/src/lib/mcp-browser-server.js#L1455` }] },
     ],
@@ -189,12 +190,13 @@ interface SecurityItem {
 const securityModel: SecurityItem[] = [
   {
     icon: Globe,
-    title: 'Loopback only',
-    color: 'text-emerald-400',
-    text: 'The MCP bridge and the agent API bind to 127.0.0.1 by default (0.0.0.0 only if remote is explicitly enabled). Nothing in the MCP stack listens on an external interface.',
+    title: 'Loopback by default — but not everything',
+    color: 'text-amber-400',
+    text: `The agent API and the native bridge bind to ${net.agentApi.defaultBindAddress}; the agent API only exposes every interface when remote is explicitly turned on. The MCP SSE bridge does not follow that rule: mcp-browser-server.js:1620 calls listen(port) with no host argument, so it accepts connections from any interface, and there is no switch to restrict it. Treat port ${net.mcpBridge.port} as LAN-reachable until that changes.`,
     refs: [
       { label: 'bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` },
       { label: 'src/lib/agent-api/providers.ts:22,78', url: `${GH}/aartiq-browser/src/lib/agent-api/providers.ts#L22-L78` },
+      { label: 'src/lib/mcp-browser-server.js:1620', url: `${GH}/aartiq-browser/src/lib/mcp-browser-server.js#L1620` },
     ],
   },
   {
@@ -234,7 +236,7 @@ const setupSteps = [
   },
   {
     title: 'Launch Aartiq with the MCP bridge enabled',
-    text: 'The browser listens for bridge calls on 127.0.0.1:46203 while running. Configuration happens in the desktop app (Settings → MCP) — this website does not proxy tokens or run OAuth for you.',
+    text: `The browser listens for bridge calls on ${net.nativeBridge.defaultBindAddress}:${net.nativeBridge.port} while running. Configuration happens in the desktop app (Settings → MCP) — this website does not proxy tokens or run OAuth for you.`,
     refs: [
       { label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` },
       { label: 'src/lib/agent-api/providers.ts:19-29', url: `${GH}/aartiq-browser/src/lib/agent-api/providers.ts#L19-L29` },
@@ -423,7 +425,7 @@ export default function MCPSettingsPage() {
             <div className="flex items-start gap-4">
               <CheckCircle2 size={22} className="mt-0.5 shrink-0 text-emerald-400" />
               <div>
-                <h3 className="text-lg font-semibold">Why this page is honest about the implementation</h3>
+                <h3 className="text-lg font-semibold">What ships vs. what this site links to</h3>
                 <p className="mt-2 max-w-3xl leading-relaxed text-white/50">
                   The MCP surface you see on this page is the one that ships: the tool list, the bridge, the security pipeline, and the
                   approvals are all in the open-source repository and enforceable in CI. Aartiq does not proxy third-party OAuth servers

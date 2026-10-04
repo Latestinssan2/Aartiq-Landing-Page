@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Shield, Lock, Eye, Database, Globe, Mail } from "lucide-react";
+import { net } from "@/data/facts";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -187,10 +188,10 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="space-y-3 mt-4">
                 {[
-                  "All MCP traffic stays on the loopback interface (127.0.0.1) — nothing in the MCP stack listens externally",
+                  `The agent API and the native bridge listen on ${net.agentApi.defaultBindAddress} only. The MCP SSE bridge (mcp-browser-server.js:1620) listens on every interface and offers no restrict switch.`,
                   "You choose which MCP servers to connect to and what tools to approve",
                   "Every tool call runs the fail-closed security pipeline (verb gate, tab lock, handler, prompt-injection scan)",
-                  "High-risk tools require your explicit approval before they execute",
+                  "High-risk tools require explicit confirmation before they execute, unless you have already granted that permission",
                   "We are not responsible for the data practices of external MCP servers you connect manually",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">

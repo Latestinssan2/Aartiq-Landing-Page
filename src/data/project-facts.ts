@@ -1,0 +1,743 @@
+/**
+ * project-facts.ts — THE single source of truth for Aartiq published facts.
+ *
+ * Rules for this file:
+ *  1. Every value here was verified against source, a live test run, or the GitHub API.
+ *     If a value cannot be verified, it is absent or carries TODO(verify) — never guessed.
+ *  2. No other file in this repo may hard-code any value defined here. `npm run docs:check`
+ *     (Aartiq/scripts/check-docs.ts) fails the build if one does.
+ *  3. Test counts and command counts are GENERATED, not typed. See test-facts.generated.json.
+ *  4. This file is the only place these facts are written by hand.
+ *
+ * Audit that produced these values: Aartiq/aartiq-browser/docs-audit/consistency-report.md
+ */
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+/** How much a layer actually enforces, as opposed to describes. */
+export type LayerStrength =
+  /** The OS itself confines the process. Not bypassable from inside the app. */
+  | "enforcement boundary"
+  /** Enforced by app logic that a compromised renderer can influence. */
+  | "policy layer"
+  /** Text/regex inspection. Bypassable by construction — catches the obvious cases. */
+  | "heuristic/first-pass"
+  /** Reduces exposure or impact without gating the action. */
+  | "mitigation";
+
+export type RiskTierId = "low" | "medium" | "high" | "critical";
+
+export interface SecurityLayer {
+  id: string;
+  name: string;
+  /** One line. */
+  description: string;
+  strength: LayerStrength;
+  /** Where to read the implementation. */
+  source: string;
+}
+
+export interface RiskTier {
+  id: RiskTierId;
+  /** What the user actually experiences. */
+  approvalMethod: string;
+  /** Whether it can run without asking. */
+  autoApprove: string;
+  /** Real identifiers from the source, not invented. */
+  examples: string[];
+  /** The limitation that stops this row from reading as a guarantee. */
+  limit: string;
+}
+
+export interface NetworkServer {
+  id: string;
+  name: string;
+  /** `number` = fixed default; string = overridable via the named env var. */
+  port: number | string;
+  portIsEnvOverridable: boolean;
+  defaultBindAddress: string;
+  /** Exactly what makes it bind all interfaces. `null` = there is no such switch. */
+  bindsAllInterfacesWhen: string | null;
+  auth: string;
+  /** Whether the docs previously claimed localhost binding. */
+  note?: string;
+}
+
+export interface GeneratedTestFacts {
+  generatedAt: string;
+  environment: {
+    os: string;
+    platform: string;
+    arch: string;
+    node: string;
+    /** Human label used in prose, e.g. "macOS (local)". */
+    label: string;
+  };
+  suites: {
+    total: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+  };
+  tests: {
+    declared: number;
+    passed: number;
+    failed: number;
+    skipped: number;
+  };
+  skipBreakdown: {
+    reason: string;
+    count: number;
+    detail: string;
+  }[];
+  perSuite: {
+    suite: string;
+    passed: number;
+    skipped: number;
+    failed: number;
+    declared: number;
+  }[];
+  commandCount: number;
+  commandCountSource: string;
+}
+
+export interface GeneratedRepoFacts {
+  generatedAt: string;
+  /** True when read live from the GitHub API. */
+  live: boolean;
+  fullName: string;
+  stars: number;
+  forks: number;
+  contributors: number;
+  createdAt: string;
+  pushedAt: string;
+  visibility: string;
+  /** Set when the live fetch failed and the cached values were used. */
+  staleSince?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Version & release
+// ---------------------------------------------------------------------------
+
+export const version = {
+  /** aartiq-browser/package.json "version" */
+  semver: "0.3.7",
+  /** GitHub release tag_name for the latest published release. */
+  tag: "v0.3.7",
+  /** releases/latest .published_at */
+  releaseDate: "2026-09-13",
+  /** Not prerelease, not draft, CI green. */
+  status: "stable" as const,
+  /**
+   * Release codename. Two different values were live at once before this
+   * ("AppContainer" in version.ts, "Nebula" in version-server.ts); v0.3.7 is the
+   * AppContainer release, and it is the one every page should show.
+   */
+  codename: "AppContainer",
+  repository: "https://github.com/Latestinssan/Aartiq",
+  releaseNotes: "release_notes/v0.3.7.md",
+};
+
+// ---------------------------------------------------------------------------
+// Project status — ONE canonical statement
+// ---------------------------------------------------------------------------
+
+export const project = {
+  lastUpdated: "2026-09-13",
+  /**
+   * Rendered verbatim wherever project status is shown. Do not paraphrase it
+   * per page — that is how the docs drifted apart in the first place.
+   */
+  status: {
+    headline: "Maintenance phase — AI-assisted, human-governed.",
+    statement:
+      "Aartiq is in an AI-assisted maintenance phase. AI agents may help review and " +
+      "organise issues, analyse bugs, improve documentation, and prepare proposed fixes. " +
+      "AI assistance does not replace human responsibility: anything touching security, " +
+      "permissions, user data, releases, or project direction is reviewed, approved, and " +
+      "owned by a human. New feature work is paused while that happens.",
+    /** What is explicitly NOT true, so no page implies otherwise. */
+    notAbandoned: "The project is not abandoned or discontinued.",
+  },
+  /** Why the project exists, in the founder's terms. Shown once per page at most. */
+  origin: {
+    name: "Aartiq",
+    tagline: "For The Questions That Matter",
+    oneCm:
+      'Aartiq is just 1 CM away from the future. The "1 CM" is a personal reminder that ' +
+      "respecting a boundary often begins with asking before crossing it.",
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Security — six layers
+// ---------------------------------------------------------------------------
+
+const SECURITY_LAYERS: SecurityLayer[] = [
+    {
+      id: "visual-sandbox",
+      name: "Visual Sandbox & SecureDOM",
+      description:
+        "Renders and extracts pages visually, so raw page HTML is never handed to the model as an instruction channel.",
+      strength: "heuristic/first-pass",
+      source: "src/lib/Security.ts",
+    },
+    {
+      id: "syntactic-firewall",
+      name: "Syntactic Firewall",
+      description:
+        "Regex blocklist over commands and model output. Its own header says it is not the primary defence, because text filters are bypassable by construction.",
+      strength: "heuristic/first-pass",
+      source: "src/lib/SecurityValidator.js",
+    },
+    {
+      id: "human-in-the-loop",
+      name: "Human-in-the-Loop Approval",
+      description:
+        "Actions are described and offered for approval before they run, so the user decides rather than the model.",
+      strength: "policy layer",
+      source: "src/core/capability-controller.js, src/core/shell-permission-bridge.js",
+    },
+    {
+      id: "directory-allowlist",
+      name: "Directory Allowlist",
+      description:
+        "Scopes file access to approved directories. This is a policy layer; the boundary that actually confines writes is the OS sandbox below.",
+      strength: "policy layer",
+      source: "src/core/directory-allowlist.js",
+    },
+    {
+      id: "os-sandbox",
+      name: "OS-Level Sandboxing",
+      description:
+        "Seatbelt (macOS), bubblewrap (Linux), AppContainer + Job Object (Windows). Fail-closed: setup failure means the command does not run.",
+      strength: "enforcement boundary",
+      source: "src/core/sandbox-executor.js",
+    },
+    {
+      id: "capability-scoped",
+      name: "Capability-Scoped Execution",
+      description:
+        "Actions run only through registered capabilities with single-use approval tickets, never as arbitrary system calls.",
+      strength: "enforcement boundary",
+      source: "src/core/capability-controller.js, src/core/approval-ticket-manager.js",
+    },
+];
+
+export const security = {
+  layers: SECURITY_LAYERS,
+  /**
+   * Lead-in prose. The layer count is read from the array, so the sentence can
+   * never claim a different number than the rows printed under it.
+   */
+  layerSummary:
+    `The model has ${SECURITY_LAYERS.length} layers. Only ` +
+    `${SECURITY_LAYERS.filter((l) => l.strength === "enforcement boundary").length} ` +
+    "of them are enforcement boundaries in the strict sense — controls the OS applies that " +
+    "application code cannot bypass. The rest are policy and first-pass checks, and are " +
+    "labelled as such rather than presented as equally strong.",
+
+  /**
+   * Verified against src/core/command-validator.js, src/core/capability-controller.js,
+   * src/core/shell-permission-bridge.js, src/lib/SecurityValidator.js, src/lib/permission-store.js.
+   *
+   * Read the `limit` column. Two of these rows are weaker than "approval required"
+   * suggests, and one is stronger.
+   */
+  riskTiers: [
+    {
+      id: "low",
+      approvalMethod:
+        "Auto-approved. A session grant for low-risk shell commands is created at startup, so no dialog appears.",
+      autoApprove:
+        "Yes, by default — unconditional session grant (8h TTL, not written to disk).",
+      examples: ["ls", "cat", "pwd", "find", "grep", "echo", "NAVIGATE"],
+      limit: "Auto-approval is the default, not an opt-in. The grant is issued at startup before you choose anything.",
+    },
+    {
+      id: "medium",
+      approvalMethod:
+        "Auto-approved. A session grant for medium-risk shell commands is created at startup alongside the low-risk one.",
+      autoApprove: "Yes, by default — same unconditional session grant.",
+      examples: ["cp", "mv", "mkdir", "chmod", "npm", "git", "curl", "osascript"],
+      limit:
+        "The shell classifier only ever emits medium or high, so medium is the DEFAULT tier for any command that is not a regex-detected destructive pattern.",
+    },
+    {
+      id: "high",
+      approvalMethod:
+        "Explicit confirmation. Denied by default, then offered as Allow Once / Always / Deny.",
+      autoApprove:
+        "Only if a SHELL_HIGH or SHELL_ALL grant exists, or the user has explicitly auto-approved that binary.",
+      examples: ["sudo", "rm", "dd", "shutdown", "kill", "mount", "SHELL_COMMAND"],
+      limit:
+        '"Allow Always" persists on the FIRST WORD of the command, so approving `curl <url>` permanently allowlists `curl` generally.',
+    },
+    {
+      id: "critical",
+      approvalMethod:
+        "Denied at the policy gate unconditionally, then offered to the user as an interactive Allow / Deny prompt.",
+      autoApprove:
+        "Never. Four independent guards refuse it, and it is unreachable from every permission grant and auto-approve setting.",
+      examples: [],
+      limit:
+        "No registry assigns this tier — it is only synthesised at runtime for commands arriving from a remote device. On the desktop shell path it uses no biometric and no QR confirmation, just a dialog.",
+    },
+  ] satisfies RiskTier[],
+
+  /**
+   * TODO(verify) — the figures "22 gated / 9 monitoring-only IPC channels" could not be
+   * verified and do NOT appear in docs-audit/action-inventory.md. That file contains no
+   * count of either kind, and its wildcard rows (`clipboard-*`, `window-*`, `store-*`)
+   * make an exact IPC-channel count underivable from it. Do not publish these numbers.
+   */
+  monitoringOnlyChannels: {
+    status: "TODO(verify)" as const,
+    claimedGated: 22,
+    claimedMonitoringOnly: 9,
+    verified: false,
+    /** What action-inventory.md actually contains, re-read 2026-10-03. */
+    actual: [
+      "§2a lists 24 command types under 'No Permission Gate — Executes Immediately'.",
+      "§2b lists 7 command types under 'Has Permission Dialog (requestActionPermission())'.",
+      "The single 'Monitoring-only' row is SecureDOMParser.analyze() — a renderer function, not an IPC channel.",
+    ],
+    resolution:
+      "Either re-derive the counts from IPC registration in preload.js, or drop the figures. They are not used on any page.",
+  },
+
+  /**
+   * Two defaults are live at the same time. Stating both is the honest description;
+   * collapsing them would misreport what the app enforces.
+   */
+  defaultAllowlist: {
+    summary:
+      "The narrow default and the legacy broad default are both still in the tree, and they disagree.",
+    current: {
+      where: "src/core/directory-allowlist.js:24-43",
+      grants:
+        "Only the Aartiq app-data directory and the temp directory, recursive, read-write.",
+      note: "A test explicitly asserts the home directory is NOT included (tests/directory-allowlist.test.js:217-220).",
+    },
+    legacy: {
+      where: "src/lib/permission-store.js:8-16",
+      grants:
+        "Recursive read-write across the entire home directory, plus read on /Applications and /System/Applications.",
+      note:
+        "permission-store.js is the module getAllowedDirectories() actually calls, so this broad seed is still the one that takes effect.",
+    },
+    commandPolicy: {
+      where: "config/command-policy.json",
+      blocks: "24 commands, including curl and wget.",
+      requiresApproval: "~50 more, including package managers, docker, systemctl, diskutil, crontab.",
+      legacyFallback:
+        "src/lib/command-validator.js:45-52 — blocks only 7 commands and requires approval for none. Used only if the policy file fails to load.",
+    },
+  },
+
+  /** What the model does NOT promise. Keep these; do not summarise them away. */
+  knownLimits: [
+    "Runtime sandbox tests execute only on their own OS. There is no single job that exercises Seatbelt, bubblewrap, and AppContainer at once.",
+    "OS-automation tests skip wherever the native tooling is absent (xdotool/xte on Linux, cliclick on macOS).",
+    "The CRX3 signature-verifier suite is skipped because verifyCrx() hangs on a Node 24 / OpenSSL header parse. It is counted as skipped, never as passing, until the verifier is fixed.",
+    "SecurityValidator.js does not guarantee that non-blocked commands are safe — it is a fast first-pass reject layer.",
+    "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
+    "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
+    "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
+    "The MCP bridge and the WiFi sync server bind all network interfaces by default and are reachable from the local network. See network.servers.",
+    "The native bridge accepts an X-Aartiq-Native-Token header but does not verify it; any local process can call its routes.",
+  ],
+} as const;
+
+// ---------------------------------------------------------------------------
+// Network — every listener, verified in source
+// ---------------------------------------------------------------------------
+
+export const network = {
+  servers: [
+    {
+      id: "mcp-bridge",
+      name: "MCP browser bridge",
+      port: 3001,
+      portIsEnvOverridable: true, // MCP_SERVER_PORT
+      defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
+      bindsAllInterfacesWhen: null, // no switch exists to restrict it
+      auth: "None on connect. CORS is '*'. A pairing token exists but SSE auto-confirms it; only per-tool risk approval gates individual calls.",
+      note: "listen(port, cb) is called with no host argument.",
+    },
+    {
+      id: "wifi-sync",
+      name: "WiFi sync (desktop ↔ mobile)",
+      port: 3004,
+      portIsEnvOverridable: false,
+      defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
+      bindsAllInterfacesWhen: null,
+      auth: "Handshake pairing code only. The command and desktop-control message types are not re-checked against it.",
+      note: "new WebSocketServer({ port }) is constructed with no host option.",
+    },
+    {
+      id: "native-bridge",
+      name: "Native macOS / CLI bridge",
+      port: 46203,
+      portIsEnvOverridable: true, // AARTIQ_NATIVE_MAC_UI_PORT
+      defaultBindAddress: "127.0.0.1",
+      bindsAllInterfacesWhen: null, // host is a hard-coded literal
+      auth: "None. Clients send X-Aartiq-Native-Token; the server never reads it.",
+      note: "TODO(verify) — this port is also the agent-api default, and the bridge's EADDRINUSE is logged and swallowed. Inferred from call order, not observed at runtime.",
+    },
+    {
+      id: "agent-api",
+      name: "Agent API tool server",
+      port: 46203,
+      portIsEnvOverridable: false,
+      defaultBindAddress: "127.0.0.1",
+      bindsAllInterfacesWhen: "config.remote === true (defaults to false; no UI, env var, or IPC path sets it)",
+      auth: "None. An anonymous caller is auto-registered as a limited-trust agent.",
+    },
+    {
+      id: "background-service",
+      name: "Background task service (separate Electron app)",
+      port: 3999,
+      portIsEnvOverridable: false,
+      defaultBindAddress: "0.0.0.0",
+      bindsAllInterfacesWhen: null,
+      auth: "None. Serves ~/Documents/Aartiq/public with Access-Control-Allow-Origin: *.",
+      note: "Started by `npm run service`, not by the browser app itself.",
+    },
+  ] satisfies NetworkServer[],
+
+  /** Ports that appear in docs but have no implementation in the tree. */
+  retiredPorts: [
+    { port: 9922, name: "Nexus bridge", status: "Not present. A dead variable remains in main.js." },
+    { port: 9877, name: "Raycast HTTP API", status: "Not present. Port constant is declared and never read." },
+    { port: 9876, name: "Flutter bridge", status: "Implemented and correctly token-gated, but never instantiated." },
+  ],
+
+  discovery: {
+    port: 3005,
+    status:
+      "UDP broadcast destination, not a listener. The discovery socket binds an ephemeral port.",
+  },
+  /**
+   * Development-only port: `next dev -p 3003` in aartiq-browser/package.json.
+   * A packaged build loads the renderer directly (main.js:3623), so this is not
+   * a listener on a user's machine — it is listed separately from `servers`.
+   */
+  devRenderer: {
+    port: 3003,
+    purpose: "Next.js dev server. Development only — never started in a packaged build.",
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// CI
+// ---------------------------------------------------------------------------
+
+export const ci = {
+  workflow: ".github/workflows/jest.yml",
+  /**
+   * Workflow inventory, read from `.github/workflows/*.yml`.
+   *
+   * check-docs.ts counts the files on disk and fails if this number is wrong, so
+   * adding or removing a workflow forces the SSOT (and therefore AGENTS.md) to be
+   * updated. AGENTS.md previously claimed 14 and described every workflow as
+   * "manual or tag push"; the real split is below.
+   */
+  workflows: {
+    count: 13,
+    manualOnly: 11,
+    tagPush: 1,
+    pushToMain: 1,
+    note:
+      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main for a path filter, and the remaining eleven are workflow_dispatch.",
+  },
+  /**
+   * jest.yml declares only `workflow_dispatch`. There is no `push:` and no
+   * `pull_request:` key, so this suite does not run on every commit.
+   */
+  trigger: {
+    type: "on-demand" as const,
+    events: ["workflow_dispatch"],
+    detail:
+      "Manual dispatch only. There is no push or pull_request trigger, so a green run is not evidence about the latest commit.",
+  },
+  jobs: {
+    defined: 4,
+    detail:
+      "All four jobs were green on the run above. Dispatch inputs can reduce this to 3 (skip-full-suite) or 1 (windows-test-pattern), so this is a default-dispatch count rather than an invariant.",
+    timeout: "30 minutes on the full-suite job; the three sandbox jobs have no timeout configured.",
+    nodeVersion: "24",
+  },
+  latestRun: {
+    id: 34769503518,
+    runNumber: 52,
+    url: "https://github.com/Latestinssan/Aartiq/actions/runs/34769503518",
+    event: "workflow_dispatch",
+    headSha: "acc703ae",
+    date: "2026-09-13",
+    conclusion: "success",
+  },
+  /** Per-job jest summary lines, read from the run's job logs. */
+  perJob: [
+    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 537, skipped: 40, failed: 0, declared: 577 },
+    { name: "Run Jest (Windows AppContainer sandbox runtime)", os: "windows-latest", passed: 61, skipped: 30, failed: 0, declared: 91 },
+    { name: "Run Jest (macOS Seatbelt sandbox runtime)", os: "macos-latest", passed: 104, skipped: 0, failed: 0, declared: 104 },
+    { name: "Run Jest (Linux bubblewrap sandbox runtime)", os: "ubuntu-latest", passed: 57, skipped: 21, failed: 0, declared: 78 },
+  ],
+  /**
+   * The same commit yields different pass/skip splits per platform, which is why
+   * every published count carries its environment.
+   */
+  platformVarianceNote:
+    "On ubuntu-latest the full suite reports 537 passed / 40 skipped. A local macOS run of the same 577 declared tests reports 551 passed / 26 skipped. Quote the environment with the number.",
+} as const;
+
+// ---------------------------------------------------------------------------
+// Benchmarks
+// ---------------------------------------------------------------------------
+
+export const benchmarks = {
+  currentVersion: version.semver, // checked by check-docs.ts rule (c)
+  benchmarkVersion: "0.3.4",
+  date: "2026-07-20",
+  hardware: {
+    machine: "MacBook Pro",
+    /** EveryMac model identifier for the machine the figures came from. */
+    model: "Mac16,8",
+    chip: "M4 Pro",
+    cores: 12,
+    memoryGb: 24,
+    os: "macOS 26.5",
+    osBuild: "25F71",
+  },
+  results: [
+    { metric: "First visible window", value: "0.32s" },
+    { metric: "Warm start", value: "0.31s" },
+    { metric: "Idle CPU after initialization", value: "<1%" },
+  ],
+  /**
+   * The full "Detailed Results" table. Kept here rather than in the page so that
+   * every published figure sits next to `provenance` — none of these numbers has
+   * a script or a raw output file behind it in either repository.
+   * The active-port row is deliberately absent: it is rendered from
+   * `network.servers` so it cannot drift from the network facts.
+   */
+  details: [
+    { metric: "Cold Start (Window Visible)", value: "0.32s", notes: "Average of 3 runs, ±0.00s" },
+    { metric: "Warm Start (Window Visible)", value: "0.31s", notes: "From OS file cache" },
+    { metric: "Main Process RSS", value: "430 MB", notes: "Stabilizes to ~610 MB after tab activity" },
+    {
+      metric: "Total RSS (all processes)",
+      value: "1,712 MB",
+      notes: "Electron main, renderer, GPU, utility, and helper processes",
+    },
+    { metric: "CPU (at launch)", value: "14.7%", notes: "During initial window creation and first paint" },
+    { metric: "CPU (idle after init)", value: "< 1%", notes: "After background services finish loading" },
+    { metric: "Memory (main, % of 24 GB)", value: "~1.7%", notes: "—" },
+    { metric: "Memory (total, % of 24 GB)", value: "~7.1%", notes: "Including all Chromium subprocesses" },
+    { metric: "App Bundle Size", value: "1.2 GB", notes: "Frameworks: 276 MB, Resources: 958 MB" },
+  ],
+  provenance:
+    "TODO(verify) — no benchmark script, raw output file, or instrumentation exists in either repository. These figures cannot currently be reproduced or checked. A published page also claimed the benchmark scripts were included in the repository; that claim was false and has been removed.",
+  caveat:
+    "Startup means time to first visible window, not complete service initialisation. Results vary by hardware, operating system, and configuration.",
+} as const;
+
+// ---------------------------------------------------------------------------
+// Repo
+// ---------------------------------------------------------------------------
+
+export const repo = {
+  fullName: "Latestinssan/Aartiq",
+  /**
+   * Numbers come from repo-facts.generated.json, refreshed by
+   * `npm run docs:repo-facts`. Cached fallback keeps the build working offline.
+   * If the numbers cannot be fetched, pages show no count rather than a stale one.
+   */
+  fetchedAtBuildTime: true,
+  cacheFallbackPath: "repo-facts.generated.json",
+} as const;
+
+// ---------------------------------------------------------------------------
+// Platforms & providers
+// ---------------------------------------------------------------------------
+
+/**
+ * Verified against the build configuration and the release workflows — not against
+ * marketing copy.
+ *
+ * - Windows: `win.target` is `["nsis", "appx"]`, and `.github/workflows/windows-msix.yml:147`
+ *   renames the electron-builder output `*.appx` -> `*.msix` before upload, so both
+ *   extensions are genuinely published. The Microsoft Store product ID is taken from
+ *   the README badge, four release notes and three release-workflow templates, and it
+ *   matches `productid` in the store badge on the downloads page.
+ * - macOS: `mac.target` is `["dmg", "zip"]`; CI builds both arm64 and x64.
+ * - Linux: `linux.target` is `["AppImage"]` ONLY. No `.deb` is produced by any workflow,
+ *   so no page may offer one. (Claims of a `.deb` were removed in this pass.)
+ * - Android: release APKs are built by flutter_distributor / `flutter build apk`.
+ * - iOS: `flutter build ios --release --no-codesign`, zipped to `ios_no_sign.ipa` and
+ *   uploaded as a CI artifact. Never published to a store or a release.
+ */
+export const platforms = [
+  {
+    id: "windows",
+    label: "Windows",
+    artifacts: ".exe, .appx/.msix",
+    distributed: true,
+    store: "Microsoft Store",
+    storeUrl: "https://apps.microsoft.com/detail/9nd6wg2rp7cm",
+  },
+  { id: "macos", label: "macOS — Apple Silicon", artifacts: ".dmg, .zip", distributed: true },
+  { id: "macos-intel", label: "macOS — Intel", artifacts: ".dmg, .zip", distributed: true },
+  { id: "linux", label: "Linux", artifacts: ".AppImage", distributed: true },
+  { id: "android", label: "Android", artifacts: ".apk", distributed: true, note: "Side-loaded from the downloads page. There is no Google Play listing." },
+  { id: "ios", label: "iOS", artifacts: "built unsigned in CI, not distributed", distributed: false, note: "No App Store or AltStore listing exists." },
+];
+
+/**
+ * Verified against the provider factory and settings UI.
+ * `note` is required wherever support is weaker than the name implies, so no page
+ * can accidentally upgrade a routed-through-something-else provider to first-class.
+ */
+export const providers = [
+  { id: "gemini", label: "Google Gemini", firstClass: true },
+  { id: "openai", label: "OpenAI", firstClass: true },
+  { id: "anthropic", label: "Anthropic Claude", firstClass: true },
+  { id: "groq", label: "Groq", firstClass: true },
+  { id: "ollama", label: "Ollama (local)", firstClass: true },
+  { id: "apple-intelligence", label: "Apple Intelligence (macOS)", firstClass: true },
+  {
+    id: "xai",
+    label: "xAI",
+    firstClass: false,
+    note: "Reachable through the OpenAI-compatible provider. No dedicated provider class, and it is absent from the provider-id union.",
+  },
+  {
+    id: "azure",
+    label: "Azure OpenAI",
+    firstClass: false,
+    note: "Reachable through the OpenAI-compatible provider. No dedicated provider class.",
+  },
+  {
+    id: "lmstudio",
+    label: "LM Studio (local)",
+    firstClass: false,
+    note: "Available to the agent bridge only. There is no UI for selecting it as a chat provider.",
+  },
+  {
+    id: "openclaw",
+    label: "OpenClaw (local agent bridge)",
+    firstClass: false,
+    note: "Local agent runner. Its output is treated as untrusted.",
+  },
+] as const;
+
+/** Present in the provider factory but absent from every UI provider list. */
+export const providersUndocumented = ["deepseek", "openrouter", "cerebras", "llama"] as const;
+
+// ---------------------------------------------------------------------------
+// Legal — one copy
+// ---------------------------------------------------------------------------
+
+export const legal = {
+  /**
+   * UNRESOLVED CONFLICT — requires a human decision, not a docs edit.
+   * The repository root carries Apache-2.0 and GitHub's API reports Apache-2.0,
+   * but aartiq-browser/LICENSE.txt is a restrictive EULA and it is the license the
+   * Windows NSIS installer displays (package.json:190). The two cannot both be
+   * correct. Until a human resolves this, publish the conflict, not a verdict.
+   */
+  licenseConflict: {
+    resolved: false as const,
+    rootLicense: "Apache-2.0 (LICENSE)",
+    browserLicenseFile: "aartiq-browser/LICENSE.txt — restrictive EULA: no modification, no derivative works, no redistribution",
+    mcpLicense: "MIT (aartiq-mcp/LICENSE)",
+    landingPageLicense: "none — no LICENSE file, package.json is private",
+    evidence: [
+      "aartiq-browser/package.json:190 sets nsis.license = LICENSE.txt, so Windows installers show the EULA.",
+      "The EULA's own line 4 asserts 'This Is Open Source Software' while sections 2 forbids modification and redistribution.",
+      "The README trademark section says the licence 'permits the use, modification, and redistribution of the source code', contradicting the EULA.",
+      "gh api reports license: Apache-2.0 because it detects the root LICENSE only.",
+    ],
+  },
+  table: [
+    { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE", status: "conflicted" as const },
+    { component: "Aartiq MCP Server — aartiq-mcp/", license: "MIT", licenseFile: "aartiq-mcp/LICENSE", status: "verified" as const },
+    { component: "Landing page / documentation site", license: "Unlicensed (private repository)", licenseFile: "none", status: "verified" as const },
+  ],
+  trademark: {
+    mark: "Aartiq™",
+    owner: "Latestinssan",
+    paragraph:
+      "Aartiq™ is a trademark of Latestinssan. The open-source licence permits use, modification, and redistribution of the source code. It does not grant permission to use the Aartiq name, logo, trademarks, or visual identity. Modified distributions must be rebranded under a different name and must not present themselves as official Aartiq releases.",
+  },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Skills — terminology glossary
+// ---------------------------------------------------------------------------
+
+/**
+ * The product uses these words in several files with different meanings. This is the
+ * only definition; wording elsewhere must match it or be corrected.
+ */
+export const skills = {
+  glossary: [
+    {
+      term: "Capability",
+      definition:
+        "A registered action the model may invoke. Capabilities are the only way to affect the system — there is no unrestricted access to system primitives.",
+    },
+    {
+      term: "Approval ticket",
+      definition:
+        "A single-use, time-limited token that authorises one capability execution and is consumed on use.",
+    },
+    {
+      term: "Skill",
+      definition:
+        "A named, loadable instruction bundle that shapes how the assistant approaches a class of task. Distinct from a capability: a skill changes behaviour, a capability changes the system.",
+    },
+    {
+      term: "Risk tier",
+      definition:
+        "An advisory label (low / medium / high / critical) attached to a capability or derived for a command. It is not itself an enforcement boundary — see security.riskTiers.",
+    },
+    {
+      term: "Enforcement boundary",
+      definition:
+        "A control the OS applies, which application code cannot bypass. Only OS sandboxing and capability scoping qualify.",
+    },
+    {
+      term: "Fail-closed",
+      definition:
+        "If a control cannot be established or verified, the action does not run. There is no fallback path that runs it anyway.",
+    },
+    {
+      term: "Monitoring-only",
+      definition:
+        "Code that observes and reports but does not block. It never gates an action, and should never be counted as if it did.",
+    },
+    {
+      term: "Agent API",
+      definition:
+        "The HTTP and MCP transports that expose the capability registry to external agents. Both pass every call through the security pipeline.",
+    },
+    {
+      term: "Local-first",
+      definition:
+        "User data stays on the device. Local models keep request content local; sync is end-to-end encrypted; credentials live in the OS keychain.",
+    },
+  ] as const,
+};
+
+// NOTE: generated test counts, repo counts, and the derived strings built from
+// them deliberately live in `facts.ts`, not here. Keeping this module free of
+// imports means both the Next.js app and the plain-node scripts in
+// `Aartiq/scripts/` can import it directly — Node's TypeScript support requires
+// explicit import attributes for JSON, which a bundler-style bare JSON import
+// (needed by Next) would break. This file stays the only place hand-written
+// facts are declared; `facts.ts` only merges in generated data.

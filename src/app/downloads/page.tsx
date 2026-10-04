@@ -19,6 +19,7 @@ import {
 import { useState, useEffect, useMemo } from "react";
 import { auth } from "@/lib/firebase";
 import { APP_INFO } from "@/lib/version";
+import { version } from "@/data/facts";
 import { GitHubRelease, getReleaseDownloadLinks } from "@/lib/github-release";
 
 export default function DownloadsPage() {
@@ -64,7 +65,7 @@ export default function DownloadsPage() {
             </div>
             <div className="text-left md:text-right">
               <p className="text-[10px] font-black uppercase tracking-[0.5em] text-sky-400 mb-2">Stable Build Pipeline</p>
-              <h4 className="text-2xl font-black">{latestRelease?.tag_name || "v0.3.5 Stable"}</h4>
+              <h4 className="text-2xl font-black">{latestRelease?.tag_name || `${version.tag} Stable`}</h4>
               <p className="text-xs font-bold text-white/20 uppercase tracking-widest mt-1">Apple Silicon and Intel builds stay in sync with GitHub releases</p>
             </div>
           </motion.div>
@@ -131,14 +132,11 @@ export default function DownloadsPage() {
                    }} />
                  </div>
 
-                 <div className="flex flex-wrap items-center gap-5">
-                   <button className="flex items-center gap-4 rounded-full border border-white/10 bg-white/5 px-10 py-5 text-xs font-black uppercase tracking-[0.3em] text-white/30 transition hover:border-white/20 hover:text-white/60">
-                     <Smartphone size={18} /> Google Play
-                   </button>
-                   <button className="flex items-center gap-4 rounded-full border border-white/10 bg-white/5 px-10 py-5 text-xs font-black uppercase tracking-[0.3em] text-white/30 transition hover:border-white/20 hover:text-white/60">
-                     iOS (AltStore)
-                   </button>
-                 </div>
+                <p className="max-w-xl text-sm font-medium leading-relaxed text-white/40">
+                  The Android companion ships as an <span className="font-bold text-white/60">.apk</span> you side-load from the
+                  downloads page above &mdash; there is no Google Play listing. The iOS build is produced unsigned by CI and is
+                  not distributed.
+                </p>
              </div>
              
              <div className="relative aspect-video rounded-[3rem] border border-white/10 bg-[#06080f] shadow-2xl overflow-hidden group">

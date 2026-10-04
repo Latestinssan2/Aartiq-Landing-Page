@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { net, platforms } from "@/data/facts";
 
 const BASE = 'https://aartiq.ponsrischool.in';
 
@@ -27,15 +28,15 @@ export async function GET() {
 
 Aartiq is a privacy-focused browser that integrates AI directly into the browsing experience. It consists of three main components connected via WebSocket and IPC:
 
-- **aartiq-browser**: Electron desktop app (main.js, Next.js UI on port 3003, Background Service)
+- **aartiq-browser**: Electron desktop app (main.js, Next.js UI on dev port ${net.devRenderer.port}, Background Service)
 - **flutter_browser_app**: Flutter mobile companion (WiFi sync, remote desktop, push notifications)
 - **Landing_Page**: Documentation site (Next.js)
 
 ### Communication Protocols
-- HTTP (Next.js): Port 3003 (Frontend UI)
-- WebSocket: Port 3004 (Desktop-mobile sync)
-- UDP: Port 3005 (Device discovery)
-- HTTP (Nexus bridge): Port 9922 (Nexus-AI integration)
+- HTTP (Next.js): Port ${net.devRenderer.port} (development UI only — not started in a packaged build)
+- WebSocket: Port ${net.wifiSync.port} (Desktop-mobile sync)
+- UDP: Port ${net.discovery.port} (Device discovery — a broadcast destination, not a listener)
+- HTTP (Nexus bridge): retired — no such listener exists (network.retiredPorts)
 
 ### Key Services
 - Security.ts / SecurityValidator.js — Command validation, risk levels, injection detection
@@ -59,17 +60,18 @@ Open the DMG and drag Aartiq to Applications
 \`\`\`
 Download Aartiq-Setup-x.x.x.exe or Aartiq-x.x.x.msix from the downloads page
 Run the installer
+# Or install from the Microsoft Store: ${platforms.find((p) => p.id === "windows")?.storeUrl}
 \`\`\`
 
 ### Linux
 \`\`\`
-Download Aartiq-x.x.x.AppImage or aartiq_x.x.x_amd64.deb
+Download Aartiq-x.x.x.AppImage
 chmod +x Aartiq-*.AppImage && ./Aartiq-*.AppImage
-# or: sudo dpkg -i aartiq_*.deb
+# No .deb package is produced by any build workflow.
 \`\`\`
 
 ### Android
-Download Aartiq-x.x.x.apk from downloads page and side-load, or get it from the Google Play Store.
+Download Aartiq-x.x.x.apk from the downloads page and side-load it. There is no Google Play listing.
 
 ### AI Provider Setup
 After installation, configure at least one AI provider in Settings:
@@ -137,20 +139,36 @@ All AI commands use a structured JSON format:
 
 ## 4. Security Model
 
-Aartiq uses a three-layer security architecture:
+Aartiq uses a six-layer defense-in-depth model:
 
-### Permission Levels
-1. **Normal**: Basic browser commands (navigate, search, read page). No confirmation needed.
-2. **Elevated**: File operations, settings changes. User confirmation dialog.
-3. **Critical**: Shell commands, biometric operations. Requires biometric authentication + confirmation.
+1. Visual sandbox and SecureDOM
+2. Syntactic firewall (regex first-pass reject)
+3. Human-in-the-loop approval
+4. Directory allowlist
+5. OS-level sandboxing (Seatbelt on macOS, bubblewrap on Linux, AppContainer + Job Object on Windows)
+6. Capability-scoped execution
+
+### Risk tiers
+
+Each capability carries a risk label that determines approval behaviour:
+
+1. **low**: auto-approved by default (session grant created at startup).
+2. **medium**: auto-approved by default (same session grant).
+3. **high**: explicit confirmation required, unless a grant or an explicit auto-approve entry covers it.
+4. **critical**: denied at the policy gate; a plain Allow/Deny prompt is then shown. No registry assigns this tier.
 
 ### Security Features
 - AES-256-GCM encryption for data at rest
 - E2EE for cross-device sync
-- Biometric authentication for critical operations (macOS Touch ID, Windows Hello)
+- Optional biometric authentication on MCP tool calls (macOS Touch ID, Windows Hello); off by default
 - Input validation and injection detection via SecurityValidator.js
 - Command audit logging
 - All OS automation commands are permission-gated and logged
+
+### Known limits
+- The regex layer is a fast first-pass reject, not the primary defense.
+- Only OS sandboxing and capability scoping are enforcement boundaries; the other layers are policy or heuristic.
+- The CRX3 signature-verifier test suite is skipped until its header parsing is fixed, and is counted as skipped rather than passing.
 
 ---
 
@@ -180,7 +198,7 @@ The background task scheduler runs independently of the browser window.
 
 ### WiFi P2P Sync
 - Direct device-to-device sync over local network
-- Uses WebSocket (port 3004) and UDP discovery (port 3005)
+- Uses WebSocket (port ${net.wifiSync.port}) and UDP discovery (port ${net.discovery.port})
 - Zero-configuration pairing via QR code
 
 ### Firebase Cloud Sync
@@ -315,7 +333,7 @@ Extensions directory: ~/Library/Application Support/Aartiq/extensions/ (macOS)
 
 **AI provider not responding**: Verify API key in Settings → AI Providers. Check rate limits and quota.
 
-**Sync not working**: Ensure both devices are on the same network. Check firewall settings for ports 3004-3005.
+**Sync not working**: Ensure both devices are on the same network. Check firewall settings for ports ${net.syncPortRange}.
 
 **Plugins not loading**: Verify manifest.json exists in the plugin folder. Check the console for error messages.
 

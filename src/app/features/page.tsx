@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
+import { net } from "@/data/facts";
 
 /**
  * Every claim below is tied to a source file and line in the Aartiq browser
@@ -300,7 +301,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Agent API (MCP + HTTP tools)",
         description:
-          "The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to 127.0.0.1 by default with defaultTrust 'limited'.",
+          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
         icon: Cpu,
         color: "from-emerald-500 to-teal-400",
         refs: [
@@ -442,7 +443,7 @@ const settingsReference: { group: string; rows: { key: string; def: string; what
       { key: "enableAiPreferenceLearning", def: "false", what: "AI learns preferences via SAVE_PREFERENCE", src: "useAppStore.ts:177,911" },
       { key: "enableCrossSessionMemory", def: "false", what: "RAG memory across sessions", src: "useAppStore.ts:179,913" },
       { key: "localLlmMode", def: "'normal'", what: "light | normal | heavy", src: "useAppStore.ts:143,437" },
-      { key: "mcpServerPort", def: "3001", what: "Local MCP server port", src: "useAppStore.ts:159,444" },
+      { key: "mcpServerPort", def: String(net.mcpBridge.port), what: "Local MCP server port", src: "useAppStore.ts:159,444" },
     ],
   },
   {

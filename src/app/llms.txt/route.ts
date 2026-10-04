@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { platforms } from "@/data/facts";
 
 const BASE = 'https://aartiq.ponsrischool.in';
 
@@ -47,8 +48,8 @@ Aartiq is built on a small set of firm beliefs:
 
 ## Downloads
 
-- [Download Page](https://aartiq.ponsrischool.in/downloads): Pre-built installers for Windows (.exe, .msix), macOS (.dmg, .zip), Linux (.AppImage, .deb), and Android (.apk)
-- [Microsoft Store](https://apps.microsoft.com/detail/9N5Z9R9Z9Z9Z): Windows Store distribution
+- [Download Page](https://aartiq.ponsrischool.in/downloads): Pre-built installers for ${platforms.filter((p) => p.distributed && p.id !== "macos-intel").map((p) => `${p.label} (${p.artifacts})`).join(", ")}. iOS is built unsigned in CI and is not distributed.
+- [Microsoft Store](${platforms.find((p) => p.id === "windows")?.storeUrl}): Windows Store distribution. Android is side-loaded from the downloads page; there is no Google Play listing.
 - [Features](https://aartiq.ponsrischool.in/features): Full feature overview and screenshots
 
 ## Key Capabilities
@@ -59,7 +60,7 @@ Aartiq is built on a small set of firm beliefs:
 - **Background Scheduler**: Cron-based task scheduling that runs even when the browser window is closed
 - **Document Generation**: PDF, Excel (.xlsx), PowerPoint (.pptx), and Word (.docx) generation from JSON/JSX templates
 - **Cross-Device**: E2EE WiFi sync between desktop and Android devices. Firebase cloud sync with AES-256-GCM encryption
-- **Security**: Six-layer defense-in-depth model (visual sandbox, syntactic firewall, human-in-the-loop, directory allowlist, OS-level sandboxing, capability-scoped execution). Three-tier permission system (Normal → Elevated → Critical). AES-256-GCM encryption. Sandboxed automation
+- **Security**: Six-layer defense-in-depth model (visual sandbox, syntactic firewall, human-in-the-loop, directory allowlist, OS-level sandboxing, capability-scoped execution). Four risk tiers (low / medium / high / critical) controlling approval. AES-256-GCM encryption. Sandboxed automation
 - **Plugin System**: Node.js-based plugin SDK with command registration, event hooks, and persistent config storage
 - **Extensions**: Chrome manifest v3 extension support via Electron session.defaultSession
 

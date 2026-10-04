@@ -195,7 +195,7 @@ export default function RootLayout({
                 "Local LLM Support (Ollama)",
                 "Shell Command Execution",
                 "Background Scheduling",
-                "Three-Layer Security",
+                "Six-Layer Security",
                 "Cross-Device Sync",
                 "PDF Generation",
                 "Open Source"

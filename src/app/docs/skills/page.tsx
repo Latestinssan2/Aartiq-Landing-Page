@@ -1,5 +1,7 @@
 "use client";
 
+import { net } from "@/data/facts";
+
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { 
@@ -99,7 +101,7 @@ const sections = [
       },
       {
         h: "Providers",
-        p: "Model-agnostic config: LM Studio (http://127.0.0.1:1234/v1), Ollama (http://127.0.0.1:11434/v1), and OpenClaw (http://127.0.0.1:18789). The server binds to 127.0.0.1 by default (0.0.0.0 only if remote is enabled) with defaultTrust 'limited'.",
+        p: `Model-agnostic config: LM Studio (http://127.0.0.1:1234/v1), Ollama (http://127.0.0.1:11434/v1), and OpenClaw (http://127.0.0.1:18789). The agent API binds to ${net.agentApi.defaultBindAddress} by default (${net.agentApi.bindsAllInterfacesWhen || "never"} is the only path to external reach) with defaultTrust 'limited'.`,
         refs: ["src/lib/agent-api/providers.ts:19-80"],
       },
       {

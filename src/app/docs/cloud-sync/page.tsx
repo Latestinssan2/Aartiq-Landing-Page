@@ -1,5 +1,7 @@
 "use client";
 
+import { net } from "@/data/facts";
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -52,9 +54,9 @@ const syncTypes = [
       "Mobile app installed"
     ],
     howItWorks: [
-      "Desktop broadcasts discovery signal on UDP port 3005",
+      `Desktop broadcasts a discovery signal on UDP port ${net.discovery.port} (a broadcast destination — the socket itself binds an ephemeral port)`,
       "Mobile scans local network via mDNS",
-      "WebSocket connection established on port 3004",
+      `WebSocket connection established on port ${net.wifiSync.port}`,
       "Bi-directional sync begins"
     ]
   },

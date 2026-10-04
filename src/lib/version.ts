@@ -1,3 +1,5 @@
+import { version } from "@/data/project-facts";
+
 export const APP_INFO = {
   name: 'Aartiq',
   fullName: 'Aartiq',
@@ -11,9 +13,14 @@ export const APP_INFO = {
   supportEmail: 'support@ponsrischool.in',
 };
 
+/**
+ * Re-exported from the single source of truth so this module cannot drift from
+ * project-facts.ts. It used to repeat the version, release date, codename, and
+ * channel as its own literals.
+ */
 export const APP_VERSION = {
-  version: '0.3.7',
-  codename: 'AppContainer',
-  releaseDate: '2026-09-13',
-  channel: 'stable',
+  version: version.semver,
+  codename: version.codename,
+  releaseDate: version.releaseDate,
+  channel: version.status,
 };

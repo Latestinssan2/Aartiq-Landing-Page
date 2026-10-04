@@ -1,22 +1,27 @@
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { version } from "@/data/project-facts";
 
-export function getVersionFromPackage(): { version: string; codename: string; releaseDate: string; channel: string } {
-  try {
-    const candidates = [
-      join(process.cwd(), '..', 'aartiq-browser', 'package.json'),
-      join(process.cwd(), 'aartiq-browser', 'package.json'),
-      join(process.cwd(), 'package.json'),
-    ];
-    const packagePath = candidates.find((candidate) => existsSync(candidate)) || candidates[candidates.length - 1];
-    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
-    return {
-      version: packageJson.version || '0.0.0',
-      codename: 'Nebula',
-      releaseDate: new Date().toISOString().split('T')[0],
-      channel: 'stable',
-    };
-  } catch {
-    return { version: '0.0.0', codename: 'Nebula', releaseDate: '2026-01-01', channel: 'stable' };
-  }
+/**
+ * Version facts used as the offline fallback by /api/version.
+ *
+ * These are never written here. They come from the single source of truth, which
+ * is itself verified against `aartiq-browser/package.json` and the GitHub releases
+ * API by scripts/gen-repo-facts.ts and scripts/gen-test-facts.ts.
+ *
+ * Historically this function read `../aartiq-browser/package.json` and, when that
+ * directory was absent (the landing site is deployed from its own repository),
+ * silently fell back to the *landing site's* package.json — reporting its own
+ * version instead of the browser's. Deriving from the SSOT removes that path.
+ */
+export function getVersionFromPackage(): {
+  version: string;
+  codename: string;
+  releaseDate: string;
+  channel: string;
+} {
+  return {
+    version: version.semver,
+    codename: version.codename,
+    releaseDate: version.releaseDate,
+    channel: version.status,
+  };
 }

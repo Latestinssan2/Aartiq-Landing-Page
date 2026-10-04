@@ -8,6 +8,15 @@ import { APP_INFO } from "@/lib/version";
 import { useVersion } from "@/lib/useVersion";
 import { GitHubRelease, getReleaseDownloadLinks } from "@/lib/github-release";
 import {
+  tests,
+  derived,
+  commandCount,
+  distributedPlatformCount,
+  version as projectVersion,
+  security,
+  project,
+} from "@/data/facts";
+import {
   Bot,
   ShieldCheck,
   Layers,
@@ -81,7 +90,7 @@ const featureHighlights = [
     glow: "rgba(245, 158, 11, 0.4)"
   },
   {
-    name: "Three-Layer Security",
+    name: "Six-Layer Security",
     description: "src/lib/Security.ts, src/lib/SecurityValidator.js, src/main/handlers/permission-handlers.js",
     icon: Layers,
     color: "from-indigo-500/20 to-blue-500/20",
@@ -97,9 +106,10 @@ const featureHighlights = [
 ];
 
 const metrics = [
-  { label: "Automated Tests", value: "537" },
-  { label: "Platforms", value: "4" },
-  { label: "AI Commands", value: "25" },
+  // Every value here is imported or counted — none of it is typed.
+  { label: "Automated Tests", value: String(tests.tests.passed) },
+  { label: "Platforms", value: String(distributedPlatformCount) },
+  { label: "AI Commands", value: String(commandCount) },
   { label: "Security Model", value: "Capability-gated" },
 ];
 
@@ -769,7 +779,9 @@ export default function Home() {
 
         <Boundary />
 
-        {/* 1 CM — introduced early so the motif makes sense */}
+        {/* 1 CM — told once here, early enough that the Boundary motif below makes
+            sense. The closing reveal and footer note that used to repeat it were
+            removed rather than reworded. */}
         <section className="py-24 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -784,7 +796,7 @@ export default function Home() {
               The distance between what AI <span className="text-white/40">can do</span> and what it is <span className="text-cyan-400">allowed to do.</span>
             </p>
             <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-white/40">
-              That one centimeter is the space Aartiq leaves for you to decide. Everything below shows it in practice.
+              {project.origin.oneCm}
             </p>
           </motion.div>
         </section>
@@ -924,7 +936,8 @@ export default function Home() {
               Defense In <span className="text-white/40">Depth.</span>
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base font-medium text-white/50">
-              Every claim below links to the source or documentation that backs it. Inspect, don't trust.
+              Every claim below links to the source or documentation that backs it, and each layer is
+              labelled by what it actually does — enforcing, advising, or filtering.
             </p>
           </div>
 
@@ -938,7 +951,7 @@ export default function Home() {
             <Link href="/docs/security" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><FolderLock size={24} /></div>
               <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">Filesystem Isolation</h3>
-              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">Directory boundaries are explicit, inspectable, and user-controlled — see them enforced live above.</p>
+              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">The directory allowlist is a policy layer that scopes file access; the boundary that actually confines writes is the OS sandbox — see both in the layer breakdown.</p>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 group-hover:underline">View the implementation →</span>
             </Link>
             <Link href="/docs/security" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-6 transition hover:border-cyan-400/40">
@@ -950,19 +963,22 @@ export default function Home() {
             <Link href="/docs/testing" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><GitBranch size={24} /></div>
               <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">CI Verification</h3>
-              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">Builds and policies are verified continuously in CI before any release ships.</p>
+              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">The security suite runs in CI on manual dispatch, not on every push — which is why each run is linked rather than implied.</p>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 group-hover:underline">See the CI config →</span>
             </Link>
             <Link href="/docs/testing" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><CheckCircle2 size={24} /></div>
-              <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">537 Automated Tests</h3>
-              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">Including approval-ticket and permission-boundary regression tests. The latest green CI run is 537 passing / 40 environment-skipped / 0 failing across all four jest.yml jobs — read the honest breakdown, including the one suite that is currently skipped.</p>
+              <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">{tests.tests.passed} Automated Tests</h3>
+              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">
+                Including approval-ticket and permission-boundary regression tests. On {derived.testEnvironment} the suite reports {derived.testSummaryWithTotal}, and every skip below is
+                accounted for by reason — including the one suite that is currently skipped.
+              </p>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 group-hover:underline">Browse the test suite →</span>
             </Link>
             <Link href="/docs/security" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><HelpCircle size={24} /></div>
-              <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">Honest Limitations</h3>
-              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">Aartiq documents what it cannot guarantee. No security theater — read what is and isn't claimed.</p>
+              <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">Known Limits</h3>
+              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">What Aartiq cannot guarantee, written next to what it can. No security theater — read what is and isn't claimed.</p>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 group-hover:underline">Read what's claimed →</span>
             </Link>
           </div>
@@ -1160,10 +1176,10 @@ export default function Home() {
                 Development is paused — and it is <span className="text-white/70">led by AI, not by a human developer</span>. AI agents do the planning, writing, testing, and maintenance; the founder sets the direction and reviews consequential changes. There is no paid team behind the product.
               </p>
               <p>
-                Current state: release <span className="text-white/70">v0.3.7</span> (AppContainer + Job Object sandboxing on Windows, agent API &amp; tool server, CRX3 extension validation). The full jest.yml CI run is green on all four jobs — Windows AppContainer 61 passing, macOS Seatbelt 104 passing, Linux bubblewrap 57 passing, and the complete aartiq-browser suite 537 passing / 40 environment-skipped / 0 failing.
+                Current state: release <span className="text-white/70">{projectVersion.tag}</span> (AppContainer + Job Object sandboxing on Windows, agent API &amp; tool server, CRX3 extension validation). The suite runs on manual dispatch — latest green run is linked from the test suite page — with all four jobs passing.
               </p>
               <p>
-                One honest gap remains: the CRX3 signature-verifier suite is skipped until its verifier parses the header correctly (see Known Limits on the{' '}
+                One gap remains: the CRX3 signature-verifier suite is skipped until its verifier parses the header correctly (see Known Limits on the{' '}
                 <Link href="/docs/testing" className="text-amber-400 hover:underline">test suite page</Link>). It is counted as skipped, never as passing.
               </p>
               <p className="text-white/70">
@@ -1184,16 +1200,9 @@ export default function Home() {
 
         <Boundary />
 
-        {/* CLOSING */}
+        {/* CLOSING — the tagline already carries the brand in the hero, so this
+            section quotes the founder's line rather than repeating it. */}
         <section className="py-24 sm:py-32 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-5xl font-black uppercase leading-[0.9] tracking-tighter text-white sm:text-7xl"
-          >
-            For <span className="bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Questions That Matter.</span>
-          </motion.h2>
           <p className="mx-auto mt-8 max-w-3xl text-xl font-medium leading-relaxed text-white/50">
             “The most important question isn't what you ask AI. It's what AI asks you before it acts.”
           </p>
@@ -1351,35 +1360,6 @@ export default function Home() {
         </section>
 
         <Boundary />
-
-        {/* FINAL REVEAL — quiet signature, not another explanation */}
-        <section id="reveal" className="py-32 sm:py-48 scroll-mt-24 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            <h2 className="text-8xl font-black tracking-tighter uppercase bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_50px_rgba(56,189,248,0.55)] drop-shadow-[0_0_20px_rgba(168,85,247,0.45)] sm:text-[12rem] leading-none">
-              1 CM
-            </h2>
-            <p className="text-3xl font-black uppercase tracking-tight text-white/80 sm:text-5xl">
-              The space between capability and authority.
-            </p>
-          </motion.div>
-        </section>
-
-        {/* 1 CM footer note */}
-        <section className="pb-24 text-center">
-          <div className="mx-auto max-w-3xl rounded-[40px] border border-purple-500/20 bg-purple-500/5 px-8 py-12 sm:px-12">
-            <p className="text-2xl font-black uppercase tracking-tighter text-white sm:text-4xl">
-              Aartiq is just <span className="bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent">1 CM</span> away from the future.
-            </p>
-            <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-white/40">
-              The “1 CM” is a personal reminder that respecting a boundary often begins with asking before crossing it.
-            </p>
-          </div>
-        </section>
 
         {/* FOOTER */}
         <footer className="border-t border-white/5 pt-40 pb-20">

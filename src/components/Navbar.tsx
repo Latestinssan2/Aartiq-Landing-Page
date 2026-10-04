@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { APP_INFO } from "@/lib/version";
+import { APP_INFO, APP_VERSION } from "@/lib/version";
 import { useVersion } from "@/lib/useVersion";
 import { Github } from "lucide-react";
 
@@ -36,7 +36,14 @@ export const Navbar = ({ onOpenAuth, user }: { onOpenAuth: () => void, user: any
             <div className="flex items-center gap-2">
               <span className="text-xl font-black uppercase tracking-tighter leading-none">{APP_INFO.name}™</span>
               <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[9px] font-black text-sky-400">
-                v{version || '0.3.0'}
+              {/*
+                `useVersion()` starts empty and fills in from /api/version after
+                hydration. The previous fallback was the literal '0.3.0', so the
+                badge showed a version that had been superseded for months on the
+                first paint of every page. Fall back to the SSOT instead — it is
+                what /api/version returns anyway, so there is no hydration flash.
+              */}
+                v{version || APP_VERSION.version}
               </span>
             </div>
             <span className="text-[9px] font-bold uppercase tracking-widest text-sky-400/60">

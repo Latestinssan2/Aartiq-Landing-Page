@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useVersion } from "@/lib/useVersion";
+import { benchmarks, derived, network, version, project } from "@/data/facts";
 import { 
   Bot, 
   ShieldCheck, 
@@ -42,7 +43,7 @@ const keyFeatures = [
   },
   {
     icon: ShieldCheck,
-    title: "Three-Layer Security",
+    title: "Six-Layer Security",
     description: "Visual sandbox, syntactic firewall, and human-in-the-loop authorization prevent unauthorized actions.",
     fileRef: "src/lib/Security.ts",
     color: "from-emerald-500/20 to-teal-500/20",
@@ -153,7 +154,7 @@ const architectureLayers = [
   },
   {
     name: "Security Layer",
-    description: "Three-layer architecture: visual sandbox, syntactic firewall, human-in-the-loop",
+    description: "Six layers: visual sandbox, syntactic firewall, human-in-the-loop, directory allowlist, OS sandboxing, capability-scoped execution",
     components: ["Permission Store", "PII Scrubber", "Injection Detector", "QR Auth"],
     color: "bg-amber-500"
   },
@@ -199,11 +200,8 @@ export default function OverviewPage() {
           </span>
         </h1>
 
-        <div className="mb-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-5 py-2 text-[11px] font-black uppercase tracking-[0.3em] text-purple-400">
-            <Quote size={13} /> For The Questions That Matter
-          </span>
-        </div>
+        {/* The brand tagline is carried by the Project Philosophy heading further
+            down — it is deliberately not repeated under the H1. */}
         
         <p className="mx-auto mb-12 max-w-3xl text-xl font-medium leading-relaxed text-white/50">
           Aartiq is an open-source Electron application that integrates large 
@@ -395,8 +393,9 @@ export default function OverviewPage() {
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
             Benchmarks measured on physical hardware using the methodology described below. Results may vary depending on hardware, operating system version, and installed extensions.
           </p>
-          <p className="mt-3 max-w-2xl text-sm text-white/30">
-            All benchmark scripts are included in the repository and can be executed unchanged on supported macOS systems.
+          <p className="mt-3 max-w-2xl text-sm text-white/40">
+            Figures below were <strong className="text-sky-300">{derived.benchmarkLabel}</strong>, not on the
+            current release (v{benchmarks.currentVersion}). {benchmarks.provenance}
           </p>
         </div>
 
@@ -405,12 +404,12 @@ export default function OverviewPage() {
           <h3 className="mb-6 text-sm font-black uppercase tracking-[0.3em] text-white/40">Test Environment</h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { label: "Device", value: "MacBook Pro (Mac16,8)" },
-              { label: "Chip", value: "Apple M4 Pro — 12 cores" },
-              { label: "RAM", value: "24 GB" },
-              { label: "OS", value: "macOS 26.5 (25F71)" },
-              { label: "App Version", value: "0.3.4" },
-              { label: "Date", value: "2026-07-20" },
+              { label: "Device", value: `${benchmarks.hardware.machine} (${benchmarks.hardware.model})` },
+              { label: "Chip", value: `Apple ${benchmarks.hardware.chip} — ${benchmarks.hardware.cores} cores` },
+              { label: "RAM", value: `${benchmarks.hardware.memoryGb} GB` },
+              { label: "OS", value: `${benchmarks.hardware.os} (${benchmarks.hardware.osBuild})` },
+              { label: "App Version", value: benchmarks.benchmarkVersion },
+              { label: "Date", value: benchmarks.date },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between rounded-xl bg-white/5 p-4">
                 <span className="text-xs text-white/40">{item.label}</span>
@@ -429,19 +428,19 @@ export default function OverviewPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="rounded-[2rem] border border-emerald-500/20 bg-emerald-500/5 p-8 text-center">
             <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/60">Cold Start (Window Visible)</p>
-            <p className="text-5xl font-black text-emerald-400">0.32<span className="text-2xl">s</span></p>
+            <p className="text-5xl font-black text-emerald-400">{benchmarks.results[0].value.replace("s", "")}<span className="text-2xl">s</span></p>
             <p className="mt-2 text-xs text-white/40">Process start → First visible window</p>
-            <p className="mt-1 text-[10px] text-white/20">3/3 runs identical (±0.00s)</p>
+            <p className="mt-1 text-[10px] text-white/20">{derived.benchmarkLabel}</p>
           </div>
           <div className="rounded-[2rem] border border-sky-500/20 bg-sky-500/5 p-8 text-center">
             <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-400/60">Warm Start</p>
-            <p className="text-5xl font-black text-sky-400">0.31<span className="text-2xl">s</span></p>
+            <p className="text-5xl font-black text-sky-400">{benchmarks.results[1].value.replace("s", "")}<span className="text-2xl">s</span></p>
             <p className="mt-2 text-xs text-white/40">From OS file cache (second launch)</p>
           </div>
           <div className="rounded-[2rem] border border-purple-500/20 bg-purple-500/5 p-8 text-center">
             <p className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-purple-400/60">Memory (Main)</p>
-            <p className="text-5xl font-black text-purple-400">430<span className="text-2xl">MB</span></p>
-            <p className="mt-2 text-xs text-white/40">RSS at steady state (1.8% of 24GB)</p>
+            <p className="text-5xl font-black text-purple-400">{benchmarks.details.find((d) => d.metric === "Main Process RSS")?.value.split(" ")[0]}<span className="text-2xl">MB</span></p>
+            <p className="mt-2 text-xs text-white/40">RSS at steady state ({benchmarks.hardware.memoryGb} GB total)</p>
           </div>
         </div>
 
@@ -459,16 +458,12 @@ export default function OverviewPage() {
               </thead>
               <tbody className="text-sm text-white/60">
                 {[
-                  { metric: "Cold Start (Window Visible)", value: "0.32s", notes: "Average of 3 runs, ±0.00s" },
-                  { metric: "Warm Start (Window Visible)", value: "0.31s", notes: "From OS file cache" },
-                  { metric: "Main Process RSS", value: "430 MB", notes: "Stabilizes to ~610 MB after tab activity" },
-                  { metric: "Total RSS (all processes)", value: "1,712 MB", notes: "Electron main, renderer, GPU, utility, and helper processes" },
-                  { metric: "CPU (at launch)", value: "14.7%", notes: "During initial window creation and first paint" },
-                  { metric: "CPU (idle after init)", value: "< 1%", notes: "After background services finish loading" },
-                  { metric: "Memory (main, % of 24 GB)", value: "~1.7%", notes: "—" },
-                  { metric: "Memory (total, % of 24 GB)", value: "~7.1%", notes: "Including all Chromium subprocesses" },
-                  { metric: "Active Ports", value: "3001, 3004, 46203", notes: "MCP, WiFi sync, Native bridge" },
-                  { metric: "App Bundle Size", value: "1.2 GB", notes: "Frameworks: 276 MB, Resources: 958 MB" },
+                  ...benchmarks.details,
+                  {
+                    metric: "Active Ports",
+                    value: network.servers.map((s) => s.port).filter((p, i, a) => a.indexOf(p) === i).join(", "),
+                    notes: network.servers.map((s) => s.id).join(", "),
+                  },
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-white/5">
                     <td className="py-3 font-medium text-white/70">{row.metric}</td>
@@ -481,10 +476,17 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        {/* Reproduce */}
+        {/* Measure it yourself */}
         <div className="mt-8 rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-8">
-          <h3 className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-amber-400/60">How to Reproduce</h3>
-          <p className="mb-4 text-sm text-white/50">Run these commands on your own machine to verify:</p>
+          <h3 className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-amber-400/60">
+            Measure It Yourself
+          </h3>
+          <p className="mb-4 text-sm text-white/50">
+            These are not the commands that produced the table above — no such script was
+            committed, which is what the provenance note says. They are the equivalent
+            measurements you can run on your own machine to compare your numbers against
+            ours:
+          </p>
           <div className="rounded-xl bg-black/40 p-4 font-mono text-xs text-white/60">
             <p className="text-white/30"># Kill any running instance</p>
             <p className="text-emerald-400">{`pkill -f "Aartiq" && sleep 4`}</p>
@@ -572,11 +574,8 @@ export default function OverviewPage() {
         </div>
 
         <div className="mt-8 rounded-[2rem] border border-purple-500/20 bg-purple-500/5 p-8 text-center">
-          <p className="text-2xl font-black uppercase tracking-tighter">
-            Aartiq is just <span className="text-purple-400">1 CM</span> away from the future.
-          </p>
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-relaxed text-white/40">
-            "The '1 CM' in Aartiq is a personal reminder that respecting a boundary often begins with asking before crossing it."
+          <p className="text-xl font-black uppercase tracking-tighter text-white sm:text-2xl">
+            {project.origin.oneCm}
           </p>
           <p className="mt-6 text-base font-bold text-white/60">
             Thank you for your patience and support. <span className="text-rose-400">❤️</span>

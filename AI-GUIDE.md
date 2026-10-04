@@ -31,14 +31,16 @@ Aartiq/
 ## Version System
 
 ### Current Version
-- **Version:** `0.3.5` (stable)
-- **Codename:** Nebula
-- **Release Date:** 2026-07-23
+<!-- SSOT:START current-version -->
+- **Version:** `0.3.7` (stable)
+- **Codename:** AppContainer
+- **Release Date:** 2026-09-13
+<!-- SSOT:END current-version -->
 
 ### Version Pattern
 - Format: `Major.Minor.Patch` (e.g., `0.2.7`)
 - Channels: `alpha` → `beta` → `stable`
-- Versions defined in: `src/lib/version.ts`
+- Single source of truth: `src/data/project-facts.ts` (`version`). `src/lib/version.ts` re-exports it; nothing defines a version on its own.
 
 ### Files to Update on Version Change
 ```typescript
@@ -65,7 +67,7 @@ export const APP_VERSION = {
 | Changelog | `/docs/changelog` | Release notes | Every release |
 | Cloud Sync | `/docs/cloud-sync` | WiFi P2P, E2EE sync, mobile | Sync changes |
 | AI Commands | `/docs/ai-commands` | All JSON commands for AI | New/modified commands |
-| Security | `/docs/security` | Three-layer security model | Security changes |
+| Security | `/docs/security` | Six-layer security model | Security changes |
 | Automation | `/docs/automation` | Background scheduling, cron | New automation features |
 | Native API | `/docs/native-api` | macOS SwiftUI panels, IPC | New APIs |
 | Apple Integration | `/docs/apple-integration` | Siri, Shortcuts, Voice, Raycast | macOS integration |
@@ -196,11 +198,17 @@ Aartiq uses structured JSON commands. Always respond with JSON format:
 
 ### Risk Levels
 
-| Level | Approval | Examples |
-|-------|----------|----------|
-| Low | Instant | Navigation, screenshots |
-| Medium | Shift+Tab | Clicking, form filling |
-| High | QR Code | Shell commands, external app clicks |
+The four tiers, their real approval behaviour, and the limitation on each one —
+rendered from the project's single source of truth:
+
+<!-- SSOT:START risk-table -->
+| Tier | Approval behaviour | Auto-approved? | Examples | What it does not guarantee |
+| --- | --- | --- | --- | --- |
+| **low** | Auto-approved. A session grant for low-risk shell commands is created at startup, so no dialog appears. | Yes, by default — unconditional session grant (8h TTL, not written to disk). | `ls`, `cat`, `pwd`, `find`, `grep`, `echo`, `NAVIGATE` | Auto-approval is the default, not an opt-in. The grant is issued at startup before you choose anything. |
+| **medium** | Auto-approved. A session grant for medium-risk shell commands is created at startup alongside the low-risk one. | Yes, by default — same unconditional session grant. | `cp`, `mv`, `mkdir`, `chmod`, `npm`, `git`, `curl`, `osascript` | The shell classifier only ever emits medium or high, so medium is the DEFAULT tier for any command that is not a regex-detected destructive pattern. |
+| **high** | Explicit confirmation. Denied by default, then offered as Allow Once / Always / Deny. | Only if a SHELL_HIGH or SHELL_ALL grant exists, or the user has explicitly auto-approved that binary. | `sudo`, `rm`, `dd`, `shutdown`, `kill`, `mount`, `SHELL_COMMAND` | "Allow Always" persists on the FIRST WORD of the command, so approving `curl <url>` permanently allowlists `curl` generally. |
+| **critical** | Denied at the policy gate unconditionally, then offered to the user as an interactive Allow / Deny prompt. | Never. Four independent guards refuse it, and it is unreachable from every permission grant and auto-approve setting. | _none assigned by any registry_ | No registry assigns this tier — it is only synthesised at runtime for commands arriving from a remote device. On the desktop shell path it uses no biometric and no QR confirmation, just a dialog. |
+<!-- SSOT:END risk-table -->
 
 ### When to Update Security Docs
 

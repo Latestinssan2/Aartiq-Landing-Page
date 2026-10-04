@@ -68,10 +68,9 @@ const steps = [
       linux: {
         steps: [
           "Make the AppImage executable: chmod +x Aartiq.Browser-x.x.x.AppImage",
-          "Run the AppImage: ./Aartiq.Browser-x.x.x.AppImage",
-          "Or use your package manager to install the .deb file"
+          "Run the AppImage: ./Aartiq.Browser-x.x.x.AppImage"
         ],
-        note: "AppImage requires FUSE to run properly on some distributions."
+        note: "AppImage requires FUSE to run properly on some distributions. No .deb package is published."
       },
       android: {
         steps: [

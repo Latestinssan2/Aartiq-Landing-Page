@@ -72,8 +72,8 @@ export const searchIndex: SearchIndex = {
     {
       id: "mcp-agent-api",
       title: "Aartiq MCP Server & Agent API",
-      description: "Real implemented MCP server (aartiq-mcp, MIT) — 60+ tools across 11 categories for Claude Desktop and any MCP client — plus an Agent API over HTTP. The ToolRegistry runs a fail-closed pipeline (verb gate, tab lock, handler, prompt-injection scan) and everything binds to 127.0.0.1.",
-      content: "MCP Model Context Protocol aartiq-mcp Claude Desktop agent API ToolRegistry stdio HTTP bridge 46203 127.0.0.1 loopback 60+ tools 11 categories panels settings bookmarks history permissions security scheduling video system clipboard app-knowledge send_ai_prompt fail-closed verb gate tab lock injection scan defaultTrust limited setup mcpb bundle MIT source lines",
+      description: "Real implemented MCP server (aartiq-mcp, MIT) — 60+ tools across 11 categories for Claude Desktop and any MCP client — plus an Agent API over HTTP. The ToolRegistry runs a fail-closed pipeline (verb gate, tab lock, handler, prompt-injection scan); the agent API and native bridge are loopback-only while the MCP SSE bridge listens on every interface.",
+      content: "MCP Model Context Protocol aartiq-mcp Claude Desktop agent API ToolRegistry stdio HTTP bridge loopback all-interfaces 60+ tools 11 categories panels settings bookmarks history permissions security scheduling video system clipboard app-knowledge send_ai_prompt fail-closed verb gate tab lock injection scan defaultTrust limited setup mcpb bundle MIT source lines",
       url: "/mcp-settings",
       keywords: ["MCP", "Model Context Protocol", "Claude Desktop", "agent API", "ToolRegistry", "stdio", "HTTP bridge", "aartiq-mcp", "tools"],
       type: "page"
@@ -216,7 +216,7 @@ export const searchIndex: SearchIndex = {
     {
       id: "security",
       title: "Security Model",
-      description: "Three-layer security architecture and privacy features",
+      description: "Six-layer security architecture and privacy features",
       content: "security encryption AES-256-GCM PBKDF2 DOMPurify capability-scoped execution AllowedAction E2EE end-to-end encryption permission levels Visual Sandbox Syntactic Firewall Human-in-the-Loop biometric Touch ID batch approval irreversible command vault keychain",
       url: "/docs/security",
       keywords: ["security", "encryption", "AES", "PBKDF2", "DOMPurify", "capability", "E2EE", "permissions", "sandbox", "firewall", "biometric", "Touch ID", "vault"],

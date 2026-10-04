@@ -1,0 +1,225 @@
+{
+  "generatedAt": "2026-10-04T02:31:28.419Z",
+  "environment": {
+    "os": "Darwin 27.0.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "node": "24.14.0",
+    "label": "macOS (local)"
+  },
+  "suites": {
+    "total": 26,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 1
+  },
+  "tests": {
+    "declared": 577,
+    "passed": 551,
+    "skipped": 26,
+    "failed": 0
+  },
+  "skipBreakdown": [
+    {
+      "reason": "Platform-skipped",
+      "count": 12,
+      "detail": "linux-bwrap-sandbox requires linux; generated on darwin; windows-job-sandbox requires win32; generated on darwin"
+    },
+    {
+      "reason": "Missing native OS-automation tooling",
+      "count": 11,
+      "detail": "automation — tests registered via itWhenAvailable, skipped when the backend is absent (looks for xdotool, xte). Reason in file: \"jest-circus has no `this.skip()` (Jasmine-only). Register the OS // automation tests as skipped unless the native backend exists on this // runner (xdotool / xt\""
+    },
+    {
+      "reason": "CRX3 signature-verifier bug",
+      "count": 3,
+      "detail": "src/tests/extensions.crx-verifier.test.ts — describe.skip"
+    }
+  ],
+  "perSuite": [
+    {
+      "suite": "sandbox-security",
+      "passed": 64,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 64
+    },
+    {
+      "suite": "extraction",
+      "passed": 58,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 58
+    },
+    {
+      "suite": "skill-loading",
+      "passed": 54,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 54
+    },
+    {
+      "suite": "tab-intelligence",
+      "passed": 51,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 51
+    },
+    {
+      "suite": "security-validator",
+      "passed": 42,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 42
+    },
+    {
+      "suite": "dom-engine",
+      "passed": 40,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 40
+    },
+    {
+      "suite": "security-fixes",
+      "passed": 40,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 40
+    },
+    {
+      "suite": "component-tests",
+      "passed": 37,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 37
+    },
+    {
+      "suite": "directory-allowlist",
+      "passed": 36,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 36
+    },
+    {
+      "suite": "webauthn-service",
+      "passed": 26,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 26
+    },
+    {
+      "suite": "approval-ticket-security",
+      "passed": 21,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 21
+    },
+    {
+      "suite": "automation",
+      "passed": 5,
+      "skipped": 11,
+      "failed": 0,
+      "declared": 16
+    },
+    {
+      "suite": "dom-handlers",
+      "passed": 16,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 16
+    },
+    {
+      "suite": "linux-bwrap-sandbox",
+      "passed": 7,
+      "skipped": 7,
+      "failed": 0,
+      "declared": 14
+    },
+    {
+      "suite": "windows-job-sandbox",
+      "passed": 8,
+      "skipped": 5,
+      "failed": 0,
+      "declared": 13
+    },
+    {
+      "suite": "guardrails.origin-guard",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "guardrails.prompt-injection",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "snapshot",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "agent-api.registry",
+      "passed": 5,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 5
+    },
+    {
+      "suite": "agent.tab-lock",
+      "passed": 5,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 5
+    },
+    {
+      "suite": "agent.trust",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 4
+    },
+    {
+      "suite": "home-intelligence",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 4
+    },
+    {
+      "suite": "theme",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 4
+    },
+    {
+      "suite": "autofill.vault",
+      "passed": 3,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 3
+    },
+    {
+      "suite": "extensions.crx-verifier",
+      "passed": 0,
+      "skipped": 3,
+      "failed": 0,
+      "declared": 3
+    },
+    {
+      "suite": "extensions.permission-analyzer",
+      "passed": 3,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 3
+    }
+  ],
+  "commandCount": 73,
+  "commandCountSource": "src/lib/AICommandParser.ts — COMMAND_REGISTRY"
+}

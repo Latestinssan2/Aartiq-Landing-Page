@@ -80,7 +80,7 @@ export const docsPages: Record<string, { title: string; description: string; key
   },
   security: {
     title: "Security Model",
-    description: "Three-layer security architecture, E2EE encryption, permissions, and privacy features",
+    description: "Six-layer security architecture, E2EE encryption, permissions, and privacy features",
     keywords: ["security", "encryption", "E2EE", "privacy", "AES-256", "RSA"],
   },
   automation: {

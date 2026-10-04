@@ -27,6 +27,71 @@ import {
   FileKey
 } from "lucide-react";
 
+import { tests, derived, ci, security, net, version } from "@/data/facts";
+
+/** Per-suite declared counts, keyed by suite name (extension stripped). */
+const suiteTotal = (...names: string[]) =>
+  names.reduce((n, name) => {
+    const s = tests.perSuite.find((x) => x.suite === name);
+    return n + (s ? s.declared : 0);
+  }, 0);
+
+const osSandboxTests = suiteTotal(
+  "sandbox-security",
+  "windows-job-sandbox",
+  "linux-bwrap-sandbox",
+);
+const approvalTicketTests = suiteTotal("approval-ticket-security");
+
+/** Windows CI job, resolved by OS rather than by re-typing its counts. */
+const windowsJob = ci.perJob.find((j) => j.os.startsWith("windows")) ?? {
+  passed: 0,
+  skipped: 0,
+  failed: 0,
+  declared: 0,
+};
+
+/**
+ * Presentation only — names, badges, and colours. Every word of substance
+ * (approval method, auto-approve default, examples, and the limitation) comes
+ * from `security.riskTiers`, so the four tiers cannot be described one way here
+ * and another way in the README.
+ */
+const TIER_STYLE = {
+  low: {
+    name: "Low Risk",
+    badge: "Auto-approved",
+    icon: ShieldCheck,
+    color: "text-emerald-400",
+    border: "border-emerald-500/20",
+    bg: "bg-emerald-500/5",
+  },
+  medium: {
+    name: "Medium Risk",
+    badge: "Auto-approved",
+    icon: ShieldAlert,
+    color: "text-amber-400",
+    border: "border-amber-500/20",
+    bg: "bg-amber-500/5",
+  },
+  high: {
+    name: "High Risk",
+    badge: "Explicit confirmation",
+    icon: ShieldAlert,
+    color: "text-red-400",
+    border: "border-red-500/20",
+    bg: "bg-red-500/5",
+  },
+  critical: {
+    name: "Critical Risk",
+    badge: "Never auto-approved",
+    icon: ShieldOff,
+    color: "text-rose-400",
+    border: "border-rose-500/30",
+    bg: "bg-rose-500/5",
+  },
+} as const;
+
 const securityLayers = [
   {
     name: "Visual Sandbox",
@@ -215,7 +280,7 @@ const securityLayers = [
       "All platforms: environment is sanitized — only allowlisted variables (PATH, HOME, USER, LANG, LC_ALL, TMPDIR, SHELL, TERM, etc.) pass through; API keys and tokens never reach the sandboxed process (buildSafeEnv)",
       "Every result carries an explicit `isolation` object ({ filesystem, network, process }) so callers cannot mistake process containment for filesystem/network isolation: macOS, Linux, and Windows all report {true, true, true} when the platform sandbox is active, and any setup failure or unsandboxed run reports all false. No single boolean 'sandboxed' is trusted on its own",
       "Network inside the sandbox is denied by default on all platforms: macOS (deny network*), Linux (--unshare-net), and Windows (zero AppContainer capabilities). Per-domain network allowlisting is NOT supported on any platform — requesting it fails closed",
-      "Honest macOS residual: Seatbelt profiles start from (allow default), so not every IPC class is denied-by-default — Mach IPC remains usable (required for node/python/shell), and Apple Events cannot be filtered by current sandbox-exec (operation not exposed), so a sandboxed command could still ask another app to act on its behalf",
+      "macOS residual (not eliminated): Seatbelt profiles start from (allow default), so not every IPC class is denied-by-default — Mach IPC remains usable (required for node/python/shell), and Apple Events cannot be filtered by current sandbox-exec (operation not exposed), so a sandboxed command could still ask another app to act on its behalf",
       "Source files: src/core/sandbox-executor.js, src/core/win-job-runner.ps1, src/core/directory-allowlist.js"
     ],
     benefits: [
@@ -225,7 +290,7 @@ const securityLayers = [
       "Network exfiltration is blocked by default-deny networking inside the sandbox (macOS/Linux/Windows), not by firewall rules"
     ],
     notGuaranteed: [
-      "On Windows before v0.3.7 the Job Object confined processes only; AppContainer (v0.3.7) adds OS-layer filesystem (package-SID ACL grants) and network (zero capabilities) isolation. The Windows runtime matrix runs in CI on windows-latest and is currently PASSING — the full three-sandbox Jest matrix on Windows (91 tests: 61 passing, 30 platform-skipped) completes green, and every runtime containment test (suspended AppContainer start, verified job assignment, grandchild containment, secret isolation, OS-enforced ACL allowlist denial, KILL_ON_JOB_CLOSE) returns a verified sandbox result. The documentation claims the process is created suspended with SECURITY_CAPABILITIES on CreateProcessW, then the Job Object is assigned and verified via IsProcessInJob before resuming. This is the right design — you should verify the actual PowerShell/C++/Node implementation (src/core/win-job-runner.ps1) rather than trusting the documentation alone.",
+      `On Windows before v${version.semver} the Job Object confined processes only; AppContainer (v${version.semver}) adds OS-layer filesystem (package-SID ACL grants) and network (zero capabilities) isolation. The Windows runtime matrix runs in CI on windows-latest and is currently ${ci.latestRun.conclusion} — the full three-sandbox Jest matrix on Windows (${windowsJob.passed} passing, ${windowsJob.skipped} platform-skipped of ${windowsJob.declared}) completes green, and every runtime containment test (suspended AppContainer start, verified job assignment, grandchild containment, secret isolation, OS-enforced ACL allowlist denial, KILL_ON_JOB_CLOSE) returns a verified sandbox result. The documentation claims the process is created suspended with SECURITY_CAPABILITIES on CreateProcessW, then the Job Object is assigned and verified via IsProcessInJob before resuming. This is the right design — you should verify the actual PowerShell/C++/Node implementation (src/core/win-job-runner.ps1) rather than trusting the documentation alone.`,
       "A sandbox confines what a command can do. It does not make a malicious command safe, and it does not decide what the AI asks for. Human approval is a social control, not a cryptographic one; a coerced or careless approval still executes.",
       "Seatbelt and bubblewrap constrain the process, not the data it is handed. If you allowlist a directory that contains secrets, the sandboxed command can read them. Allowlists are trust boundaries you draw — only as good as where you draw them.",
       "These guarantees apply to code executed through executeSandboxed(). The Electron main process, the renderer, native modules, and helper apps are NOT inside the sandbox. Sandboxing reduces blast radius; it is not a substitute for least-privilege OS accounts, patched dependencies, or simply not running untrusted code.",
@@ -585,7 +650,7 @@ export default function SecurityPage() {
                   </div>
                 )}
 
-                {/* Honest limits for OS sandbox */}
+                {/* Limits the OS sandbox does not cover */}
                 {layer.notGuaranteed && (
                   <div className="mt-8 rounded-xl border border-rose-500/20 bg-rose-500/5 p-6">
                     <h5 className="mb-4 flex items-center gap-2 text-sm font-black uppercase text-rose-400">
@@ -732,82 +797,45 @@ export default function SecurityPage() {
         </div>
 
         <div className="space-y-4">
-          {[
-            {
-              name: "Low Risk",
-              risk: "Auto-approved",
-              icon: ShieldCheck,
-              color: "text-emerald-400",
-              border: "border-emerald-500/20",
-              bg: "bg-emerald-500/5",
-              description: "Read-only actions and navigation",
-              examples: ["Reading tabs", "Navigating to URLs", "Performing searches"],
-              approval: "Auto-approved based on user preferences"
-            },
-            {
-              name: "Medium Risk",
-              risk: "Per-action approval",
-              icon: ShieldAlert,
-              color: "text-amber-400",
-              border: "border-amber-500/20",
-              bg: "bg-amber-500/5",
-              description: "Actions that modify state or affect the system",
-              examples: ["Shell commands", "File writes", "Clipboard access"],
-              approval: "Per-action approval dialog"
-            },
-            {
-              name: "High Risk",
-              risk: "Biometric confirmation",
-              icon: ShieldAlert,
-              color: "text-red-400",
-              border: "border-red-500/20",
-              bg: "bg-red-500/5",
-              description: "Destructive or irreversible operations",
-              examples: ["rm -rf", "dd if=", "Deleting files"],
-              approval: "Biometric confirmation (Touch ID / Windows Hello), falling back to OS password prompt; QR/PIN mobile approval for remote-origin commands"
-            },
-            {
-              name: "Critical Risk",
-              risk: "Always explicit",
-              icon: ShieldOff,
-              color: "text-rose-400",
-              border: "border-rose-500/30",
-              bg: "bg-rose-500/5",
-              description: "Remote or privileged operations — never auto-approved",
-              examples: ["Remote shell commands", "Privilege escalation (sudo)", "System-level changes"],
-              approval: "Always requires explicit approval; never auto-approved. Routed through the capability controller's ticket-based flow."
-            }
-          ].map((tier, i) => (
+          {security.riskTiers.map((tier, i) => {
+            const style = TIER_STYLE[tier.id];
+            const Icon = style.icon;
+            return (
             <motion.div
-              key={tier.name}
+              key={tier.id}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className={`flex flex-col gap-6 rounded-2xl border ${tier.border} ${tier.bg} p-8 lg:flex-row lg:items-center lg:justify-between`}
+              className={`flex flex-col gap-6 rounded-2xl border ${style.border} ${style.bg} p-8 lg:flex-row lg:items-center lg:justify-between`}
             >
               <div className="flex items-start gap-4">
-                <tier.icon size={24} className={`mt-1 shrink-0 ${tier.color}`} />
+                <Icon size={24} className={`mt-1 shrink-0 ${style.color}`} />
                 <div>
                   <div className="flex items-center gap-3">
-                    <h4 className="font-bold text-white">{tier.name}</h4>
-                    <span className={`rounded-full ${tier.bg} px-3 py-1 text-[10px] font-black uppercase tracking-wider ${tier.color}`}>
-                      {tier.risk}
+                    <h4 className="font-bold text-white">{style.name}</h4>
+                    <span className={`rounded-full ${style.bg} px-3 py-1 text-[10px] font-black uppercase tracking-wider ${style.color}`}>
+                      {style.badge}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-white/40">{tier.description}</p>
+                  <p className="mt-1 text-sm text-white/40">{tier.autoApprove}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {tier.examples.map((ex) => (
                       <code key={ex} className="rounded bg-black/30 px-2 py-1 text-xs text-white/50">{ex}</code>
                     ))}
                   </div>
+                  <p className="mt-3 text-xs text-white/35">
+                    <span className="font-black uppercase tracking-wider text-white/25">Known limit: </span>
+                    {tier.limit}
+                  </p>
                 </div>
               </div>
               <div className="max-w-sm lg:text-right">
                 <p className="text-xs font-black uppercase tracking-wider text-white/30">Approval</p>
-                <p className="mt-1 text-sm text-white/60">{tier.approval}</p>
+                <p className="mt-1 text-sm text-white/60">{tier.approvalMethod}</p>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </motion.section>
 
@@ -819,11 +847,15 @@ export default function SecurityPage() {
       >
         <div className="mb-16">
           <p className="mb-4 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
-            High-Risk Actions
+            Remote &amp; Power Actions
           </p>
           <h2 className="text-4xl font-black uppercase tracking-tighter sm:text-5xl">
             QR Code <span className="text-white/20">Approval</span>
           </h2>
+          <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
+            The QR flow is used for two things only: power actions, and shell commands arriving from a paired
+            mobile device. A high-risk command typed at the desktop does not go through it.
+          </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -831,7 +863,8 @@ export default function SecurityPage() {
             <Smartphone size={40} className="mb-6 text-sky-400" />
             <h3 className="mb-4 text-xl font-black uppercase tracking-wider">Mobile App Approval</h3>
             <p className="mb-8 text-white/50">
-              High-risk actions require physical confirmation via the Aartiq mobile app.
+              Power actions (shutdown, restart, sleep, lock) and remote-origin shell commands require physical
+              confirmation via the Aartiq mobile app.
             </p>
             
             <div className="space-y-6">
@@ -901,14 +934,18 @@ export default function SecurityPage() {
             <Smartphone size={40} className="mb-6 text-sky-400" />
             <h3 className="mb-4 text-xl font-black uppercase tracking-wider">Elevated Risk for Remote Origin</h3>
             <p className="mb-6 text-white/50">
-              WiFi Sync commands from paired mobile devices pass through the exact same validation and permission checks as local commands, with one difference: the remote origin elevates the risk tier by one level.
+              WiFi Sync commands from paired mobile devices pass through the exact same validation and permission checks
+              as local commands. One action goes further: a remote-origin <code>shell-command</code> has its risk tier
+              bumped by one level before it reaches the capability controller.
             </p>
             <ul className="space-y-3">
               {[
-                "low → medium",
-                "medium → high",
-                "high → critical (never auto-approved)",
-                "Critical-risk commands are never auto-approved, regardless of origin"
+                "shell-command only: low → medium",
+                "shell-command only: medium → high",
+                "shell-command only: high → critical (denied at the policy gate, then a plain Allow/Deny prompt)",
+                "shutdown / restart / sleep / lock additionally require a QR + PIN approval regardless of risk tier",
+                "Other remote actions (send-prompt, get-clipboard, update-setting) run the same local validation but do NOT receive the tier bump",
+                "Note: no registry ever assigns the critical tier outside this remote shell path, so 'critical is never auto-approved' is true but describes a mostly-unused label — see the source (src/main/handlers/sync-handlers.js)"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle2 size={18} className="mt-0.5 text-emerald-400" />
@@ -928,7 +965,7 @@ export default function SecurityPage() {
               {[
                 "Shutdown, restart, sleep, and lock require QR/PIN approval",
                 "Remote shell commands are validated by SecurityValidator, routed through the capability controller, and executed via execFile (no shell interpretation)",
-                "The MCP server binds to 127.0.0.1 only — no external network exposure",
+                `The agent API and native bridge bind to ${net.agentApi.defaultBindAddress} only; the ${net.mcpBridge.name} (port ${net.mcpBridge.port}) listens on every interface — see Known Limits`,
                 "Pairing tokens expire after 10 minutes"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
@@ -1236,16 +1273,27 @@ export default function SecurityPage() {
 Security <span className="text-white/20">Test Coverage</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-             Every layer above is backed by automated regression tests. The suite is dispatched via GitHub Actions CI (`.github/workflows/jest.yml`) on demand (latest green run: <a href="https://github.com/Latestinssan/Aartiq/actions/runs/34769503518" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:underline">#34769503518</a>). It is not triggered on every push.
+            Every layer above is backed by automated regression tests. The suite is dispatched via GitHub Actions CI (
+            <code className="text-sky-300">.github/workflows/jest.yml</code>) on demand (latest green run:{" "}
+            <a
+              href={ci.latestRun.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-400 hover:underline"
+            >
+              #{ci.latestRun.runNumber}
+            </a>
+            ). It is not triggered on every push.
           </p>
           <a
-            href="https://github.com/Latestinssan/Aartiq/actions/runs/34769503518"
+            href={ci.latestRun.url}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-bold text-emerald-300 transition-colors hover:bg-emerald-500/20"
           >
             <ShieldCheck size={16} />
-            Full aartiq-browser suite + three sandbox runtimes — PASSING (4/4 jobs)
+            Full aartiq-browser suite + three sandbox runtimes — {ci.latestRun.conclusion} (
+            {ci.jobs.defined}/{ci.jobs.defined} jobs)
             <ArrowUpRight size={16} />
           </a>
          </div>
@@ -1253,22 +1301,25 @@ Security <span className="text-white/20">Test Coverage</span>
           <div className="grid gap-6 lg:grid-cols-4">
             <div className="rounded-[2rem] border border-emerald-500/20 bg-emerald-500/5 p-8 text-center">
               <Bug size={32} className="mx-auto mb-4 text-emerald-400" />
-              <h3 className="text-3xl font-black text-emerald-400">577</h3>
-              <p className="text-sm text-white/50">Total declared tests (537 passing, 40 environment-skipped, 0 failing in the latest green run)</p>
+              <h3 className="text-3xl font-black text-emerald-400">{tests.tests.declared}</h3>
+              <p className="text-sm text-white/50">
+                Total declared tests ({derived.testSummary} on {derived.testEnvironment}, generated{" "}
+                {derived.testGeneratedAt.slice(0, 10)})
+              </p>
             </div>
             <div className="rounded-[2rem] border border-rose-500/20 bg-rose-500/5 p-8 text-center">
               <ShieldOff size={32} className="mx-auto mb-4 text-rose-400" />
-              <h3 className="text-3xl font-black text-rose-400">84</h3>
+              <h3 className="text-3xl font-black text-rose-400">{osSandboxTests}</h3>
               <p className="text-sm text-white/50">OS-sandbox tests (fail-closed + adversarial)</p>
             </div>
             <div className="rounded-[2rem] border border-sky-500/20 bg-sky-500/5 p-8 text-center">
               <ShieldCheck size={32} className="mx-auto mb-4 text-sky-400" />
-              <h3 className="text-3xl font-black text-sky-400">21</h3>
+              <h3 className="text-3xl font-black text-sky-400">{approvalTicketTests}</h3>
               <p className="text-sm text-white/50">Approval-ticket regression tests</p>
             </div>
             <div className="rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-8 text-center">
               <Layers size={32} className="mx-auto mb-4 text-amber-400" />
-              <h3 className="text-3xl font-black text-amber-400">6</h3>
+              <h3 className="text-3xl font-black text-amber-400">{security.layers.length}</h3>
               <p className="text-sm text-white/50">Security layers under test</p>
             </div>
           </div>
