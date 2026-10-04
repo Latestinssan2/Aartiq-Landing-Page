@@ -556,9 +556,18 @@ export const ci = {
   /**
    * The same commit yields different pass/skip splits per platform, which is why
    * every published count carries its environment.
+   *
+   * This must not restate a current count. The per-job figures above belong to
+   * run 34769503518 at acc703ae, and the local macOS suite has grown well past
+   * the 577 tests that commit declared — so a second set of numbers here reads
+   * as a present-tense claim and contradicts the generated line beside it. Point
+   * at the generated number instead of repeating one that has expired.
    */
   platformVarianceNote:
-    "On ubuntu-latest the full suite reports 537 passed / 40 skipped. A local macOS run of the same 577 declared tests reports 551 passed / 26 skipped. Quote the environment with the number.",
+    "The per-job figures above belong to that run and commit, not to the current tree, " +
+    "which has grown since — for a current figure use the generated macOS line above. " +
+    "The same commit yields a different pass/skip split per platform, which is why every " +
+    "published count carries its environment.",
 } as const;
 
 // ---------------------------------------------------------------------------
