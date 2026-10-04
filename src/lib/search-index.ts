@@ -379,7 +379,7 @@ export const searchIndex: SearchIndex = {
       id: "cloud-sync",
       title: "Cloud Sync",
       description: "End-to-end encrypted cross-device synchronization",
-      content: "cloud sync E2EE encryption WiFi P2P mobile pairing QR code clipboard history tabs",
+      content: "cloud sync E2EE encryption passphrase WiFi P2P mobile pairing code clipboard desktop control trust blocked known devices UDP broadcast",
       url: "/docs/cloud-sync",
       keywords: ["cloud", "sync", "E2EE", "encryption", "WiFi", "P2P", "mobile", "clipboard"],
       type: "page"
