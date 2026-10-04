@@ -138,7 +138,7 @@ const architecture: ArchCard[] = [
     icon: Server,
     title: 'MCP stdio server (aartiq-mcp)',
     color: 'text-emerald-400',
-    body: 'A standalone, MIT-licensed MCP server bundle (aartiq-mcp/) that any MCP client can launch via stdio. It exposes 60+ tools and bridges into the running Aartiq browser over a local HTTP bridge.',
+    body: 'A standalone, MIT-licensed MCP server bundle (aartiq-mcp/) that any MCP client can launch via stdio. It exposes 64 tools across 11 categories and bridges into the running Aartiq browser over a local HTTP bridge.',
     points: [
       { text: 'ListTools / CallTool request handlers over the MCP SDK.', refs: [{ label: 'server/index.js:1185-1192', url: `${GH}/aartiq-mcp/server/index.js#L1185-L1192` }] },
       { text: 'Tool dispatch through handleToolCall.', refs: [{ label: 'server/index.js:892', url: `${GH}/aartiq-mcp/server/index.js#L892` }] },
@@ -151,7 +151,7 @@ const architecture: ArchCard[] = [
     color: 'text-sky-400',
     body: 'The stdio server never talks to the browser directly. A BridgeClient forwards each tool call over plain HTTP to the browser process, which alone holds the real capabilities.',
     points: [
-      { text: `Default host ${net.nativeBridge.defaultBindAddress}, default port ${net.nativeBridge.port} — loopback only. Note that both servers default to this same port.`, refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
+      { text: `Default host ${net.nativeBridge.defaultBindAddress}, default port ${net.nativeBridge.port} — loopback only. BridgeClient talks to the native bridge; the agent API moved to ${net.agentApi.port}, so the two no longer share a port.`, refs: [{ label: 'server/bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` }] },
       { text: 'BridgeClient class with per-request timeout and AI response polling.', refs: [{ label: 'server/bridge-client.js:9', url: `${GH}/aartiq-mcp/server/bridge-client.js#L9-L12` }] },
     ],
   },
@@ -190,13 +190,14 @@ interface SecurityItem {
 const securityModel: SecurityItem[] = [
   {
     icon: Globe,
-    title: 'Loopback by default — but not everything',
+    title: 'Loopback by default',
     color: 'text-amber-400',
-    text: `The agent API and the native bridge bind to ${net.agentApi.defaultBindAddress}; the agent API only exposes every interface when remote is explicitly turned on. The MCP SSE bridge does not follow that rule: mcp-browser-server.js:1620 calls listen(port) with no host argument, so it accepts connections from any interface, and there is no switch to restrict it. Treat port ${net.mcpBridge.port} as LAN-reachable until that changes.`,
+    text: `All three HTTP listeners bind to loopback by default. The agent API uses ${net.agentApi.defaultBindAddress} and exposes every interface only when remote is explicitly turned on; the MCP SSE bridge resolves its bind host through resolveBindHost() (mcp-browser-server.js:1678-1681) and listens on 127.0.0.1 unless the security_mcpBridgeRemote setting is turned on (main.js:9161, default off). The WiFi sync and PDF sync services are the two listeners that do bind all interfaces — without a token — which the README states plainly.`,
     refs: [
       { label: 'bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` },
       { label: 'src/lib/agent-api/providers.ts:22,78', url: `${GH}/aartiq-browser/src/lib/agent-api/providers.ts#L22-L78` },
-      { label: 'src/lib/mcp-browser-server.js:1620', url: `${GH}/aartiq-browser/src/lib/mcp-browser-server.js#L1620` },
+      { label: 'src/lib/mcp-browser-server.js:1678-1681', url: `${GH}/aartiq-browser/src/lib/mcp-browser-server.js#L1678-L1681` },
+      { label: 'main.js:9161', url: `${GH}/aartiq-browser/main.js#L9161` },
     ],
   },
   {
@@ -267,7 +268,7 @@ export default function MCPSettingsPage() {
           </h1>
           <p className="mt-6 max-w-3xl text-lg font-medium leading-relaxed text-white/50">
             Aartiq ships a real, implemented MCP server (<span className="text-emerald-400">aartiq-mcp</span>, MIT) that drives the
-            browser from Claude Desktop and any MCP client — 60+ tools across 11 categories — plus an Agent API that exposes the same
+            browser from Claude Desktop and any MCP client — 64 tools across 11 categories — plus an Agent API that exposes the same
             surface over HTTP. Every tool call runs a fail-closed security pipeline and everything binds to the loopback interface.
             This page documents the implemented system; each claim links to the exact source lines on GitHub.
           </p>

@@ -3,19 +3,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { 
+import {
   Monitor,
   Mic,
   Volume2,
-  Keyboard,
   Terminal,
-  Calendar,
   AppWindow,
   Camera,
   Search,
   FileText,
   MessageSquare,
-  Share2,
   Settings,
   ChevronRight,
   Copy,
@@ -24,9 +21,10 @@ import {
   Bot,
   Command,
   Cpu,
-  Globe,
-  ExternalLink,
-  Cog
+  AlertTriangle,
+  XCircle,
+  CheckCircle2,
+  Link2,
 } from "lucide-react";
 
 const CodeBlock = ({ code, language = "bash" }: { code: string; language?: string }) => {
@@ -39,18 +37,11 @@ const CodeBlock = ({ code, language = "bash" }: { code: string; language?: strin
   };
 
   return (
-    <div className="relative group rounded-xl overflow-hidden bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
+    <div className="relative group rounded-xl overflow-hidden bg-slate-900/80 border border-slate-700/50">
       <div className="flex items-center justify-between px-4 py-2 bg-slate-800/50 border-b border-slate-700/50">
         <span className="text-xs text-slate-400 font-mono">{language}</span>
-        <button
-          onClick={copyToClipboard}
-          className="p-1.5 rounded-lg hover:bg-slate-700/50 transition-colors"
-        >
-          {copied ? (
-            <Check className="w-4 h-4 text-emerald-400" />
-          ) : (
-            <Copy className="w-4 h-4 text-slate-400" />
-          )}
+        <button onClick={copyToClipboard} className="p-1.5 rounded-lg hover:bg-slate-700/50">
+          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
         </button>
       </div>
       <pre className="p-4 overflow-x-auto">
@@ -60,207 +51,197 @@ const CodeBlock = ({ code, language = "bash" }: { code: string; language?: strin
   );
 };
 
-const ParameterTable = ({ 
-  params 
-}: { 
-  params: { name: string; required: boolean; type: string; desc: string }[] 
-}) => (
-  <div className="overflow-x-auto rounded-xl border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b border-slate-700/50 bg-slate-800/30">
-          <th className="px-4 py-3 text-left text-slate-300 font-semibold">Parameter</th>
-          <th className="px-4 py-3 text-left text-slate-300 font-semibold">Type</th>
-          <th className="px-4 py-3 text-left text-slate-300 font-semibold">Required</th>
-          <th className="px-4 py-3 text-left text-slate-300 font-semibold">Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        {params.map((param, idx) => (
-          <tr key={idx} className="border-b border-slate-700/30 last:border-0">
-            <td className="px-4 py-3 font-mono text-blue-400">{param.name}</td>
-            <td className="px-4 py-3 text-slate-400">{param.type}</td>
-            <td className="px-4 py-3">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                param.required 
-                  ? "bg-amber-500/20 text-amber-400" 
-                  : "bg-slate-700/50 text-slate-400"
-              }`}>
-                {param.required ? "Required" : "Optional"}
-              </span>
-            </td>
-            <td className="px-4 py-3 text-slate-300">{param.desc}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+type Reach = "works" | "unwired" | "dead-channel";
 
+const REACH_META: Record<Reach, { label: string; icon: typeof CheckCircle2; tone: string }> = {
+  works: {
+    label: "Does the work",
+    icon: CheckCircle2,
+    tone: "border-emerald-500/30 bg-emerald-500/5 text-emerald-300",
+  },
+  unwired: {
+    label: "Code exists, nothing reaches it",
+    icon: AlertTriangle,
+    tone: "border-amber-500/30 bg-amber-500/5 text-amber-300",
+  },
+  "dead-channel": {
+    label: "Sends on a channel with no listener",
+    icon: XCircle,
+    tone: "border-rose-500/30 bg-rose-500/5 text-rose-300",
+  },
+};
+
+// Every action in the actionHandlers table in src/lib/windows-integration.js.
+// The previous version of this page cited src/lib/platform/WindowsIntegration.ts,
+// which is not a file in this repository, and described each of these as a
+// working Windows shortcut.
+//
+// The three reach values are the whole story of this page:
+//
+//   dead-channel : the handler sends on an IPC channel that no renderer
+//                  subscribes to, so the send returns and nothing happens.
+//   works        : the handler reaches a real system API instead.
+//   unwired      : the code is correct and the channel matches, but nothing
+//                  outside the app can invoke it. That is the case for every
+//                  action on this page, because the OS never delivers the URL.
 const windowsActions = [
   {
-    name: "AI Chat",
-    url: "aartiq://chat",
-    description: "Send a message to the AI assistant for processing",
-    params: [
-      { name: "message", required: true, type: "string", desc: "The message to send to AI" },
-      { name: "stream", required: false, type: "boolean", desc: "Enable streaming response" }
-    ],
-    example: "aartiq://chat?message=Explain%20quantum%20computing&stream=true"
-  },
-  {
-    name: "Smart Search",
-    url: "aartiq://search",
-    description: "Perform a web search with AI-powered results",
-    params: [
-      { name: "query", required: true, type: "string", desc: "Search query" },
-      { name: "safe", required: false, type: "boolean", desc: "Safe search (default: true)" }
-    ],
-    example: "aartiq://search?query=Windows%2012%20features&safe=true"
-  },
-  {
-    name: "Create PDF",
-    url: "aartiq://create-pdf",
-    description: "Generate a PDF document with customizable templates",
-    params: [
-      { name: "content", required: true, type: "string", desc: "Content for the PDF" },
-      { name: "title", required: false, type: "string", desc: "Document title" },
-      { name: "template", required: false, type: "string", desc: "Template: professional, executive, academic, minimalist, dark" }
-    ],
-    example: "aartiq://create-pdf?content=Hello%20World&title=My%20Report&template=professional"
-  },
-  {
-    name: "Navigate",
-    url: "aartiq://navigate",
-    description: "Open a URL in the Aartiq browser",
-    params: [
-      { name: "url", required: true, type: "string", desc: "URL to open" },
-      { name: "newTab", required: false, type: "boolean", desc: "Open in new tab" }
-    ],
-    example: "aartiq://navigate?url=https://github.com&newTab=true"
-  },
-  {
-    name: "Run Command",
-    url: "aartiq://run-command",
-    description: "Execute a PowerShell or CMD command",
-    params: [
-      { name: "command", required: true, type: "string", desc: "Command to execute" },
-      { name: "shell", required: false, type: "string", desc: "Shell: powershell, cmd, pwsh" },
-      { name: "confirm", required: false, type: "boolean", desc: "Skip confirmation" }
-    ],
-    example: "aartiq://run-command?command=Get-Process&shell=powershell&confirm=true"
-  },
-  {
-    name: "Schedule Task",
-    url: "aartiq://schedule",
-    description: "Schedule an automation task with cron expression",
-    params: [
-      { name: "task", required: true, type: "string", desc: "Task description" },
-      { name: "cron", required: true, type: "string", desc: "Cron expression" },
-      { name: "action", required: true, type: "string", desc: "Action type: pdf, search, chat, scrape" }
-    ],
-    example: "aartiq://schedule?task=Daily%20report&cron=0%208%20*%20*&action=pdf"
+    name: "Open App",
+    action: "open-app",
+    reach: "works" as Reach,
+    params: "appName, appPath",
+    description:
+      "Calls shell.openPath. With appPath it opens exactly that path. With appName it guesses C:\\Program Files\\<name>\\<name>.exe and then C:\\Program Files (x86)\\<name>\\<name>.exe, and returns success even if neither exists. There is no args parameter.",
   },
   {
     name: "Set Volume",
-    url: "aartiq://volume",
-    description: "Adjust system volume level",
-    params: [
-      { name: "level", required: true, type: "number", desc: "Volume level (0-100)" },
-      { name: "mute", required: false, type: "boolean", desc: "Mute/unmute" }
-    ],
-    example: "aartiq://volume?level=75&mute=false"
+    action: "volume",
+    reach: "works" as Reach,
+    params: "level (0-100)",
+    description:
+      "Runs a PowerShell script that drives the CoreAudio IAudioEndpointVolume COM interface. The level is clamped to 0-100 and defaults to 50 when absent or unparseable.",
   },
   {
-    name: "Open App",
-    url: "aartiq://open-app",
-    description: "Launch a Windows application",
-    params: [
-      { name: "appName", required: true, type: "string", desc: "Application name or path" },
-      { name: "args", required: false, type: "string", desc: "Command line arguments" }
-    ],
-    example: "aartiq://open-app?appName=notepad&args=c:\\temp\\notes.txt"
+    name: "Voice",
+    action: "voice",
+    reach: "works" as Reach,
+    params: "command (listen | speak), text, rate, volume, voice",
+    description:
+      "command=listen runs a single System.Speech recognition with a two-second silence timeout and returns whatever it heard. It is one-shot, not continuous. command=speak speaks the text parameter.",
+  },
+  {
+    name: "Copilot",
+    action: "copilot",
+    reach: "works" as Reach,
+    params: "(none read)",
+    description:
+      "Opens the Copilot application by shell.openPath, falling back to copilot.microsoft.com in the browser. That is the whole implementation. It does not send a prompt anywhere and does not read the prompt parameter the old page documented.",
+  },
+  {
+    name: "AI Chat",
+    action: "chat",
+    reach: "dead-channel" as Reach,
+    params: "message",
+    description: "Sends the message on ai:chat-message. Nothing subscribes to that channel.",
+  },
+  {
+    name: "Navigate",
+    action: "navigate",
+    reach: "dead-channel" as Reach,
+    params: "url",
+    description: "Sends browser:navigate. Nothing subscribes to that channel.",
+  },
+  {
+    name: "Smart Search",
+    action: "search",
+    reach: "dead-channel" as Reach,
+    params: "query",
+    description: "Sends ai:search. Nothing subscribes to that channel.",
+  },
+  {
+    name: "Create PDF",
+    action: "create-pdf",
+    reach: "dead-channel" as Reach,
+    params: "content, title, template",
+    description:
+      "Sends ai:create-pdf. Nothing subscribes to that channel, and template is forwarded without ever being interpreted.",
+  },
+  {
+    name: "Run Command",
+    action: "run-command",
+    reach: "dead-channel" as Reach,
+    params: "command, confirm",
+    description:
+      "Refuses unless confirm is exactly the string \"true\", then sends the command on shell:execute. Nothing subscribes to that channel, so nothing executes. Note that confirm is a required gate here, not a convenience that skips a prompt.",
   },
   {
     name: "Screenshot",
-    url: "aartiq://screenshot",
-    description: "Capture a screenshot of the screen or window",
-    params: [
-      { name: "mode", required: false, type: "string", desc: "full, window, region" },
-      { name: "save", required: false, type: "boolean", desc: "Save to file" }
-    ],
-    example: "aartiq://screenshot?mode=region&save=true"
+    action: "screenshot",
+    reach: "dead-channel" as Reach,
+    params: "(none read)",
+    description:
+      "Sends system:screenshot. Nothing subscribes to that channel. The mode and save parameters the old page documented are not read.",
+  },
+  {
+    name: "Schedule Task",
+    action: "schedule",
+    reach: "dead-channel" as Reach,
+    params: "task, cron, model",
+    description:
+      "Sends ai:schedule. Nothing subscribes to that channel. There is no action parameter; the old page listed action: pdf, search, chat, scrape, which is not read anywhere.",
   },
   {
     name: "Ask & Speak",
-    url: "aartiq://ask-ai",
-    description: "Ask AI and get spoken audio response",
-    params: [
-      { name: "prompt", required: true, type: "string", desc: "Question or prompt" },
-      { name: "speak", required: false, type: "boolean", desc: "Speak the response" },
-      { name: "voice", required: false, type: "string", desc: "Voice name (default: David)" }
-    ],
-    example: "aartiq://ask-ai?prompt=What%20is%20the%20weather&speak=true&voice=David"
+    action: "ask-ai",
+    reach: "dead-channel" as Reach,
+    params: "prompt, model, speak",
+    description: "Sends ai:ask-speaking. Nothing subscribes to that channel.",
   },
-  {
-    name: "Copilot Query",
-    url: "aartiq://copilot",
-    description: "Send query to Microsoft Copilot and get response",
-    params: [
-      { name: "prompt", required: true, type: "string", desc: "Query for Copilot" },
-      { name: "mode", required: false, type: "string", desc: "creative, balanced, precise" }
-    ],
-    example: "aartiq://copilot?prompt=Help%20me%20write%20a%20function&mode=precise"
-  },
-  {
-    name: "OCR Scan",
-    url: "aartiq://ocr",
-    description: "Perform OCR on screen region or image",
-    params: [
-      { name: "mode", required: false, type: "string", desc: "screen, clipboard, file" },
-      { name: "lang", required: false, type: "string", desc: "Language code (eng, spa, fra, etc.)" }
-    ],
-    example: "aartiq://ocr?mode=screen&lang=eng"
-  }
 ];
 
-const voiceCommands = [
-  { phrase: "Hey Aartiq, ask about...", description: "Send a question to AI", example: "Hey Aartiq, ask about machine learning" },
-  { phrase: "Hey Aartiq, search for...", description: "Perform a web search", example: "Hey Aartiq, search for Windows 12 release date" },
-  { phrase: "Hey Aartiq, create PDF", description: "Generate a PDF document", example: "Hey Aartiq, create PDF with my meeting notes" },
-  { phrase: "Hey Aartiq, run command...", description: "Execute a PowerShell command", example: "Hey Aartiq, run command Get-EventLog" },
-  { phrase: "Hey Aartiq, schedule...", description: "Schedule a task", example: "Hey Aartiq, schedule daily report at 8am" },
-  { phrase: "Hey Aartiq, set volume to...", description: "Adjust system volume", example: "Hey Aartiq, set volume to 50 percent" },
-  { phrase: "Hey Aartiq, open...", description: "Launch an application", example: "Hey Aartiq, open Visual Studio Code" },
-  { phrase: "Hey Aartiq, take screenshot", description: "Capture screen", example: "Hey Aartiq, take screenshot of active window" },
-  { phrase: "Hey Aartiq, speak the answer", description: "Voice chat with AI", example: "Hey Aartiq, what's the weather? Speak the answer" },
-  { phrase: "Hey Aartiq, ask Copilot...", description: "Query Microsoft Copilot", example: "Hey Aartiq, ask Copilot to explain async/await" },
-  { phrase: "Hey Aartiq, OCR this", description: "Extract text from screen", example: "Hey Aartiq, OCR this region" },
-  { phrase: "Hey Aartiq, automate...", description: "Create automation workflow", example: "Hey Aartiq, automate my backup process" }
+const BRIDGE_CHANNELS = [
+  ["windows:execute-action", "action, params", "Runs any action above"],
+  ["windows:copilot:open", "(none)", "Opens Copilot"],
+  ["windows:voice:listen", "params", "One-shot dictation"],
+  ["windows:voice:speak", "text, params", "Speech synthesis"],
+  ["windows:voice:get-voices", "(none)", "Installed SAPI voices"],
+  ["windows:generate-url", "action, params", "Builds an aartiq:// URL"],
+  ["windows:create-shortcut", "name, action, params", "Writes a .url file into userData"],
+  ["windows:get-shortcuts-list", "(none)", "A hardcoded list of twelve entries"],
+  ["windows:register-protocol", "(none)", "Registers aartiq:// for this build"],
 ];
 
-const copilotActions = [
-  { name: "Open Copilot Panel", action: "aartiq://copilot-panel", description: "Open Microsoft Copilot sidebar", shortcut: "Ctrl + Shift + C" },
-  { name: "Ask Copilot", action: "Ask a question", description: "Send prompt to Copilot and get response", shortcut: "Copilot + C" },
-  { name: "Code Assist", action: "Copilot:explain", description: "Explain selected code with Copilot", shortcut: "Ctrl + Alt + E" },
-  { name: "Refactor Code", action: "Copilot:refactor", description: "Refactor selected code", shortcut: "Ctrl + Alt + R" },
-  { name: "Generate Tests", action: "Copilot:tests", description: "Generate unit tests", shortcut: "Ctrl + Alt + T" },
-  { name: "Document Code", action: "Copilot:doc", description: "Generate documentation", shortcut: "Ctrl + Alt + D" },
-  { name: "Chat with Both", action: "aartiq://dual-chat", description: "Chat with both Aartiq and Copilot", shortcut: "Ctrl + D" },
-  { name: "Compare Answers", action: "aartiq://compare", description: "Compare Aartiq and Copilot responses", shortcut: "Ctrl + Shift + P" }
+// Names in the handler that do not appear in actionHandlers, so passing them
+// returns "Unknown action". Three of the twelve entries the get-shortcuts-list
+// handler returns are in this set.
+const MISMATCHED_SHORTCUT_IDS = [
+  { listed: "voice-chat", actual: "voice" },
+  { listed: "ask-and-speak", actual: "ask-ai" },
+  { listed: "set-volume", actual: "volume" },
 ];
+
+const REMOVED = [
+  "The source path src/lib/platform/WindowsIntegration.ts. There is no src/lib/platform directory. The module is src/lib/windows-integration.js.",
+  "aartiq:// as a way to reach the app from another Windows program. The scheme is registered, but the only handler is app.on('open-url'), which Electron emits on macOS only, and there is no second-instance handler or argv parsing. A Windows protocol activation starts a second process and is discarded.",
+  "The Power Automate section and the POST http://localhost:3000/api/commands endpoint. No such endpoint exists and port 3000 has never been a listener in this project.",
+  "Microsoft Copilot as a second assistant. There is no dual chat, no compare mode, no aartiq://dual-chat and no aartiq://compare. The Copilot action launches the Copilot app.",
+  "Ctrl+Shift+C, Ctrl+D, Ctrl+Shift+P, Ctrl+Alt+E, Ctrl+Alt+R, Ctrl+Alt+T and Ctrl+Alt+D. None of these accelerators is registered anywhere in the project.",
+  "The Copilot:explain, Copilot:refactor, Copilot:tests and Copilot:doc actions. None exists.",
+  "The \"Hey Aartiq\" wake word and all twelve voice phrases. There is no wake word, no hotword detection and no continuous listening in this codebase; the string does not appear.",
+  "Install-Module SpeechRecognition and Start-SpeechRecognition. No PowerShell module is installed or required. The app shells out to System.Speech, which is part of .NET.",
+  "The VoiceAttack snippet mixing PowerShell comments with a VBScript body, an undefined {Hwnd} placeholder, and a do-nothing Sleep loop.",
+  "The configuration keys voice.enabled, voice.wakeWord, voice.voice, voice.rate, copilot.enabled, copilot.defaultMode, automate.httpPort and automate.authToken. No configuration file reads any of them.",
+  "Windows 12, which does not exist as a release. The page had used it as a search example.",
+];
+
+const REGISTRY = `Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\\aartiq]
+@="URL:Aartiq Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\\aartiq\\DefaultIcon]
+@="C:\\Program Files\\Aartiq\\aartiq.exe,0"
+
+[HKEY_CLASSES_ROOT\\aartiq\\shell\\open\\command]
+@="\\"C:\\Program Files\\Aartiq\\aartiq.exe\\" \\"%1\\""`;
 
 export default function WindowsIntegrationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const sections = [
     { id: "overview", label: "Overview" },
-    { id: "windows-shortcuts", label: "Windows Shortcuts" },
-    { id: "voice-control", label: "Voice Control" },
-    { id: "copilot-integration", label: "Copilot Integration" },
-    { id: "power-automate", label: "Power Automate" },
-    { id: "setup-guide", label: "Setup Guide" },
+    { id: "reach", label: "What Actually Works" },
+    { id: "actions", label: "Actions" },
+    { id: "bridge", label: "Bridge API" },
+    { id: "voice", label: "Voice" },
+    { id: "setup", label: "Protocol Registration" },
   ];
+
+  const counts = {
+    works: windowsActions.filter((a) => a.reach === "works").length,
+    dead: windowsActions.filter((a) => a.reach === "dead-channel").length,
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-black to-zinc-900">
@@ -277,16 +258,10 @@ export default function WindowsIntegrationPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Link 
-                href="/docs/apple-integration"
-                className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
-              >
+              <Link href="/docs/apple-integration" className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors">
                 macOS Integration
               </Link>
-              <Link 
-                href="/docs/deep-links"
-                className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
-              >
+              <Link href="/docs/deep-links" className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors">
                 Deep Links
               </Link>
             </div>
@@ -296,19 +271,19 @@ export default function WindowsIntegrationPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
-          <motion.aside 
+          <motion.aside
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className={`flex-shrink-0 ${sidebarOpen ? 'w-64' : 'w-16'}`}
+            className={`flex-shrink-0 ${sidebarOpen ? "w-64" : "w-16"}`}
           >
-            <button 
+            <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors mb-4"
             >
-              {sidebarOpen ? <Settings className="w-5 h-5" /> : <Settings className="w-5 h-5" />}
+              <Settings className="w-5 h-5" />
               {sidebarOpen && <span className="text-sm">Collapse</span>}
             </button>
-            
+
             {sidebarOpen && (
               <nav className="space-y-1">
                 {sections.map((section) => (
@@ -324,223 +299,319 @@ export default function WindowsIntegrationPage() {
             )}
           </motion.aside>
 
-          <main className="flex-1 min-w-0">
+          <main className="flex-1 min-w-0 space-y-16">
             {/* Overview */}
-            <section id="overview" className="mb-16">
+            <section id="overview">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-blue-900/20 border border-zinc-800/50 p-8 md:p-12"
               >
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LjI1NSwyNTUsMC4wNSkiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50" />
                 <div className="relative">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500">
                       <Monitor className="w-8 h-8 text-white" />
                     </div>
                     <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium border border-blue-500/30">
-                      Windows 10/11
+                      Windows 10 / 11
                     </span>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                    Windows Integration
-                  </h1>
-                  <p className="text-xl text-zinc-300 max-w-2xl mb-6">
-                    aartiq:// URL scheme handler for Windows 10/11. Source: src/lib/platform/WindowsIntegration.ts.
-                    Provides programmatic access to AI chat, web search, PDF generation, shell execution,
-                    system control, and Copilot integration.
+                  <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Windows Integration</h2>
+                  <p className="text-xl text-zinc-300 max-w-3xl mb-6">
+                    Implemented in{" "}
+                    <code className="font-mono text-lg text-blue-300">src/lib/windows-integration.js</code>.
+                    It defines twelve actions, a PowerShell and System.Speech layer for volume and
+                    voice, and a nine-method bridge. This page previously described a Windows
+                    shortcut system that does not exist. The honest version is shorter: the code is
+                    largely there, the IPC bridge is wired up and reachable, but nothing on Windows
+                    can invoke it from outside the app.
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 text-sm">
-                      <Zap className="w-4 h-4 text-amber-400" />
-                      URL Scheme Handler
+                      <Link2 className="w-4 h-4 text-amber-400" />
+                      Scheme registered, never delivered
                     </div>
                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 text-sm">
                       <Mic className="w-4 h-4 text-amber-400" />
-                      Voice Activation
-                    </div>
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 text-sm">
-                      <Bot className="w-4 h-4 text-amber-400" />
-                      Copilot Integration
+                      One-shot dictation
                     </div>
                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 text-sm">
                       <Terminal className="w-4 h-4 text-amber-400" />
-                      Power Automate
+                      PowerShell via CoreAudio
                     </div>
                   </div>
                 </div>
               </motion.div>
             </section>
 
-            {/* Windows Shortcuts */}
-            <section id="windows-shortcuts" className="mb-16">
-              <motion.div 
-                id="windows-shortcuts"
+            {/* The reach problem */}
+            <section className="p-8 rounded-3xl border border-amber-500/25 bg-amber-500/[0.04]">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertTriangle className="w-6 h-6 text-amber-400" />
+                <h2 className="text-2xl font-bold text-amber-300">
+                  Nothing on Windows can invoke any of these actions
+                </h2>
+              </div>
+              <div className="space-y-4 text-zinc-300">
+                <p>
+                  At startup, on Windows only, the app calls{" "}
+                  <code className="font-mono text-blue-300">registerWindowsProtocol()</code>, which
+                  registers <code className="font-mono text-blue-300">aartiq://</code> as a protocol
+                  handler. When Windows activates that protocol it launches a second copy of the
+                  executable with the URL as an argument.
+                </p>
+                <p>
+                  The module has a function that would handle exactly that —{" "}
+                  <code className="font-mono text-blue-300">handleURLSchemeEvent</code> — and{" "}
+                  <code className="font-mono text-blue-300">handleWindowsShortcutAction</code>,
+                  which is what it calls. Both are imported by{" "}
+                  <code className="font-mono text-blue-300">main.js</code> and neither is ever
+                  called. There is no{" "}
+                  <code className="font-mono text-blue-300">second-instance</code> handler, no{" "}
+                  <code className="font-mono text-blue-300">requestSingleInstanceLock</code>, and
+                  no code that reads{" "}
+                  <code className="font-mono text-blue-300">process.argv</code> for a URL.
+                </p>
+                <p>
+                  So the twelve actions are reachable from inside the app, through{" "}
+                  <code className="font-mono text-blue-300">electronAPI.windows.*</code>, and from
+                  nowhere else. A Windows protocol activation opens a second instance of the app and
+                  the URL is discarded.
+                </p>
+                <p className="text-zinc-400">
+                  The same is true of the Linux page, and for the same reason. On macOS the{" "}
+                  <code className="font-mono text-blue-300">open-url</code> event does fire, which is
+                  why the{" "}
+                  <Link href="/docs/deep-links" className="text-blue-400 underline">
+                    deep-link reference
+                  </Link>{" "}
+                  has working entries and this one does not.
+                </p>
+              </div>
+            </section>
+
+            {/* What actually works */}
+            <section id="reach">
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 mb-8"
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8"
               >
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30">
-                  <Command className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Windows Shortcuts</h2>
-                  <p className="text-zinc-400 leading-relaxed">
-                    aartiq:// URL scheme triggered from any Windows application. Source: src/lib/platform/WindowsIntegration.ts.
-                    Compatible with Power Automate, Task Scheduler, and other Windows automation tools.
-                  </p>
-                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">What actually works</h2>
+                <p className="text-zinc-400 leading-relaxed max-w-3xl">
+                  Of the twelve actions, {counts.works} reach a real system API and {counts.dead} end
+                  in a <code className="font-mono text-blue-300">webContents.send</code> on a
+                  channel that no renderer subscribes to. The channel name is the only thing that
+                  would have connected them, and it is not connected.
+                </p>
               </motion.div>
 
-              <div className="mb-8">
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/30">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Globe className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-lg font-semibold text-white">URL Scheme</h3>
-                  </div>
-                  <code className="text-emerald-400 font-mono text-lg">aartiq://</code>
-                  <p className="text-zinc-400 mt-2">
-                    Register the URL scheme in Windows Registry to enable deep linking from any application.
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-emerald-500/25">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-400 mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {counts.works} reach a system API
+                  </h3>
+                  <p className="text-zinc-400 text-sm">
+                    open-app, volume, voice and copilot. These shell out or call Electron&apos;s{" "}
+                    <code className="font-mono">shell</code> module directly rather than relying on a
+                    renderer channel, so they work even though nothing outside the app can trigger
+                    them.
+                  </p>
+                </div>
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-rose-500/25">
+                  <XCircle className="w-8 h-8 text-rose-400 mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    {counts.dead} send into nothing
+                  </h3>
+                  <p className="text-zinc-400 text-sm">
+                    chat, navigate, search, create-pdf, run-command, screenshot, schedule and ask-ai
+                    all report success. None of the eight channel names has a subscriber anywhere
+                    in the renderer.
+                  </p>
+                </div>
+                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-amber-500/25">
+                  <AlertTriangle className="w-8 h-8 text-amber-400 mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">0 reachable from Windows</h3>
+                  <p className="text-zinc-400 text-sm">
+                    All twelve, including the four that work, because the OS never delivers the URL
+                    that would call them. Fixing the channels without fixing delivery would not
+                    change what a user can do.
                   </p>
                 </div>
               </div>
+            </section>
 
-              <div className="grid gap-6 md:grid-cols-2 mb-8">
-                {windowsActions.map((action, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-700/50 backdrop-blur-sm hover:border-blue-500/30 transition-all group"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
-                        {action.name}
-                      </h3>
-                      <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-blue-400 transition-colors" />
-                    </div>
-                    <p className="text-zinc-400 text-sm mb-4">{action.description}</p>
-                    
-                    <div className="mb-4">
-                      <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">URL Pattern</span>
-                      <code className="block mt-1 text-sm font-mono text-emerald-400 bg-zinc-800/50 px-2 py-1.5 rounded-lg overflow-x-auto">
-                        {action.url}
+            {/* Actions */}
+            <section id="actions">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Actions</h2>
+                <p className="text-zinc-400 leading-relaxed max-w-3xl">
+                  Transcribed from the <code className="font-mono text-blue-300">actionHandlers</code>{" "}
+                  table in{" "}
+                  <code className="font-mono text-blue-300">src/lib/windows-integration.js</code>. The
+                  reach column is derived from whether the handler sends on a channel a renderer
+                  subscribes to, which is checked by a test rather than by reading this page.
+                </p>
+              </motion.div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {windowsActions.map((action, idx) => {
+                  const meta = REACH_META[action.reach];
+                  const Icon = meta.icon;
+                  return (
+                    <motion.div
+                      key={action.action}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                      className="p-5 rounded-2xl bg-zinc-900/60 border border-zinc-700/50"
+                    >
+                      <div className="flex items-center justify-between mb-3 gap-3">
+                        <h3 className="text-lg font-semibold text-white">{action.name}</h3>
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider shrink-0 ${meta.tone}`}
+                        >
+                          <Icon className="w-3 h-3" />
+                          {meta.label}
+                        </span>
+                      </div>
+
+                      <code className="block text-sm font-mono text-blue-300 bg-zinc-800/50 px-2 py-1.5 rounded-lg mb-3 overflow-x-auto">
+                        aartiq://{action.action}
                       </code>
-                    </div>
 
-                    {action.params.length > 0 && (
-                      <div className="mb-4">
-                        <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Parameters</span>
-                        <div className="mt-2 space-y-1.5">
-                          {action.params.map((param, pidx) => (
-                            <div key={pidx} className="flex items-center gap-2 text-sm">
-                              <span className="font-mono text-blue-400">{param.name}</span>
-                              {param.required && <span className="text-amber-400 text-xs">*</span>}
-                              <span className="text-zinc-500">-</span>
-                              <span className="text-zinc-400">{param.desc}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      <p className="text-zinc-400 text-sm mb-3">{action.description}</p>
 
-                    <details className="group/code">
-                      <summary className="text-sm text-blue-400 hover:text-blue-300 cursor-pointer flex items-center gap-1">
-                        Show Example
-                      </summary>
-                      <div className="mt-3">
-                        <CodeBlock code={action.example} />
+                      <div className="text-xs">
+                        <span className="text-zinc-500 uppercase tracking-wider font-semibold">
+                          Parameters read
+                        </span>
+                        <code className="block mt-1 font-mono text-zinc-300">{action.params}</code>
                       </div>
-                    </details>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
 
               <div className="mt-8 p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-blue-400" />
-                  PowerShell Usage
+                  <Command className="w-5 h-5 text-blue-400" />
+                  Calling an action from inside the app
                 </h3>
-                <CodeBlock code={`# Open Aartiq with chat message
-Start-Process "aartiq://chat?message=Hello%20AI"
+                <p className="text-zinc-400 text-sm mb-4">
+                  This is the only path that works today. It goes through the preload bridge, so it
+                  is subject to the same channel problem for the eight actions that only send.
+                </p>
+                <CodeBlock
+                  language="javascript"
+                  code={`// preload.js exposes the whole Windows surface under electronAPI.windows
+const result = await window.electronAPI.windows.executeAction('volume', { level: 40 });
+// -> { success: true, volume: 40 }
 
-# Search with Windows PowerShell
-Start-Process "aartiq://search?query=powershell%20tutorials"
+// generateUrl builds a link without opening it
+const url = await window.electronAPI.windows.generateUrl('chat', { message: 'hello' });
+// -> "aartiq://chat?message=hello"
 
-# Create PDF
-$content = "My Report Content"
-Start-Process "aartiq://create-pdf?content=$content&title=Report"
-
-# Run command and get output via HTTP API
-$response = Invoke-WebRequest -Uri "http://localhost:3000/api/commands" -Method POST -Body (@{
-    action = "chat"
-    message = "List running processes"
-} | ConvertTo-Json) -ContentType "application/json"
-
-Write-Host $response.Content`} />
+// Nothing on Windows can invoke these from outside the app.
+await window.electronAPI.windows.executeAction('chat', { message: 'hello' });
+// -> { success: true, message: 'Message sent to AI' }  …and nothing happens`}
+                />
               </div>
             </section>
 
-            {/* Voice Control */}
-            <section id="voice-control" className="mb-16">
-              <motion.div 
-                id="voice-control"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 mb-8"
-              >
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30">
-                  <Mic className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Windows Voice Control</h2>
-                  <p className="text-zinc-400 leading-relaxed">
-                    Voice control via Windows Speech Recognition and PowerShell TTS. Source: src/lib/platform/WindowsIntegration.ts.
-                    Works when the browser window is minimized.
-                  </p>
-                </div>
+            {/* Bridge API */}
+            <section id="bridge">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Bridge API</h2>
+                <p className="text-zinc-400 leading-relaxed max-w-3xl">
+                  The Windows handlers and the preload methods that call them agree on all nine
+                  channel names, which is unusual for this codebase — the Linux bridge does not have
+                  that property. These are the real method names.
+                </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <div className="overflow-x-auto rounded-xl border border-slate-700/50 bg-slate-900/50">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-700/50 bg-slate-800/30">
+                      <th className="px-4 py-3 text-left text-slate-300 font-semibold">Channel</th>
+                      <th className="px-4 py-3 text-left text-slate-300 font-semibold">Arguments</th>
+                      <th className="px-4 py-3 text-left text-slate-300 font-semibold">Effect</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {BRIDGE_CHANNELS.map(([channel, args, effect]) => (
+                      <tr key={channel} className="border-b border-slate-700/30 last:border-0">
+                        <td className="px-4 py-3 font-mono text-blue-400">{channel}</td>
+                        <td className="px-4 py-3 font-mono text-slate-400">{args}</td>
+                        <td className="px-4 py-3 text-slate-300">{effect}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-6 p-6 rounded-2xl bg-amber-500/[0.04] border border-amber-500/25">
+                <h3 className="text-lg font-semibold text-amber-300 mb-3">
+                  Three shortcut ids in the built-in list do not exist
+                </h3>
+                <p className="text-zinc-400 text-sm mb-4">
+                  <code className="font-mono text-blue-300">windows:get-shortcuts-list</code> returns
+                  a hardcoded array of twelve entries. Three of its ids are not keys in the{" "}
+                  <code className="font-mono text-blue-300">actionHandlers</code> table, so passing
+                  them straight back returns{" "}
+                  <code className="font-mono text-blue-300">Unknown action</code>.
+                </p>
+                <div className="space-y-2">
+                  {MISMATCHED_SHORTCUT_IDS.map((m) => (
+                    <div key={m.listed} className="flex items-center gap-3 text-sm font-mono">
+                      <span className="text-rose-300 line-through">{m.listed}</span>
+                      <ChevronRight className="w-4 h-4 text-zinc-500" />
+                      <span className="text-emerald-300">{m.actual}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Voice */}
+            <section id="voice">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Voice</h2>
+                <p className="text-zinc-400 leading-relaxed max-w-3xl">
+                  There is no wake word. The previous version of this page listed twelve "Hey
+                  Aartiq" phrases and told the reader to install a PowerShell speech module; the
+                  string{" "}
+                  <code className="font-mono text-blue-300">Hey Aartiq</code> does not appear anywhere
+                  in this repository, and no module is installed. What exists is a single
+                  recognition attempt through .NET&apos;s System.Speech.
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 gap-8">
                 <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
                       <Search className="w-5 h-5 text-blue-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white">Speech Recognition</h3>
+                    <h3 className="text-lg font-semibold text-white">Recognition</h3>
                   </div>
                   <p className="text-zinc-400 mb-4">
-                    Windows Speech Recognition or PowerShell speech module to listen for voice commands and trigger Aartiq actions.
+                    One <code className="font-mono text-blue-300">Recognize()</code> call with a
+                    two-second silence timeout, run through PowerShell. It returns one utterance or
+                    an empty string. There is no grammar, no keyword list and no continuous mode.
                   </p>
-                  <CodeBlock code={`# PowerShell Speech Recognition Setup
-# Install required module
-Install-Module -Name SpeechRecognition -Force
-
-# Import module
-Import-Module SpeechRecognition
-
-# Start continuous recognition
-Start-SpeechRecognition -Language en-US -Callback {
-    param($text, $confidence)
-    Write-Host "Heard: $text (Confidence: $confidence%)"
-    
-    # Map to Aartiq commands
-    if ($text -match "ask about (.+)") {
-        $query = $matches[1]
-        Start-Process "aartiq://chat?message=$query"
-    }
-    elseif ($text -match "search for (.+)") {
-        $query = $matches[1]
-        Start-Process "aartiq://search?query=$query"
-    }
-    elseif ($text -match "create pdf (.+)") {
-        $content = $matches[1]
-        Start-Process "aartiq://create-pdf?content=$content"
-    }
-}`} language="powershell" />
+                  <CodeBlock
+                    language="powershell"
+                    code={`Add-Type -AssemblyName System.Speech
+$recognizer = New-Object System.Speech.Recognition.SpeechRecognitionEngine
+$recognizer.LoadGrammar((New-Object System.Speech.Recognition.DictationGrammar))
+$recognizer.InitialSilenceTimeout = [TimeSpan]::FromSeconds(2)
+$recognizer.SetInputToDefaultAudioDevice()
+$result = $recognizer.Recognize()
+if ($result) { $result.Text } else { '' }`}
+                  />
                 </div>
 
                 <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
@@ -548,539 +619,123 @@ Start-SpeechRecognition -Language en-US -Callback {
                     <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20">
                       <Volume2 className="w-5 h-5 text-purple-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white">Text-to-Speech</h3>
+                    <h3 className="text-lg font-semibold text-white">Synthesis</h3>
                   </div>
                   <p className="text-zinc-400 mb-4">
-                    Aartiq speaks responses using Windows SAPI voices. Select from Microsoft David, Zira, or install additional voices.
+                    SpeechSynthesizer over System.Speech. Rate, volume and voice are passed as
+                    parameters to a param block rather than interpolated into the script source,
+                    which is why arbitrary text can be spoken safely.
                   </p>
-                  <CodeBlock code={`# Text-to-Speech with Windows Voices
-Add-Type -AssemblyName System.Speech
-
-# Create synthesizer
+                  <CodeBlock
+                    language="powershell"
+                    code={`Add-Type -AssemblyName System.Speech
 $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
-
-# Get available voices
-$synth.GetInstalledVoices() | ForEach-Object {
-    Write-Host $_.VoiceInfo.Name
-}
-
-# Set voice (choose from available)
-$synth.SelectVoice("Microsoft David")
-
-# Speak text
-$synth.Speak("Hello! I'm Aartiq. How can I help you today?")
-
-# Speak with custom rate and volume
-$synth.Rate = 0   # -10 to 10
-$synth.Volume = 100  # 0 to 100
-$synth.SpeakAsync("This is a voice response from Aartiq")
-
-# Speak and wait for completion
-$synth.Speak("Processing complete")`} language="powershell" />
+$synth.Rate = $Rate
+$synth.Volume = $Vol
+if ($VoiceName) { $synth.SelectVoice($VoiceName) }
+$synth.Speak($TextToSpeak)`}
+                  />
+                  <p className="text-zinc-500 text-xs mt-3">
+                    If the voice query fails, the module returns a hardcoded list of Microsoft David,
+                    Zira and Hortense. Those are not read from the system.
+                  </p>
                 </div>
-              </div>
-
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-                  <Mic className="w-5 h-5 text-blue-400" />
-                  Voice Command Phrases
-                </h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {voiceCommands.map((cmd, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      className="p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30 hover:border-blue-500/20 transition-all"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20">
-                          <Mic className="w-4 h-4 text-blue-400" />
-                        </div>
-                        <div className="flex-1">
-                          <code className="text-sm font-mono text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded">
-                            "{cmd.phrase}"
-                          </code>
-                          <p className="text-zinc-400 text-sm mt-2">{cmd.description}</p>
-                          {cmd.example && (
-                            <p className="text-zinc-500 text-xs mt-2 font-mono">
-                              Example: {cmd.example}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                <div className="flex items-center gap-3 mb-4">
-                  <Bot className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-lg font-semibold text-white">Voice Activation Setup</h3>
-                </div>
-                <p className="text-zinc-400 mb-4">
-                  "Hey Aartiq" wake word detection via VoiceAttack or Windows Speech Recognition.
-                </p>
-                <CodeBlock code={`# Windows Voice Activation via VoiceAttack
-# 1. Download VoiceAttack (free/paid)
-# 2. Create new profile
-# 3. Add voice command: "Hey Aartiq"
-
-# In the command action:
-# - Execute: External Program
-# - Path: "C:\\Program Files\\Aartiq\\aartiq.exe"
-# - Arguments: "aartiq://chat?message={Hwnd}"
-
-# Alternative: Use Windows Speech Recognition
-# Enable in Settings > Privacy & Security > Speech
-
-# Create VBS script for wake word detection
-Set speechRecognizer = CreateObject("SAPI.SpSharedRecognizer")
-Set context = speechRecognizer.CreateRecoContext
-Set grammar = context.CreateGrammar("AartiqCommands")
-
-# Configure the grammar to listen for "Hey Aartiq"
-grammar.DictationSetState 0
-
-Do While True
-    ' Wait for speech input
-    Sleep(100)
-Loop`} language="powershell" />
               </div>
             </section>
 
-            {/* Copilot Integration */}
-            <section id="copilot-integration" className="mb-16">
-              <motion.div 
-                id="copilot-integration"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 mb-8"
-              >
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30">
-                  <Bot className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Microsoft Copilot Integration</h2>
-                  <p className="text-zinc-400 leading-relaxed">
-                    Dual AI workflow between Aartiq and Microsoft Copilot. Source: src/lib/platform/WindowsIntegration.ts.
-                    Compare answers, chat with both AI assistants simultaneously, or use Copilot for code-specific tasks.
-                  </p>
-                </div>
+            {/* Setup */}
+            <section id="setup">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Protocol registration</h2>
+                <p className="text-zinc-400 leading-relaxed max-w-3xl">
+                  The app registers <code className="font-mono text-blue-300">aartiq://</code> for
+                  itself at startup, so a manual registry entry is only needed to work around that.
+                  Read the caveat above before expecting a link to do anything.
+                </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                {copilotActions.map((action, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="p-4 rounded-xl bg-gradient-to-br from-zinc-800/60 to-zinc-900/60 border border-zinc-700/50 hover:border-purple-500/30 transition-all group"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-all">
-                        <Bot className="w-4 h-4 text-purple-400" />
-                      </div>
-                      <h3 className="font-semibold text-white">{action.name}</h3>
-                    </div>
-                    <code className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2 py-1 rounded block mb-2 w-fit">
-                      {action.action}
-                    </code>
-                    <p className="text-zinc-400 text-sm">{action.description}</p>
-                    {action.shortcut && (
-                      <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-                        <Keyboard className="w-3 h-3" />
-                        <span>{action.shortcut}</span>
-                      </div>
-                    )}
-                  </motion.div>
+              <CodeBlock code={REGISTRY} />
+
+              <p className="text-zinc-500 text-xs mt-3">
+                Single backslashes in the key paths, and a single level of quoting around the
+                executable. The previous version of this page doubled every backslash, which is only
+                correct inside a language string literal and not in a .reg file.
+              </p>
+            </section>
+
+            {/* Removed claims */}
+            <section className="p-8 rounded-3xl bg-zinc-900/60 border border-zinc-800/50">
+              <h2 className="text-2xl font-bold text-white mb-4">Claims removed from this page</h2>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                {REMOVED.map((line) => (
+                  <li key={line} className="flex gap-3">
+                    <span className="text-zinc-600">—</span>
+                    <span>{line}</span>
+                  </li>
                 ))}
-              </div>
-
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 border border-purple-500/30 mb-8">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-purple-400" />
-                  Dual AI Workflow
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                        <Bot className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-blue-400 font-semibold">Aartiq</div>
-                    </div>
-                    <div className="flex-1 text-zinc-300">
-                      General AI tasks, document creation, web automation, scheduling,
-                      cross-app OCR and clicking, system control
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                        <Bot className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="text-purple-400 font-semibold">Microsoft Copilot</div>
-                    </div>
-                    <div className="flex-1 text-zinc-300">
-                      Code explanation, refactoring, Microsoft 365 integration,
-                      Windows system questions, creative writing in Office apps
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Command className="w-5 h-5 text-blue-400" />
-                  Keyboard Shortcuts
-                </h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Keyboard className="w-4 h-4 text-zinc-400" />
-                      <span className="text-zinc-400 text-sm">Toggle Copilot</span>
-                    </div>
-                    <code className="text-white font-mono">Ctrl + Shift + C</code>
-                  </div>
-                  <div className="p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Keyboard className="w-4 h-4 text-zinc-400" />
-                      <span className="text-zinc-400 text-sm">Dual Chat</span>
-                    </div>
-                    <code className="text-white font-mono">Ctrl + D</code>
-                  </div>
-                  <div className="p-4 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Keyboard className="w-4 h-4 text-zinc-400" />
-                      <span className="text-zinc-400 text-sm">Compare</span>
-                    </div>
-                    <code className="text-white font-mono">Ctrl + Shift + P</code>
-                  </div>
-                </div>
-              </div>
+              </ul>
             </section>
 
-            {/* Power Automate */}
-            <section id="power-automate" className="mb-16">
-              <motion.div 
-                id="power-automate"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 mb-8"
-              >
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30">
-                  <Terminal className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Power Automate Integration</h2>
-                  <p className="text-zinc-400 leading-relaxed">
-                    Microsoft Power Automate integration. Source: src/lib/platform/WindowsIntegration.ts.
-                    Trigger Aartiq actions via HTTP requests from Power Automate Desktop flows.
-                  </p>
-                </div>
-              </motion.div>
-
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 mb-4 w-fit">
-                    <Search className="w-6 h-6 text-blue-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Web Scraping Flow</h3>
-                  <p className="text-zinc-400 text-sm">
-                    Trigger Aartiq to scrape websites on schedule.
-                  </p>
-                </div>
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4 w-fit">
-                    <FileText className="w-6 h-6 text-emerald-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Document Generation</h3>
-                  <p className="text-zinc-400 text-sm">
-                    Auto-generate reports, invoices, and documents from email attachments or SharePoint.
-                  </p>
-                </div>
-                <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-4 w-fit">
-                    <Calendar className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Scheduled Tasks</h3>
-                  <p className="text-zinc-400 text-sm">
-                    Daily briefings, weekly reports, monthly summaries via cron scheduling.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50 mb-8">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Terminal className="w-5 h-5 text-blue-400" />
-                  Power Automate Desktop Flow
-                </h3>
-                <p className="text-zinc-400 mb-4">
-                  Use Power Automate Desktop to create flows that interact with Aartiq
-                  via HTTP requests or launch URLs.
-                </p>
-                <div className="space-y-4">
-                  <CodeBlock code={`# Power Automate Desktop Flow Setup
-# 1. Open Power Automate Desktop
-# 2. Create new flow: "Aartiq_Automation"
-# 3. Add HTTP request action to trigger Aartiq
-
-# HTTP Request URL:
-# http://localhost:3000/api/commands
-
-# JSON Body:
-# {
-#   "action": "chat",
-#   "message": "Your prompt here",
-#   "stream": false
-# }
-
-# Add "Run PowerShell Script" action:
-# Use Invoke-RestMethod with the Aartiq API endpoint
-$body = @{"action"="search","query"="latest news"} | ConvertTo-Json
-$response = Invoke-RestMethod -Uri "http://localhost:3000/api/commands" -Method Post -ContentType "application/json" -Body $body
-Write-Host $response.result`} language="powershell" />
-                </div>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-amber-400" />
-                  HTTP API Endpoints
-                </h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/40">
-                    <MessageSquare className="w-4 h-4 text-amber-400" />
-                    <span className="text-zinc-300 font-mono text-sm">{'POST /api/commands {action: "chat"}'}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/40">
-                    <Calendar className="w-4 h-4 text-amber-400" />
-                    <span className="text-zinc-300 font-mono text-sm">{'POST /api/commands {action: "schedule"}'}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/40">
-                    <Share2 className="w-4 h-4 text-amber-400" />
-                    <span className="text-zinc-300 font-mono text-sm">{'POST /api/commands {action: "search"}'}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/40">
-                    <AppWindow className="w-4 h-4 text-amber-400" />
-                    <span className="text-zinc-300 font-mono text-sm">{'POST /api/commands {action: "open-app"}'}</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Setup Guide */}
-            <section id="setup-guide" className="mb-16">
-              <motion.div 
-                id="setup-guide"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 mb-8"
-              >
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30">
-                  <Cog className="w-6 h-6 text-blue-400" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Setup Guide</h2>
-                  <p className="text-zinc-400 leading-relaxed">
-                    Register aartiq:// protocol handler on Windows. Source: src/lib/platform/WindowsIntegration.ts.
-                  </p>
-                </div>
-              </motion.div>
-
-              <div className="space-y-2 mb-8">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="flex gap-4"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                    1
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <h3 className="text-lg font-semibold text-white mb-2">Register URL Scheme</h3>
-                    <p className="text-zinc-400 text-sm mb-3">
-                      Add aartiq:// to Windows Registry to enable deep linking from any application.
-                    </p>
-                    <CodeBlock code={`Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\\aartiq]
-@="URL:Aartiq Protocol"
-"URL Protocol"=""
-
-[HKEY_CLASSES_ROOT\\aartiq\\DefaultIcon]
-@="C:\\\\Program Files\\\\Aartiq\\\\aartiq.exe,0"
-
-[HKEY_CLASSES_ROOT\\aartiq\\shell]
-
-[HKEY_CLASSES_ROOT\\aartiq\\shell\\open]
-
-[HKEY_CLASSES_ROOT\\aartiq\\shell\\open\\command]
-@="\\"C:\\\\\\\\Program Files\\\\\\\\Aartiq\\\\\\\\aartiq.exe\\" \\"%1\\""`} />
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="flex gap-4"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                    2
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <h3 className="text-lg font-semibold text-white mb-2">Enable Speech Recognition</h3>
-                    <p className="text-zinc-400 text-sm">
-                      Turn on Windows Speech Recognition for voice commands. Go to Settings &gt;
-                      Privacy and Security &gt; Speech and enable "Online Speech Recognition".
-                    </p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="flex gap-4"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                    3
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <h3 className="text-lg font-semibold text-white mb-2">Configure Power Automate (Optional)</h3>
-                    <p className="text-zinc-400 text-sm">
-                      Download Power Automate Desktop from Microsoft Store and create flows
-                      that trigger Aartiq actions via HTTP requests.
-                    </p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="flex gap-4"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                    4
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <h3 className="text-lg font-semibold text-white mb-2">Test Integration</h3>
-                    <p className="text-zinc-400 text-sm mb-3">
-                      Run these commands to verify everything is working.
-                    </p>
-                    <CodeBlock code={`# Test URL scheme
-Start-Process "aartiq://chat?message=Hello"
-
-# Test voice (requires microphone)
-# Say "Hey Aartiq, ask about artificial intelligence"
-
-# Test Power Automate
-# Open Power Automate Desktop > Run your flow`} />
-                  </div>
-                </motion.div>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-zinc-900/60 border border-zinc-700/50">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-blue-400" />
-                  Configuration Options
-                </h3>
-                <ParameterTable
-                  params={[
-                    { name: "voice.enabled", required: false, type: "boolean", desc: "Enable voice control" },
-                    { name: "voice.wakeWord", required: false, type: "string", desc: "Custom wake word (default: Hey Aartiq)" },
-                    { name: "voice.voice", required: false, type: "string", desc: "TTS voice name" },
-                    { name: "voice.rate", required: false, type: "number", desc: "Speech rate (-10 to 10)" },
-                    { name: "copilot.enabled", required: false, type: "boolean", desc: "Enable Copilot integration" },
-                    { name: "copilot.defaultMode", required: false, type: "string", desc: "Default Copilot mode" },
-                    { name: "automate.httpPort", required: false, type: "number", desc: "HTTP API port" },
-                    { name: "automate.authToken", required: false, type: "string", desc: "API authentication token" }
-                  ]}
-                />
-              </div>
-            </section>
-
-            {/* Quick Reference */}
-            <section className="mb-16">
+            {/* Quick reference */}
+            <section>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 className="p-8 rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-blue-900/20 border border-zinc-800/50"
               >
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <Cpu className="w-6 h-6 text-blue-400" />
                   Quick Reference
                 </h2>
+
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-4">URL Actions</h3>
+                    <h3 className="text-lg font-semibold text-white mb-4">Does something</h3>
                     <div className="space-y-2 font-mono text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://chat</span>
-                        <span className="text-zinc-500">- AI chat</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://search</span>
-                        <span className="text-zinc-500">- Web search</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://create-pdf</span>
-                        <span className="text-zinc-500">- Generate PDF</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://run-command</span>
-                        <span className="text-zinc-500">- Execute command</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://copilot</span>
-                        <span className="text-zinc-500">- Copilot query</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://schedule</span>
-                        <span className="text-zinc-500">- Schedule task</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://volume</span>
-                        <span className="text-zinc-500">- Set volume</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-emerald-400">aartiq://ocr</span>
-                        <span className="text-zinc-500">- OCR scan</span>
-                      </div>
+                      {windowsActions
+                        .filter((a) => a.reach === "works")
+                        .map((a) => (
+                          <div key={a.action} className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <span className="text-emerald-400">aartiq://{a.action}</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-4">Keyboard Shortcuts</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-400">Toggle Copilot Panel</span>
-                        <kbd className="px-2 py-1 rounded bg-zinc-800 text-zinc-300 font-mono">Ctrl+Shift+C</kbd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-400">Dual AI Chat</span>
-                        <kbd className="px-2 py-1 rounded bg-zinc-800 text-zinc-300 font-mono">Ctrl+D</kbd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-400">Compare Responses</span>
-                        <kbd className="px-2 py-1 rounded bg-zinc-800 text-zinc-300 font-mono">Ctrl+Shift+P</kbd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-zinc-400">Voice Input</span>
-                        <kbd className="px-2 py-1 rounded bg-zinc-800 text-zinc-300 font-mono">Ctrl+Shift+V</kbd>
-                      </div>
+                    <h3 className="text-lg font-semibold text-white mb-4">Sends into nothing</h3>
+                    <div className="space-y-2 font-mono text-sm">
+                      {windowsActions
+                        .filter((a) => a.reach === "dead-channel")
+                        .map((a) => (
+                          <div key={a.action} className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                            <span className="text-rose-300">aartiq://{a.action}</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-zinc-800 flex flex-wrap gap-4">
+                  <Link
+                    href="/docs/linux-integration"
+                    className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white/60 hover:bg-white/10 hover:text-white"
+                  >
+                    <AppWindow size={16} /> Linux Integration
+                  </Link>
+                  <Link
+                    href="/docs/deep-links"
+                    className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white/60 hover:bg-white/10 hover:text-white"
+                  >
+                    <FileText size={16} /> Deep Links
+                  </Link>
+                  <Link
+                    href="/docs/getting-started"
+                    className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white/60 hover:bg-white/10 hover:text-white"
+                  >
+                    <MessageSquare size={16} /> Back to Docs
+                  </Link>
                 </div>
               </motion.div>
             </section>

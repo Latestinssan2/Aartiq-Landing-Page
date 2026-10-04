@@ -408,12 +408,12 @@ export const security = {
     "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
     "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
     "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
-    "The WiFi sync server (3004) still binds every network interface by omission and has no token, Host or Origin check. The background task service (3999) still serves files on 0.0.0.0 with a wildcard CORS header. Neither was changed by the listener-authentication work. See network.servers.",
+    "The WiFi sync server (3004) still binds every network interface by omission and has no token, Host or Origin check; it was changed by neither the listener-authentication work nor the bind-default change. The background task service (3999) and the PDF sync server bound 0.0.0.0 with a wildcard CORS header until the bind default became 127.0.0.1, with AARTIQ_SERVICE_HOST as the explicit opt-in and no CORS allow-origin header sent at all. See network.servers.",
     "The session token is per-process, so it changes on every restart. A client configured once — a phone, another machine, a scheduled job — has to be reconfigured, and remote mode is not a finished design because of it.",
     "The token has to travel in the mcp-remote URL, because mcp-remote accepts a bare URL and nothing else. It can therefore appear in a process argument list and in a client's own logs. See aartiq-browser/docs-audit/issues/pairing-token-in-url.md.",
     '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching, and a permanent grant has no lifetime. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
     "A permanent grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match permanent grants.",
-    "The native bridge and the Agent API are both configured for port 46203. If both start, one fails to bind and the error is logged and swallowed, so it is not visible which one is answering. TODO(verify) — inferred from call order, not observed at runtime.",
+    "The native bridge and the Agent API both defaulted to port 46203, so if both started one failed to bind and the error was logged and swallowed — not visible from outside. The Agent API now defaults to 46204 and the native bridge keeps 46203, so the two no longer collide.",
   ],
 } as const;
 
@@ -452,26 +452,27 @@ export const network = {
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: null, // host is a hard-coded literal
       auth: "A token required on every route, read from ~/.aartiq-token (mode 0600), plus the same Host and Origin checks.",
-      note: "TODO(verify) — this port is also the agent-api default, and the bridge's EADDRINUSE is logged and swallowed. Inferred from call order, not observed at runtime.",
+      note: "The agent API used to share this port, which could leave the bridge with a swallowed EADDRINUSE; the agent API now defaults to 46204, so the two are distinct.",
     },
     {
       id: "agent-api",
       name: "Agent API tool server",
-      port: 46203,
+      port: 46204,
       portIsEnvOverridable: false,
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: "config.remote === true (defaults to false; no UI, env var, or IPC path sets it)",
       auth: "A token, required on every HTTP route, plus the same Host and Origin checks. An unknown x-agent-id is still auto-registered, but as a limited-trust agent — it no longer stands in for authentication.",
+      note: "Moved off 46203 when the native bridge collision was resolved; aartiq-mcp's BridgeClient targets the native bridge, not this server.",
     },
     {
       id: "background-service",
       name: "Background task service (separate Electron app)",
       port: 3999,
       portIsEnvOverridable: false,
-      defaultBindAddress: "0.0.0.0",
-      bindsAllInterfacesWhen: null,
-      auth: "None. Serves ~/Documents/Aartiq/public with Access-Control-Allow-Origin: *.",
-      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
+      defaultBindAddress: "127.0.0.1",
+      bindsAllInterfacesWhen: "AARTIQ_SERVICE_HOST is set to a routable address (defaults to 127.0.0.1; no switch in the app)",
+      auth: "None. Serves ~/Documents/Aartiq/public; no Access-Control-Allow-Origin header is sent, so a browser page on another origin cannot read its responses.",
+      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate. The bind default changed from 0.0.0.0 with wildcard CORS to 127.0.0.1 with none; AARTIQ_SERVICE_HOST opts back in. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
     },
   ] satisfies NetworkServer[],
 
@@ -719,27 +720,28 @@ export const providersUndocumented = ["deepseek", "openrouter", "cerebras", "lla
 
 export const legal = {
   /**
-   * UNRESOLVED CONFLICT — requires a human decision, not a docs edit.
-   * The repository root carries Apache-2.0 and GitHub's API reports Apache-2.0,
-   * but aartiq-browser/LICENSE.txt is a restrictive EULA and it is the license the
-   * Windows NSIS installer displays (package.json:190). The two cannot both be
-   * correct. Until a human resolves this, publish the conflict, not a verdict.
+   * RESOLVED 2026-10-04 — see aartiq-browser/docs-audit/licence-decision.md.
+   * The root LICENSE, aartiq-browser/LICENSE.txt and the package manifest all
+   * carry Apache-2.0 now, so the Windows NSIS installer shows the same licence
+   * as the repository. What used to be an open conflict is published as a
+   * resolution; check-docs rule (j) fails if the copies or this flag diverge.
    */
   licenseConflict: {
-    resolved: false as const,
+    resolved: true,
     rootLicense: "Apache-2.0 (LICENSE)",
-    browserLicenseFile: "aartiq-browser/LICENSE.txt — restrictive EULA: no modification, no derivative works, no redistribution",
+    browserLicenseFile:
+      "aartiq-browser/LICENSE.txt — Apache-2.0, byte-identical to the root (was a restrictive EULA; replaced 2026-10-04)",
     mcpLicense: "MIT (aartiq-mcp/LICENSE)",
     landingPageLicense: "none — no LICENSE file, package.json is private",
     evidence: [
-      "aartiq-browser/package.json:190 sets nsis.license = LICENSE.txt, so Windows installers show the EULA.",
-      "The EULA's own line 4 asserts 'This Is Open Source Software' while sections 2 forbids modification and redistribution.",
-      "The README trademark section says the licence 'permits the use, modification, and redistribution of the source code', contradicting the EULA.",
-      "gh api reports license: Apache-2.0 because it detects the root LICENSE only.",
+      "The decision, and the full text of the EULA it replaced, are recorded in aartiq-browser/docs-audit/licence-decision.md.",
+      "aartiq-browser/LICENSE.txt is byte-identical to the repository root LICENSE, and package.json build.nsis.license still points at it, so the Windows installer displays Apache-2.0.",
+      'aartiq-browser/package.json declares "license": "Apache-2.0", which is what npm and gh api read.',
+      "tests/licence-audit-rename.test.js pins the shipped files; docs:check rule (j) keeps the installer file, the manifest field and this flag in agreement.",
     ],
   },
   table: [
-    { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE", status: "conflicted" as const },
+    { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE + aartiq-browser/LICENSE.txt", status: "verified" as const },
     { component: "Aartiq MCP Server — aartiq-mcp/", license: "MIT", licenseFile: "aartiq-mcp/LICENSE", status: "verified" as const },
     { component: "Landing page / documentation site", license: "Unlicensed (private repository)", licenseFile: "none", status: "verified" as const },
   ],

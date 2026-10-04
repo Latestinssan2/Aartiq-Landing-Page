@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { 
   Cloud,
-  CloudOff,
   Wifi,
   Smartphone,
   Shield,
@@ -15,21 +14,10 @@ import {
   Key,
   CheckCircle2,
   AlertTriangle,
-  ArrowRight,
-  RefreshCw,
-  Server,
-  Database,
-  UserCheck,
-  Eye,
-  Bell,
   Download,
-  Upload,
-  Link2,
-  Zap,
-  Timer,
-  FileText,
   Clipboard,
-  History
+  Monitor,
+  Terminal
 } from "lucide-react";
 
 const syncTypes = [
@@ -43,10 +31,10 @@ const syncTypes = [
     description: "Direct local network connection between devices. Fast, private, no internet required.",
     source: "src/lib/WiFiSyncService.ts",
     features: [
-      "Real-time clipboard sync",
-      "File transfer up to 100MB",
-      "Desktop control from mobile",
-      "Push notifications"
+      "clipboard-sync",
+      "clipboard-sync-request",
+      "execute-command",
+      "desktop-control"
     ],
     requirements: [
       "Same local network (WiFi)",
@@ -54,10 +42,10 @@ const syncTypes = [
       "Mobile app installed"
     ],
     howItWorks: [
-      `Desktop broadcasts a discovery signal on UDP port ${net.discovery.port} (a broadcast destination — the socket itself binds an ephemeral port)`,
-      "Mobile scans local network via mDNS",
+      `Desktop broadcasts a discovery beacon on UDP port ${net.discovery.port} to the broadcast address 255.255.255.255 (the socket itself binds an ephemeral port)`,
+      "Mobile listens on that port for the beacon",
       `WebSocket connection established on port ${net.wifiSync.port}`,
-      "Bi-directional sync begins"
+      "Pairing code checked during the handshake, then the six message types above are available"
     ]
   },
   {
@@ -70,10 +58,10 @@ const syncTypes = [
     description: "Cloud-based sync for cross-network access. Works anywhere with internet.",
     source: "src/lib/CloudSyncService.ts, src/lib/FirebaseSyncService.ts",
     features: [
-      "Access from anywhere",
-      "End-to-end encrypted",
-      "Automatic conflict resolution",
-      "Cross-device history"
+      "Security.encrypt",
+      "Security.decrypt",
+      "setSyncPassphrase",
+      "queuePendingData"
     ],
     requirements: [
       "Internet connection",
@@ -81,98 +69,116 @@ const syncTypes = [
       "Sync enabled in settings"
     ],
     howItWorks: [
-      "Data encrypted client-side",
+      "Data encrypted client-side with your sync passphrase",
       "Uploaded to secure cloud storage",
-      "Other devices pull updates",
+      "Other devices pull and decrypt updates",
       "Offline changes sync when online"
     ]
   }
 ];
 
+/**
+ * These are the three values of the `TrustLevel` union in
+ * src/lib/WiFiSyncService.ts, transcribed. The page previously showed a
+ * Read Only / Standard / Trusted ladder with a permission list per rung, which
+ * the service never had: a trust level decides whether a *known* device may
+ * auto-connect, not what that device is permitted to do. Everything a
+ * connected device can send is listed once, under `syncItems` below, because
+ * it does not vary by trust level.
+ */
 const permissionLevels = [
   {
-    name: "Read Only",
+    name: "Trusted",
     level: 1,
-    icon: Eye,
-    color: "text-sky-400",
-    bgColor: "bg-sky-500/10",
-    description: "View data only, no modifications",
-    permissions: [
-      "View clipboard content",
-      "View open tabs",
-      "View task list"
-    ]
-  },
-  {
-    name: "Standard",
-    level: 2,
-    icon: CheckCircle2,
+    icon: Shield,
     color: "text-emerald-400",
     bgColor: "bg-emerald-500/10",
-    description: "Full sync access, can trigger actions",
+    description:
+      "Known device, allowed to auto-connect. This is what the Trust toggle in Settings sets, and it is the default for a device you have trusted.",
     permissions: [
-      "Clipboard read/write",
-      "Trigger scheduled tasks",
-      "Approve low-risk commands",
-      "View/manage files"
+      "clipboard-sync",
+      "execute-command",
+      "desktop-control"
     ]
   },
   {
-    name: "Trusted",
+    name: "Ask once",
+    level: 2,
+    icon: CheckCircle2,
+    color: "text-sky-400",
+    bgColor: "bg-sky-500/10",
+    description:
+      "Default for a device seen for the first time. You approve each connection instead of it reconnecting on its own.",
+    permissions: [
+      "clipboard-sync",
+      "execute-command",
+      "desktop-control"
+    ]
+  },
+  {
+    name: "Blocked",
     level: 3,
-    icon: Shield,
+    icon: AlertTriangle,
     color: "text-amber-400",
     bgColor: "bg-amber-500/10",
-    description: "Unrestricted access, approve any action",
-    permissions: [
-      "All Standard permissions",
-      "Approve high-risk commands",
-      "Run shell commands",
-      "Access system settings"
-    ]
+    description:
+      "Declared by the service and enforced at the handshake, which refuses a blocked device. The Settings toggle does not currently offer it — use Remove instead.",
+    permissions: []
   }
 ];
 
+/**
+ * The message types WiFiSyncService.ts actually handles, transcribed from its
+ * switch. The previous table published a per-item ceiling for each of these
+ * (~1MB clipboard, ~10 tabs, ~100 tasks, ~500 history entries, a 100MB file
+ * transfer) and a file-transfer row for a message type that does not exist.
+ * The service sets no size limit and transfers no files, so those numbers are
+ * gone rather than restated.
+ */
 const syncItems = [
-  { name: "Clipboard", icon: Clipboard, description: "Sync clipboard content bidirectionally", size: "~1MB limit" },
-  { name: "Open Tabs", icon: FileText, description: "Sync currently open browser tabs", size: "~10 tabs" },
-  { name: "Task List", icon: Bell, description: "View and manage scheduled tasks", size: "~100 tasks" },
-  { name: "Downloads", icon: Download, description: "Access download history and files", size: "Reference only" },
-  { name: "History", icon: History, description: "Sync browsing history", size: "~500 entries" },
-  { name: "Files", icon: Database, description: "Transfer files between devices", size: "Up to 100MB" }
+  { name: "Clipboard", icon: Clipboard, description: "Push the desktop clipboard to the paired device", size: "clipboard-sync" },
+  { name: "Clipboard request", icon: Clipboard, description: "Ask the paired device for its clipboard", size: "clipboard-sync-request" },
+  { name: "Desktop control", icon: Monitor, description: "Drive the desktop from the paired device", size: "desktop-control" },
+  { name: "Command execution", icon: Terminal, description: "Run a command on the desktop", size: "execute-command" },
+  { name: "Presence", icon: Wifi, description: "Keep-alive between the paired devices", size: "ping" },
+  { name: "Handshake", icon: Key, description: "Device identity and pairing code exchange", size: "handshake" }
 ];
 
+/**
+ * Each entry is a control the code implements, or an explicit statement that
+ * it does not have one. The previous list claimed a physical QR approval gate,
+ * a 60-second pairing expiry and an audit trail; none of those exist. The
+ * pairing code and the encryption are real, so they stay.
+ */
 const securityFeatures = [
   {
-    title: "Pairing Verification",
-    description: "6-digit code verification ensures only authorized devices can connect",
+    title: "Pairing code",
+    description: "A six-digit code is generated per session and checked during the handshake; a device presenting the wrong code is refused",
     icon: Key,
-    source: "src/lib/crypto-utils.ts, src/lib/shared-keychain.js"
+    source: "src/lib/WiFiSyncService.ts"
   },
   {
-    title: "QR Code Approval",
-    description: "High-risk actions require physical QR scan confirmation",
-    icon: CheckCircle2
+    title: "Known devices",
+    description: "A device you have paired is remembered, and you decide per device whether it may auto-connect",
+    icon: Shield,
+    source: "src/lib/WiFiSyncService.ts"
   },
   {
-    title: "Trust Levels",
-    description: "Granular permissions control what each device can access",
-    icon: Shield
+    title: "Blocked devices",
+    description: "A blocked device is refused at the handshake and cannot connect",
+    icon: AlertTriangle,
+    source: "src/lib/WiFiSyncService.ts"
   },
   {
-    title: "Connection Timeout",
-    description: "Unpaired connections auto-expire after 60 seconds",
-    icon: Timer
+    title: "End-to-end encryption",
+    description: "End-to-end encryption covers the cloud path: data is encrypted client-side with your sync passphrase before upload, and decrypted on the device that pulls it. The local WiFi WebSocket is not additionally encrypted by this layer",
+    icon: Lock,
+    source: "src/lib/crypto-utils.ts"
   },
   {
-    title: "End-to-End Encryption",
-    description: "All data encrypted before transmission (Cloud Sync)",
-    icon: Lock
-  },
-  {
-    title: "Activity Logging",
-    description: "All sync actions logged for audit trail",
-    icon: History
+    title: "What is not here",
+    description: "No approval QR gate, no pairing expiry timer, and no per-device audit log. Sync messages are written to the developer console and are not retained as a record you can review",
+    icon: AlertTriangle
   }
 ];
 
@@ -219,9 +225,9 @@ export default function CloudSyncPage() {
             <p className="text-sm text-white/50">Encrypted</p>
           </div>
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-center">
-            <Timer size={32} className="mx-auto mb-4 text-amber-400" />
-            <h3 className="text-3xl font-black text-amber-400">60s</h3>
-            <p className="text-sm text-white/50">Pairing Timeout</p>
+            <Key size={32} className="mx-auto mb-4 text-amber-400" />
+            <h3 className="text-3xl font-black text-amber-400">6-digit</h3>
+            <p className="text-sm text-white/50">Pairing Code</p>
           </div>
         </div>
       </motion.section>

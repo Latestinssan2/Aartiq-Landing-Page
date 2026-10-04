@@ -23,6 +23,8 @@ import {
   FileDown,
   Image as ImageIcon,
   Blocks,
+  Globe,
+  Scale,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
@@ -301,13 +303,61 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Agent API (MCP + HTTP tools)",
         description:
-          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
+          `The agent API exposes a ToolRegistry over MCP (stdio) and HTTP (POST /api/<method>). Every call runs a fail-closed pipeline: verb gate -> tab lock -> handler -> untrusted-output injection scan. 36 tools across 11 categories. Providers are model-agnostic (LM Studio / Ollama / OpenClaw), bound to ${net.agentApi.defaultBindAddress} by default with defaultTrust 'limited'.`,
         icon: Cpu,
         color: "from-emerald-500 to-teal-400",
         refs: [
           "src/lib/agent-api/registry.ts:1-89",
           "src/lib/agent-api/server.ts:1-126",
           "src/lib/agent-api/providers.ts:19-80",
+        ],
+      },
+      {
+        name: "Read the page you are already on",
+        description:
+          "page_find searches one open page with no network request and no other tab touched, matching accessible names, values, hrefs and roles to return refs that click_ref / fill_ref accept, or scanning rendered prose for context snippets. A search sends the user's query to a third party and returns somebody else's page; when the answer is on screen, that is the wrong trade.",
+        icon: Search,
+        color: "from-cyan-500 to-sky-400",
+        refs: [
+          "src/lib/agent-api/tools.ts:143-199",
+          "tests/agent-api-bridge-tools.test.js",
+        ],
+      },
+      {
+        name: "Filling a form is not submitting one",
+        description:
+          "fill_form (verb 'input') fills and never submits; form_submit (verb 'sideEffecting') goes through the approval gate. Two tools rather than one tool with a submit flag, so the side effect cannot be reached by passing a parameter. Refs bind to a data-aartiq-ax stamp on actionable nodes, so a stale ref fails loudly instead of addressing a different element after the page shifts.",
+        icon: ShieldCheck,
+        color: "from-amber-500 to-orange-400",
+        refs: [
+          "src/lib/agent-api/tools.ts:267-320",
+          "tests/page-scripts-forms.test.js",
+          "tests/snapshot-ref-binding.test.js",
+        ],
+      },
+      {
+        name: "Search that admits where it got the result",
+        description:
+          "Tavily is the recommended single key (1,000 free credits/month, no card); SerpAPI and Brave also work. With no key, search still runs by scraping a search engine's HTML — rate-limited, slower, fragile, and with no publication dates — and says so rather than presenting it as equivalent. search_providers reports which provider is live, whether it scrapes, and whether it has a news index. news_search returns real dates; web_search does not.",
+        icon: Globe,
+        color: "from-violet-500 to-purple-400",
+        refs: [
+          "src/lib/web-search-service.js:162-192",
+          "src/lib/agent-api/tools.ts:200-266",
+          "tests/web-search-service.test.js",
+        ],
+      },
+      {
+        name: "Research that checks whether sources agree",
+        description:
+          "A bounded plan -> search -> fetch -> extract -> cross-verify -> rank -> generate job, with dependencies injected so it tests without network access. Claims are keyed on subject|verb so '450 million dollars' and '450 million euros' stay one claim with two conflicting figures. Corroboration needs >=2 distinct domains re-derived from each claim's URL, so subdomains cannot fake independence. A last source is named only when timestamps are reliable; otherwise it reports unknown with the reason attached. Known limit: only numeric claims with a named subject are extracted, so the coverage percentage is numeric agreement specifically and disputed qualitative findings never reach the panel.",
+        icon: Scale,
+        color: "from-rose-500 to-pink-400",
+        refs: [
+          "src/lib/research-pipeline.ts:474-678",
+          "src/lib/researchState.ts:153-201",
+          "tests/research-pipeline.test.js",
+          "tests/research-progress-plumbing.test.js",
         ],
       },
     ],
@@ -399,7 +449,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Export (JSON + text)",
         description:
-          "exportAsJSON() emits { type:'AARTIQ_AI_ACTION_LOGS', version:'1.0', summary, logs } with counts per bucket. exportAsText() renders a human-readable list. From the chat UI these are written to disk via export-chat-txt / export-chat-pdf (default file names comet-chat-<ts>.txt / .pdf).",
+          "exportAsJSON() emits { type:'AARTIQ_AI_ACTION_LOGS', version:'1.0', summary, logs } with counts per bucket. exportAsText() renders a human-readable list. From the chat UI these are written to disk via export-chat-txt / export-chat-pdf (default file names aartiq-chat-<ts>.txt / .pdf).",
         icon: FileDown,
         color: "from-teal-500 to-emerald-400",
         refs: [

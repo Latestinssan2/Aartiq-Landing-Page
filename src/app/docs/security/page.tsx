@@ -60,7 +60,7 @@ const windowsJob = ci.perJob.find((j) => j.os.startsWith("windows")) ?? {
 const TIER_STYLE = {
   low: {
     name: "Low Risk",
-    badge: "Auto-approved",
+    badge: "Opt-in auto-approve",
     icon: ShieldCheck,
     color: "text-emerald-400",
     border: "border-emerald-500/20",
@@ -68,7 +68,7 @@ const TIER_STYLE = {
   },
   medium: {
     name: "Medium Risk",
-    badge: "Auto-approved",
+    badge: "Asked every time",
     icon: ShieldAlert,
     color: "text-amber-400",
     border: "border-amber-500/20",
@@ -100,9 +100,9 @@ const securityLayers = [
     borderColor: "border-blue-500/30",
     iconColor: "text-blue-400",
     level: 1,
-    description: "The AI perceives web pages through screenshots + OCR and a sanitized secure-DOM extractor rather than raw, unprocessed HTML. This significantly reduces DOM-based manipulation attacks, but it is a mitigation, not an absolute guarantee.",
+    description: "The AI perceives web pages as sanitized extractions of the rendered page — DOM text through the accessibility snapshot and the DOM-extraction pipeline, plus screenshots + OCR for image commands — never raw, unprocessed HTML. This significantly reduces DOM-based manipulation attacks, but it is a mitigation, not an absolute guarantee.",
     howItWorks: [
-      "Primary input is the rendered page: Electron webContents.capturePage() screenshots (src/main/handlers/browser-handlers.js) and Tesseract.js OCR (src/lib/tesseract-service.js). The AI never runs inside the page's JavaScript realm.",
+      "Most commands read the page as text: navigation, search and page reads go through the accessibility snapshot and the DOM-extraction pipeline (src/lib/web-extractor.js, Readability-based), with extraction after load at src/lib/mcp-browser-server.js:1395-1435. Screenshots (Electron webContents.capturePage — src/main/handlers/browser-handlers.js) and Tesseract.js OCR (src/lib/tesseract-service.js) serve the image commands (OCR_SCREEN and vision reads). The AI never runs inside the page's JavaScript realm.",
       "SecureDOMReader (src/components/ai/SecureDOMReader.ts) provides a text fallback path. It blocks script/style/iframe/object/embed/form/input/button tags and nav/footer/header/modal/overlay/ads classes before text extraction.",
       "PII redaction: emails, phone numbers, card numbers, bearer tokens, session IDs, and password/api-key assignments are replaced with [REDACTED] placeholders before content reaches the model.",
       "SecureDOMParser (src/lib/Security.ts) runs the extracted content against shell-primitive, encoding, and injection pattern groups, decodes base64/hex payloads, and rewrites dangerous matches to [BLOCKED: LAYER].",
@@ -191,19 +191,19 @@ const securityLayers = [
       {
         name: "Medium Risk",
         risk: "Approval dialog",
-        description: "Actions that modify browser state or open apps. Shown as Allow Once / Always Allow / Deny (shell-permission-bridge.js); persist via the permission store.",
+        description: "Actions that modify browser state or open apps. The dialog offers Allow Once / Always Allow / Deny (labels at src/components/ai/ClickPermissionModal.tsx:294-302); a shell command in this band instead routes through the shell permission bridge (src/core/shell-permission-bridge.js) and the choice persists via the permission store.",
         examples: ["Filling forms", "Clicking buttons", "Opening applications"]
       },
       {
         name: "High Risk",
-        risk: "QR + PIN or Touch ID",
-        description: "Shell commands and system changes. Either a QR+PIN approval from the paired mobile app, or an OS-native biometric prompt (Touch ID / Windows Hello). The QR carries a single-use token + 6-digit PIN.",
+        risk: "QR + PIN (paired mobile)",
+        description: "The desktop dialog cannot be approved without the paired mobile scanning the QR and returning the 6-digit PIN — mobileApproved && pinVerified gate the Approve button — src/components/ai/ClickPermissionModal.tsx:235-302. The QR carries a single-use token. High-risk MCP tool calls take the same QR route (src/lib/mcp-browser-server.js:158).",
         examples: ["Shell command execution", "External app automation", "File modifications"]
       },
       {
         name: "Critical Risk",
-        risk: "Never auto-approved",
-        description: "Always denied at checkShellPermission (command-validator.js:87). Routed through the capability controller's ticket-based flow; tickets are single-use, input-hash-bound, 5-minute TTL.",
+        risk: "Never approved",
+        description: "Always denied by checkShellPermission (src/core/command-validator.js:87-90); what follows is a plain Allow / Deny prompt (src/main/handlers/utils.js:222-229), not a ticket. No capability assigns 'critical' except remote-origin shell escalation (medium→high, high→critical — src/main/handlers/sync-handlers.js:231-238).",
         examples: ["Destructive / irreversible operations", "Privilege escalation"]
       }
     ],
@@ -211,10 +211,10 @@ const securityLayers = [
       "AI generates a command; the parser assigns a risk field (default medium).",
       "checkShellPermission() classifies low/medium/high/critical and checks the PermissionStore allowlist; with no store it denies (fail-closed) — src/core/command-validator.js:77-133.",
       "Low risk: auto-runs only if autoApproveLowRisk is on (default off); otherwise a lightweight approval.",
-      "High risk (shell/power): the desktop generates a QR encoding aartiq://approve?id=<token>&pin=<6-digit> and waits for the paired mobile to return the PIN — src/main/handlers/sync-handlers.js:40-48, src/main/handlers/utils.js:377-387.",
-      "Alternatively, high risk uses an OS-native dialog: macOS 'Approve with Touch ID', Windows PowerShell, Linux bash — src/main/handlers/native-approval-manager.js:22-98. Biometric is gated by requireBiometricPerSession / requireBiometricEveryTime.",
+      "QR + 6-digit PIN covers three things: power actions from a paired device — src/main/handlers/sync-handlers.js:294-295; desktop AI-initiated high-risk actions, where the desktop generates a QR encoding aartiq://approve?id=<token>&pin=<6-digit> and the paired mobile must return the PIN (the Approve button stays disabled until mobileApproved && pinVerified) — src/components/ai/ClickPermissionModal.tsx:235-302; and high-risk MCP tool calls — src/lib/mcp-browser-server.js:157-168. Remote-origin shell escalates its risk (medium→high, high→critical — src/main/handlers/sync-handlers.js:231-238), but its QR branch is unreachable today: execute-shell-command is registered with requiresApproval 'never' (aartiq-browser/main.js:869), so the capability controller returns approved (src/core/capability-controller.js:77-103) and the command executes directly — src/main/handlers/sync-handlers.js:247-270. Flagged for maintainer review.",
+      "Alternatively, high risk uses the platform approval dialog: an Electron message box whose approve button is labeled 'Approve with Touch ID' — no system biometric API is called — plus PowerShell on Windows and bash on Linux — src/main/handlers/native-approval-manager.js:22-56. The requireBiometricPerSession / requireBiometricEveryTime settings exist as flags (src/lib/ai-action-security.ts:17), but nothing in the codebase invokes a biometric API.",
       "The renderer only enables Approve when both mobileApproved and pinVerified are true (or the biometric dialog succeeds) — src/components/ai/ClickPermissionModal.tsx:247-302.",
-      "Critical risk is denied at the gate; anything that does proceed goes through capability-controller single-use tickets — src/core/capability-controller.js:29-100, src/core/approval-ticket-manager.js:139-278, src/lib/approval-gate.js:53-147.",
+      "Critical risk is denied at the gate — checkShellPermission returns false for critical, src/core/command-validator.js:87-90 — and a human decision at that point is a plain Allow / Deny through the shell permission bridge (src/main/handlers/utils.js:222-229), not a ticket. Single-use, input-hash-bound tickets cover MCP high-risk tool calls and approve-style capability actions — src/core/capability-controller.js:29-100, src/core/approval-ticket-manager.js:139-278, src/lib/approval-gate.js:53-147.",
       "Command only executes after explicit approval; timeouts and missing renderers resolve to deny — src/core/shell-permission-bridge.js:42-71.",
       "Source files: src/core/command-validator.js, src/lib/permission-store.js, src/main/handlers/sync-handlers.js, src/main/handlers/utils.js, src/main/handlers/native-approval-manager.js, src/components/ai/ClickPermissionModal.tsx, src/core/capability-controller.js"
     ],
@@ -244,10 +244,10 @@ const securityLayers = [
     ],
     benefits: [
       "Scopes AI file access to an explicit allowlist — any path outside it is denied with a structured reason",
-      "Note: the legacy default allowlist includes the user's home, Desktop, Documents, and Downloads (read-write). Remove or downgrade these in Settings for a stricter posture; the newer directory-allowlist.js default ships with only the app data directory + temp",
+      "Live defaults are seeded by src/lib/permission-store.js:13-21 — home, Desktop, Documents, Downloads (read-write), plus /tmp, /Applications, /System/Applications (read) — and served through getAllowedDirectories (src/lib/permission-store.js:197-200). The directory-allowlist.js:24-43 default (app data directory + temp) is exercised only by unit tests, not at runtime. Remove or downgrade these in Settings for a stricter posture",
       "Symlink traversal attacks are blocked via realpath resolution",
       "Read-only entries never receive write access — enforced in the sandbox profile (macOS/Linux) and by isPathAllowed() on all platforms",
-      "Audit trail of all directory access grants with timestamps (comet-audit.jsonl)"
+      "Audit trail of all directory access grants with timestamps (aartiq-audit.jsonl)"
     ],
     notGuaranteed: [
       "TOCTOU races: the path is checked at validation time; the filesystem may change before the operation executes",
@@ -331,7 +331,7 @@ const threatScenarios = [
   {
     threat: "Malicious JavaScript Redirect",
     scenario: "A webpage uses JavaScript to redirect the AI to a phishing site",
-    defense: "The AI only sees screenshots of the actual rendered page. JavaScript execution is blocked from the AI's perspective.",
+    defense: "The AI sees sanitized extractions of the rendered page — DOM text or screenshots/OCR — never live page JavaScript, and extracted text passes the injection scan before it reaches the model.",
     layer: "Visual Sandbox"
   },
   {
@@ -476,7 +476,7 @@ export default function SecurityPage() {
         </h1>
 
         <p className="max-w-3xl text-xl font-medium leading-relaxed text-white/50">
-          Aartiq uses a defense-in-depth model with six independent security layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
+          Aartiq uses a defense-in-depth model with six layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution — but only two of them are enforcement boundaries (the sandbox and approval, applied by the OS); the other four reduce blast radius without being boundaries. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
         </p>
 
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/40">
@@ -500,8 +500,8 @@ export default function SecurityPage() {
           </div>
           <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-center">
             <Layers size={32} className="mx-auto mb-4 text-emerald-400" />
-            <h3 className="text-3xl font-black text-emerald-400">5</h3>
-            <p className="text-sm text-white/50">Enforcement Layers Beyond The Firewall</p>
+            <h3 className="text-3xl font-black text-emerald-400">2</h3>
+            <p className="text-sm text-white/50">Enforcement Boundaries (OS-applied), of six layers</p>
           </div>
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-center">
             <Key size={32} className="mx-auto mb-4 text-amber-400" />
@@ -625,10 +625,10 @@ export default function SecurityPage() {
                   </div>
                 )}
 
-                {/* Approval Tiers for HITL */}
+                {/* Approval Tiers for HITL — AI browser actions; shell commands use security.riskTiers below */}
                 {layer.approvalTiers && (
                   <div className="mt-8">
-                    <h4 className="mb-6 text-sm font-black uppercase tracking-wider text-white/40">Approval Tiers</h4>
+                    <h4 className="mb-6 text-sm font-black uppercase tracking-wider text-white/40">Approval — AI browser actions</h4>
                     <div className="grid gap-4 sm:grid-cols-3">
                       {layer.approvalTiers.map((tier) => (
                         <div key={tier.name} className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
@@ -789,10 +789,10 @@ export default function SecurityPage() {
             Risk Assessment
           </p>
           <h2 className="text-4xl font-black uppercase tracking-tighter sm:text-5xl">
-            Risk <span className="text-white/20">Levels</span>
+            Shell <span className="text-white/20">Risk Tiers</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-            Every command is classified into one of four risk tiers before it reaches the permission gate. Higher tiers require stronger, more explicit approval.
+            Shell commands are classified into one of four risk tiers by the permission-store classifier (regenerated into src/data/shell-tiers.generated.json by scripts/gen-shell-tiers.ts) before they reach the permission gate. Higher tiers require stronger, more explicit approval. Browser actions follow their own approval table above.
           </p>
         </div>
 
@@ -853,8 +853,9 @@ export default function SecurityPage() {
             QR Code <span className="text-white/20">Approval</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-            The QR flow is used for two things only: power actions, and shell commands arriving from a paired
-            mobile device. A high-risk command typed at the desktop does not go through it.
+            The QR flow is used for power actions, desktop AI-initiated high-risk actions, and high-risk MCP
+            tool calls. Remote-origin shell is meant to use it too, but currently executes without the QR step
+            (requiresApproval 'never' — aartiq-browser/main.js:869); flagged for maintainer review.
           </p>
         </div>
 
@@ -863,8 +864,9 @@ export default function SecurityPage() {
             <Smartphone size={40} className="mb-6 text-sky-400" />
             <h3 className="mb-4 text-xl font-black uppercase tracking-wider">Mobile App Approval</h3>
             <p className="mb-8 text-white/50">
-              Power actions (shutdown, restart, sleep, lock) and remote-origin shell commands require physical
-              confirmation via the Aartiq mobile app.
+              Power actions (shutdown, restart, sleep, lock) and desktop AI-initiated high-risk actions require
+              physical confirmation via the paired mobile app (QR + PIN). Remote-origin shell is meant to as
+              well, but executes without the QR step today — see above.
             </p>
             
             <div className="space-y-6">
@@ -966,7 +968,7 @@ export default function SecurityPage() {
                 "Shutdown, restart, sleep, and lock require QR/PIN approval",
                 "Remote shell commands are validated by SecurityValidator, routed through the capability controller, and executed via execFile (no shell interpretation)",
                 `The agent API and native bridge bind to ${net.agentApi.defaultBindAddress} only; the ${net.mcpBridge.name} (port ${net.mcpBridge.port}) also binds to ${net.mcpBridge.defaultBindAddress} by default and needs an explicit setting to listen beyond loopback`,
-                "Every local listener requires a per-process token on each request, so a client that has not been given it is refused rather than connected. The token does not expire while Aartiq runs, and a new one is generated on each start"
+                "The three HTTP bridges — the MCP bridge, the agent API and the native bridge — wrap every route in a per-process token check (checkLocalRequest — src/lib/local-server-auth.js:196-237, applied at src/lib/mcp-browser-server.js:1573, src/lib/agent-api/server.ts:95 and main.js:1259-1274): a client that has not been given the token is refused rather than connected, the token does not expire while Aartiq runs, and a new one is generated on each start. The WiFi sync and PDF sync listeners carry no token (README listener table)"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle2 size={18} className="mt-0.5 text-emerald-400" />
