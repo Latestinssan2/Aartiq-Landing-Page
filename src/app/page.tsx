@@ -103,6 +103,20 @@ const featureHighlights = [
     color: "from-pink-500/20 to-rose-500/20",
     glow: "rgba(244, 114, 182, 0.4)"
   },
+  {
+    name: "Master PIN & Dual-Gate Auth",
+    description: "PBKDF2-SHA256 (100k rounds) in OS Keychain (safeStorage / Android Keystore) + remote biometrics relay. Source: src/lib/MasterPINService.ts, src/lib/PermissionRelayService.ts",
+    icon: Lock,
+    color: "from-emerald-500/20 to-cyan-500/20",
+    glow: "rgba(16, 185, 129, 0.4)"
+  },
+  {
+    name: "Permanent Sync & Unified Sessions",
+    description: "256-bit cryptographic permanent token with real hardware device identity, live session tracking and mobile viewer. Source: src/lib/WiFiSyncService.ts, src/lib/UnifiedSessionManager.ts",
+    icon: Smartphone,
+    color: "from-cyan-500/20 to-blue-500/20",
+    glow: "rgba(6, 182, 212, 0.4)"
+  },
 ];
 
 const metrics = [

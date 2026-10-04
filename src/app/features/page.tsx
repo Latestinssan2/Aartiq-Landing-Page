@@ -25,6 +25,7 @@ import {
   Blocks,
   Globe,
   Scale,
+  Smartphone,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
@@ -115,6 +116,31 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
           "src/main/handlers/native-approval-manager.js:22-98",
           "src/components/ai/useAIActionSecurityManager.tsx:120-153",
           "src/lib/native-panels/ViewModel.swift:255-275",
+        ],
+      },
+      {
+        name: "Master PIN in OS Keychain",
+        description:
+          "PBKDF2-SHA256 (100,000 iterations, 32-byte key) Master PIN stored securely in native OS Keychain via safeStorage (macOS Keychain / Windows DPAPI / Linux Secret Service) and Android Keystore (encryptedSharedPreferences). Salt + hash only are transmitted over sync; 5-attempt lockout timer stops brute-force.",
+        icon: Lock,
+        color: "from-cyan-500 to-blue-400",
+        refs: [
+          "src/lib/MasterPINService.ts:1-245",
+          "src/components/MasterPINSetup.tsx:1-262",
+          "flutter_browser_app/lib/services/master_pin_service.dart:1-158",
+        ],
+      },
+      {
+        name: "Dual-gate mobile permission relay",
+        description:
+          "Desktop execution plans can be delegated to a paired mobile device with one click ('📱 Mobile'). Risk tiers (critical, high, medium, low) are calculated dynamically with factors and mitigations. Verification requires both Gate 1 (Master PIN) and Gate 2 (Android Screen Lock / Biometrics).",
+        icon: Smartphone,
+        color: "from-emerald-500 to-green-400",
+        refs: [
+          "src/lib/PermissionRelayService.ts:1-256",
+          "src/components/AutomationPlanApproval.tsx:1-290",
+          "flutter_browser_app/lib/services/permission_service.dart:1-158",
+          "flutter_browser_app/lib/pages/permission_approval_page.dart:1-857",
         ],
       },
     ],
@@ -475,6 +501,50 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
         refs: [
           "src/components/ai/CollapsibleOCRMessage.tsx:17,112-153",
           "src/components/AIChatSidebar.tsx:2850,2893-2895,7223",
+        ],
+      },
+    ],
+  },
+  {
+    category: "Cross-Device Sync & Unified Sessions",
+    id: "sync-sessions",
+    intro:
+      "Aartiq synchronizes state seamlessly between desktop and mobile companions over local Wi-Fi WebSocket or end-to-end encrypted cloud relays with permanent cryptographic authentication.",
+    items: [
+      {
+        name: "Permanent 256-bit token authentication",
+        description:
+          "Paired devices exchange a 256-bit cryptographic permanent token on initial verification. Future connections reconnect seamlessly without re-entering pairing codes while maintaining full token validation across daemon and desktop restarts.",
+        icon: Lock,
+        color: "from-blue-500 to-cyan-400",
+        refs: [
+          "src/lib/WiFiSyncService.ts:1-350",
+          "flutter_browser_app/lib/sync_service.dart:1-500",
+        ],
+      },
+      {
+        name: "Unified session tracking & live viewer",
+        description:
+          "Tracks live browser tabs, navigation history, automation task executions, and security permissions across restarts. The mobile companion includes a dedicated Session Viewer for real-time remote inspection.",
+        icon: Smartphone,
+        color: "from-purple-500 to-indigo-400",
+        refs: [
+          "src/lib/UnifiedSessionManager.ts:1-379",
+          "flutter_browser_app/lib/pages/session_viewer_page.dart:1-629",
+          "flutter_browser_app/lib/models/session_model.dart:1-330",
+        ],
+      },
+      {
+        name: "Real hardware identity & device images",
+        description:
+          "Native OS commands detect exact computer name and hardware model (MacBook Pro, iMac, Windows PC, Linux, Android, iPhone). Visual device illustrations in UI render dynamic status indicators and permanent sync badges.",
+        icon: Globe,
+        color: "from-pink-500 to-rose-400",
+        refs: [
+          "src/lib/DeviceIdentifier.ts:1-122",
+          "src/components/DeviceImage.tsx:1-93",
+          "flutter_browser_app/lib/widgets/device_image_widget.dart:1-264",
+          "flutter_browser_app/lib/services/device_info_service.dart:1-151",
         ],
       },
     ],

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, ShieldCheck, Cloud, Repeat, Bot, Globe, Database, Terminal, Sparkles, ExternalLink, Layers } from "lucide-react";
+import { Zap, ShieldCheck, Cloud, Repeat, Bot, Globe, Database, Terminal, Sparkles, ExternalLink, Layers, Lock, Smartphone } from "lucide-react";
 
 const features = [
   {
@@ -51,6 +51,18 @@ const features = [
     description: "Ollama integration for fully private local inference with no cloud dependency — `src/service/ollama-manager.js`, `src/service/model-selector.js`.",
     icon: Database,
     color: "text-indigo-400"
+  },
+  {
+    name: "Master PIN & Dual-Gate Auth",
+    description: "PBKDF2-SHA256 (100k rounds) in OS Keychain + remote mobile biometrics relay — `src/lib/MasterPINService.ts`, `src/lib/PermissionRelayService.ts`.",
+    icon: Lock,
+    color: "text-emerald-400"
+  },
+  {
+    name: "Permanent Sync & Sessions",
+    description: "256-bit token authentication, real hardware device identity and cross-device session tracking — `src/lib/WiFiSyncService.ts`, `src/lib/UnifiedSessionManager.ts`.",
+    icon: Smartphone,
+    color: "text-cyan-400"
   },
 ];
 
