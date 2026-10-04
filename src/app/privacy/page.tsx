@@ -188,7 +188,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="space-y-3 mt-4">
                 {[
-                  `The agent API and the native bridge listen on ${net.agentApi.defaultBindAddress} only. The MCP SSE bridge (mcp-browser-server.js:1620) listens on every interface and offers no restrict switch.`,
+                  `The agent API, the native bridge and the MCP bridge all listen on ${net.agentApi.defaultBindAddress} only. Each of them also requires a per-process token on every request and checks the Host and Origin headers, so a client that has not been given the token is refused rather than connected. The token is regenerated on each Aartiq start, which means a client configured once has to be set up again after a restart.`,
                   "You choose which MCP servers to connect to and what tools to approve",
                   "Every tool call runs the fail-closed security pipeline (verb gate, tab lock, handler, prompt-injection scan)",
                   "High-risk tools require explicit confirmation before they execute, unless you have already granted that permission",
