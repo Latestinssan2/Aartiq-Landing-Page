@@ -449,7 +449,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Export (JSON + text)",
         description:
-          "exportAsJSON() emits { type:'AARTIQ_AI_ACTION_LOGS', version:'1.0', summary, logs } with counts per bucket. exportAsText() renders a human-readable list. From the chat UI these are written to disk via export-chat-txt / export-chat-pdf (default file names comet-chat-<ts>.txt / .pdf).",
+          "exportAsJSON() emits { type:'AARTIQ_AI_ACTION_LOGS', version:'1.0', summary, logs } with counts per bucket. exportAsText() renders a human-readable list. From the chat UI these are written to disk via export-chat-txt / export-chat-pdf (default file names aartiq-chat-<ts>.txt / .pdf).",
         icon: FileDown,
         color: "from-teal-500 to-emerald-400",
         refs: [

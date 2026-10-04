@@ -247,7 +247,7 @@ const securityLayers = [
       "Live defaults are seeded by src/lib/permission-store.js:13-21 — home, Desktop, Documents, Downloads (read-write), plus /tmp, /Applications, /System/Applications (read) — and served through getAllowedDirectories (src/lib/permission-store.js:197-200). The directory-allowlist.js:24-43 default (app data directory + temp) is exercised only by unit tests, not at runtime. Remove or downgrade these in Settings for a stricter posture",
       "Symlink traversal attacks are blocked via realpath resolution",
       "Read-only entries never receive write access — enforced in the sandbox profile (macOS/Linux) and by isPathAllowed() on all platforms",
-      "Audit trail of all directory access grants with timestamps (comet-audit.jsonl)"
+      "Audit trail of all directory access grants with timestamps (aartiq-audit.jsonl)"
     ],
     notGuaranteed: [
       "TOCTOU races: the path is checked at validation time; the filesystem may change before the operation executes",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T11:10:24.644Z",
+  "generatedAt": "2026-10-04T11:47:51.006Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 38,
-    "passed": 37,
+    "total": 39,
+    "passed": 38,
     "failed": 0,
     "skipped": 1
   },
   "tests": {
-    "declared": 1029,
-    "passed": 1003,
+    "declared": 1035,
+    "passed": 1009,
     "skipped": 26,
     "failed": 0
   },
@@ -228,6 +228,13 @@
     },
     {
       "suite": "guardrails.prompt-injection",
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 6
+    },
+    {
+      "suite": "licence-audit-rename",
       "passed": 6,
       "skipped": 0,
       "failed": 0,

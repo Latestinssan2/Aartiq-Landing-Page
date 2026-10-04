@@ -720,27 +720,28 @@ export const providersUndocumented = ["deepseek", "openrouter", "cerebras", "lla
 
 export const legal = {
   /**
-   * UNRESOLVED CONFLICT — requires a human decision, not a docs edit.
-   * The repository root carries Apache-2.0 and GitHub's API reports Apache-2.0,
-   * but aartiq-browser/LICENSE.txt is a restrictive EULA and it is the license the
-   * Windows NSIS installer displays (package.json:190). The two cannot both be
-   * correct. Until a human resolves this, publish the conflict, not a verdict.
+   * RESOLVED 2026-10-04 — see aartiq-browser/docs-audit/licence-decision.md.
+   * The root LICENSE, aartiq-browser/LICENSE.txt and the package manifest all
+   * carry Apache-2.0 now, so the Windows NSIS installer shows the same licence
+   * as the repository. What used to be an open conflict is published as a
+   * resolution; check-docs rule (j) fails if the copies or this flag diverge.
    */
   licenseConflict: {
-    resolved: false as const,
+    resolved: true,
     rootLicense: "Apache-2.0 (LICENSE)",
-    browserLicenseFile: "aartiq-browser/LICENSE.txt — restrictive EULA: no modification, no derivative works, no redistribution",
+    browserLicenseFile:
+      "aartiq-browser/LICENSE.txt — Apache-2.0, byte-identical to the root (was a restrictive EULA; replaced 2026-10-04)",
     mcpLicense: "MIT (aartiq-mcp/LICENSE)",
     landingPageLicense: "none — no LICENSE file, package.json is private",
     evidence: [
-      "aartiq-browser/package.json:190 sets nsis.license = LICENSE.txt, so Windows installers show the EULA.",
-      "The EULA's own line 4 asserts 'This Is Open Source Software' while sections 2 forbids modification and redistribution.",
-      "The README trademark section says the licence 'permits the use, modification, and redistribution of the source code', contradicting the EULA.",
-      "gh api reports license: Apache-2.0 because it detects the root LICENSE only.",
+      "The decision, and the full text of the EULA it replaced, are recorded in aartiq-browser/docs-audit/licence-decision.md.",
+      "aartiq-browser/LICENSE.txt is byte-identical to the repository root LICENSE, and package.json build.nsis.license still points at it, so the Windows installer displays Apache-2.0.",
+      'aartiq-browser/package.json declares "license": "Apache-2.0", which is what npm and gh api read.',
+      "tests/licence-audit-rename.test.js pins the shipped files; docs:check rule (j) keeps the installer file, the manifest field and this flag in agreement.",
     ],
   },
   table: [
-    { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE", status: "conflicted" as const },
+    { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE + aartiq-browser/LICENSE.txt", status: "verified" as const },
     { component: "Aartiq MCP Server — aartiq-mcp/", license: "MIT", licenseFile: "aartiq-mcp/LICENSE", status: "verified" as const },
     { component: "Landing page / documentation site", license: "Unlicensed (private repository)", licenseFile: "none", status: "verified" as const },
   ],
