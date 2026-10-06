@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-06T18:34:19.584Z",
+  "generated": "2026-10-06T19:19:39.554Z",
   "version": "0.3.8",
   "desktop": {
     "total": 241,
-    "totalLines": 64251,
+    "totalLines": 64255,
     "byCategory": {
       "components": 149,
       "core": 0,
@@ -15616,7 +15616,7 @@
       {
         "name": "server.ts",
         "path": "agent-api/server.ts",
-        "lines": 167,
+        "lines": 171,
         "description": "Server",
         "tags": [
           "Node.js",
@@ -15637,6 +15637,7 @@
             "./tools",
             "./providers",
             "../local-server-auth",
+            "../session-token",
             "./types",
             "../guardrails",
             "../agent/agent-registry",
@@ -20445,6 +20446,6 @@
   },
   "summary": {
     "total": 241,
-    "totalLines": 64251
+    "totalLines": 64255
   }
 }
