@@ -188,7 +188,7 @@ export default function PrivacyPolicy() {
               </p>
               <ul className="space-y-3 mt-4">
                 {[
-                  `The agent API, the native bridge and the MCP bridge all listen on ${net.agentApi.defaultBindAddress} only. Each of them also requires a per-process token on every request and checks the Host and Origin headers, so a client that has not been given the token is refused rather than connected. The token is regenerated on each Aartiq start, which means a client configured once has to be set up again after a restart.`,
+                  `The agent API, the native bridge and the MCP bridge all listen on ${net.agentApi.defaultBindAddress} only. Each of them also requires a token on every request and checks the Host and Origin headers, so a client that has not been given the token is refused rather than connected. The tokens live in mode-0600 files in your home directory (~/.aartiq-token, ~/.aartiq-mcp-token, ~/.aartiq-agent-token), so a client configured once keeps working across restarts — delete a file and restart Aartiq to rotate it.`,
                   "You choose which MCP servers to connect to and what tools to approve",
                   "Every tool call runs the fail-closed security pipeline (verb gate, tab lock, handler, prompt-injection scan)",
                   "High-risk tools require explicit confirmation before they execute, unless you have already granted that permission",

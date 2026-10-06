@@ -245,7 +245,7 @@ const setupSteps = [
   },
   {
     title: 'Connect from Claude Desktop or any MCP client',
-    text: `Point your client at the stdio entry point. Every request to the bridge needs the session token, and the Host and Origin are checked as well, so a client that has not been given the token is refused rather than connected. Works on macOS and Windows; requires Node.js ≥ 18. The token is regenerated on each Aartiq start, so run Auto-Configure again after a restart.`,
+    text: `Point your client at the stdio entry point. Every request to the bridge needs the session token, and the Host and Origin are checked as well, so a client that has not been given the token is refused rather than connected. Works on macOS and Windows; requires Node.js ≥ 18. The token is stored in ~/.aartiq-mcp-token (mode 0600) and survives restarts; delete the file and restart Aartiq to rotate it, then run Auto-Configure again.`,
     refs: [
       { label: 'server/index.js:1203', url: `${GH}/aartiq-mcp/server/index.js#L1203` },
       { label: 'aartiq-mcp/manifest.json', url: `${GH}/aartiq-mcp/manifest.json` },

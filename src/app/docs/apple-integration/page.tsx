@@ -105,7 +105,7 @@ const features = [
     ],
     workflows: [
       "Siri resolves the phrase to the matching App Intent",
-      `The intent posts to the loopback bridge on port ${BRIDGE.port} with the per-process token`,
+      `The intent posts to the loopback bridge on port ${BRIDGE.port} with the token read from ~/.aartiq-token (mode 0600)`,
       "Aartiq performs the action or queues a prompt in the chat",
       "Siri speaks the returned string as the reply"
     ]
