@@ -408,7 +408,7 @@ export const security = {
     "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
     "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
     "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
-    "The WiFi sync server (3004) still binds every network interface by omission and has no token, Host or Origin check; it was changed by neither the listener-authentication work nor the bind-default change. The background task service (3999) and the PDF sync server bound 0.0.0.0 with a wildcard CORS header until the bind default became 127.0.0.1, with AARTIQ_SERVICE_HOST as the explicit opt-in and no CORS allow-origin header sent at all. See network.servers.",
+    "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade now refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. The background task service (3999) and the PDF sync server bound 0.0.0.0 with a wildcard CORS header until the bind default became 127.0.0.1, with AARTIQ_SERVICE_HOST as the explicit opt-in and no CORS allow-origin header sent at all. See network.servers.",
     "The session token is per-process, so it changes on every restart. A client configured once — a phone, another machine, a scheduled job — has to be reconfigured, and remote mode is not a finished design because of it.",
     "The token has to travel in the mcp-remote URL, because mcp-remote accepts a bare URL and nothing else. It can therefore appear in a process argument list and in a client's own logs. See aartiq-browser/docs-audit/issues/pairing-token-in-url.md.",
     '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching, and a permanent grant has no lifetime. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
@@ -440,9 +440,10 @@ export const network = {
       port: 3004,
       portIsEnvOverridable: false,
       defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
-      bindsAllInterfacesWhen: null, // no host argument is passed at all
-      auth: "Short-lived 15-minute access tokens and 7-day refresh tokens bound to device ID. Every sync action requires an active, unexpired token, with brute-force lockout and explicit unpair revocation.",
-      note: "All sync messages require an authenticated session token. Brute-force protection locks out failed attempts after 5 tries for 15 minutes.",
+      bindsAllInterfacesWhen:
+        "the phone reaches this over the LAN, so all interfaces is the default; `AARTIQ_WIFI_SYNC_HOST` narrows the bind to an address you name (127.0.0.1 closes it to this machine)",
+      auth: "Short-lived 15-minute access tokens and 7-day refresh tokens bound to device ID. Every sync action — unpair included — requires an active, unexpired token, with brute-force lockout. The WebSocket upgrade itself refuses foreign Origins and Host headers that do not name this machine (DNS rebinding).",
+      note: "All sync messages require an authenticated session token; the pairing code gates the handshake, and Host and Origin are checked at the upgrade with the same rules the HTTP listeners use. Brute-force protection locks out failed attempts after 5 tries for 15 minutes.",
     },
     {
       id: "native-bridge",
@@ -510,17 +511,17 @@ export const ci = {
    *
    * check-docs.ts counts the files on disk and fails if this number is wrong, so
    * adding or removing a workflow forces the SSOT (and therefore AGENTS.md) to be
-   * updated. AGENTS.md previously claimed 14 and described every workflow as
-   * "manual or tag push"; the real split is below.
+   * updated. The count is 13: docs-gate.yml exists only on the ci/docs-gate
+   * branch and has not landed on main, so it is not counted here.
    */
   workflows: {
-    count: 14,
+    count: 13,
     manualOnly: 11,
     tagPush: 1,
-    pushToMain: 2,
-    pullRequest: 1,
+    pushToMain: 1,
+    pullRequest: 0,
     note:
-      "release.yml fires on version tag push, sync-component-docs.yml and docs-gate.yml fire on push to main, docs-gate.yml also runs on pull_request, and the remaining eleven are workflow_dispatch.",
+      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main, and the remaining eleven are workflow_dispatch. docs-gate.yml lives on the ci/docs-gate branch and does not run on main.",
   },
   /**
    * jest.yml declares only `workflow_dispatch`. There is no `push:` and no
