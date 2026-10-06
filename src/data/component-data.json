@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-06T19:19:39.554Z",
+  "generated": "2026-10-06T19:41:39.170Z",
   "version": "0.3.8",
   "desktop": {
     "total": 241,
-    "totalLines": 64255,
+    "totalLines": 64248,
     "byCategory": {
       "components": 149,
       "core": 0,
@@ -2938,7 +2938,7 @@
       {
         "name": "McpSettings.tsx",
         "path": "McpSettings.tsx",
-        "lines": 643,
+        "lines": 636,
         "description": "Mcp Settings",
         "tags": [
           "React",
@@ -20446,6 +20446,6 @@
   },
   "summary": {
     "total": 241,
-    "totalLines": 64255
+    "totalLines": 64248
   }
 }
