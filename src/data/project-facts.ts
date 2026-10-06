@@ -471,8 +471,8 @@ export const network = {
       portIsEnvOverridable: false,
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: "AARTIQ_SERVICE_HOST is set to a routable address (defaults to 127.0.0.1; no switch in the app)",
-      auth: "Authentication token required on all file endpoints (Bearer, X-Aartiq-Token, or ?token=) matching active sync session or AARTIQ_SYNC_TOKEN, plus Host header validation against DNS rebinding.",
-      note: "Started by `npm run service`, not by the browser app itself; all endpoints require token authentication and validate the Host header against DNS rebinding.",
+      auth: "Authentication token required on all file endpoints (Bearer, X-Aartiq-Token, or ?token=) compared in constant time against the service token (options.authToken, AARTIQ_PDF_SYNC_TOKEN, or a generated per-process token), plus Host header validation against DNS rebinding.",
+      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate; all file endpoints require the token and validate the Host header against DNS rebinding. Serves ~/Documents/Aartiq/public with no Access-Control-Allow-Origin header, so a page on another origin cannot read its responses; the bind default changed from 0.0.0.0 with wildcard CORS to 127.0.0.1 with none, and AARTIQ_SERVICE_HOST opts back in. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
     },
   ] satisfies NetworkServer[],
 
@@ -514,12 +514,13 @@ export const ci = {
    * "manual or tag push"; the real split is below.
    */
   workflows: {
-    count: 13,
+    count: 14,
     manualOnly: 11,
     tagPush: 1,
-    pushToMain: 1,
+    pushToMain: 2,
+    pullRequest: 1,
     note:
-      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main for a path filter, and the remaining eleven are workflow_dispatch.",
+      "release.yml fires on version tag push, sync-component-docs.yml and docs-gate.yml fire on push to main, docs-gate.yml also runs on pull_request, and the remaining eleven are workflow_dispatch.",
   },
   /**
    * jest.yml declares only `workflow_dispatch`. There is no `push:` and no

@@ -20,7 +20,7 @@ import { useState, useEffect, useMemo } from "react";
 import { auth } from "@/lib/firebase";
 import { APP_INFO } from "@/lib/version";
 import { version } from "@/data/facts";
-import { GitHubRelease, getReleaseDownloadLinks } from "@/lib/github-release";
+import { GitHubRelease, getReleaseDownloadLinks, isGitHubRelease } from "@/lib/github-release";
 
 export default function DownloadsPage() {
   const [user, setUser] = useState<any>(null);
@@ -28,9 +28,14 @@ export default function DownloadsPage() {
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => setUser(user));
-    fetch("https://api.github.com/repos/Latestinssan/Aartiq/releases/latest")
-      .then(res => res.json())
-      .then(data => setLatestRelease(data));
+    // Read the cached server snapshot rather than calling api.github.com from
+    // the browser, so a rate-limited response cannot be stored as a release.
+    fetch("/api/github")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        setLatestRelease(isGitHubRelease(data?.release) ? data.release : null);
+      })
+      .catch((err) => console.error("Release fetch failed:", err));
   }, []);
 
   const downloadLinks = useMemo(() => {

@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { APP_INFO } from "@/lib/version";
 import { useVersion } from "@/lib/useVersion";
-import { GitHubRelease, getReleaseDownloadLinks } from "@/lib/github-release";
+import { GitHubRelease, getReleaseDownloadLinks, isGitHubRelease } from "@/lib/github-release";
 import {
   tests,
   derived,
@@ -59,6 +59,14 @@ interface GitHubStats {
   contributors: number;
   pull_requests: number;
 }
+
+const EMPTY_GITHUB_STATS: GitHubStats = {
+  stars: 0,
+  forks: 0,
+  open_issues: 0,
+  contributors: 0,
+  pull_requests: 0,
+};
 
 const featureHighlights = [
   {
@@ -627,7 +635,7 @@ export default function Home() {
   const [showAuth, setShowAuth] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [latestRelease, setLatestRelease] = useState<GitHubRelease | null>(null);
-  const [githubStats, setGithubStats] = useState<GitHubStats>({ stars: 0, forks: 0, open_issues: 0, contributors: 0, pull_requests: 0 });
+  const [githubStats, setGithubStats] = useState<GitHubStats>(EMPTY_GITHUB_STATS);
   const { version, channel } = useVersion();
 
   useEffect(() => {
@@ -635,26 +643,16 @@ export default function Home() {
       setUser(user);
     });
 
-    fetch("https://api.github.com/repos/Latestinssan/Aartiq/releases/latest")
-      .then(res => res.json())
-      .then(data => setLatestRelease(data))
-      .catch(err => console.error("Release fetch failed:", err));
-
-    Promise.all([
-      fetch("https://api.github.com/repos/Latestinssan/Aartiq").then(res => res.json()),
-      fetch("https://api.github.com/repos/Latestinssan/Aartiq/contributors?per_page=100").then(res => res.json()),
-      fetch("https://api.github.com/search/issues?q=repo:Latestinssan/Aartiq+is:pr").then(res => res.json())
-    ])
-    .then(([repoData, contributorsData, prData]) => {
-      setGithubStats({
-        stars: repoData.stargazers_count || 0,
-        forks: repoData.forks_count || 0,
-        open_issues: repoData.open_issues_count || 0,
-        contributors: Array.isArray(contributorsData) ? contributorsData.length : 0,
-        pull_requests: prData.total_count || 0
-      });
-    })
-    .catch(err => console.error("Stats fetch failed:", err));
+    // Read the cached server snapshot rather than calling api.github.com from
+    // the browser. See src/app/api/github/route.ts for why.
+    fetch("/api/github")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        setLatestRelease(isGitHubRelease(data.release) ? data.release : null);
+        setGithubStats({ ...EMPTY_GITHUB_STATS, ...data.stats });
+      })
+      .catch((err) => console.error("Release fetch failed:", err));
 
     return () => unsubscribe();
   }, []);
@@ -696,7 +694,7 @@ export default function Home() {
           >
             <div className="flex h-2 w-2 rounded-full bg-sky-500 animate-ping" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-sky-400">
-              {latestRelease ? `v${latestRelease.tag_name.replace(/^v/i, '')}` : version ? `v${version} ${channel}` : "..."}
+              {isGitHubRelease(latestRelease) ? `v${latestRelease.tag_name.replace(/^v/i, '')}` : version ? `v${version} ${channel}` : "..."}
             </span>
           </motion.div>
 
