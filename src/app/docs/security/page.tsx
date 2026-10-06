@@ -211,18 +211,20 @@ const securityLayers = [
       "AI generates a command; the parser assigns a risk field (default medium).",
       "checkShellPermission() classifies low/medium/high/critical and checks the PermissionStore allowlist; with no store it denies (fail-closed) — src/core/command-validator.js:77-133.",
       "Low risk: auto-runs only if autoApproveLowRisk is on (default off); otherwise a lightweight approval.",
-      "QR + 6-digit PIN covers three things: power actions from a paired device — src/main/handlers/sync-handlers.js:294-295; desktop AI-initiated high-risk actions, where the desktop generates a QR encoding aartiq://approve?id=<token>&pin=<6-digit> and the paired mobile must return the PIN (the Approve button stays disabled until mobileApproved && pinVerified) — src/components/ai/ClickPermissionModal.tsx:235-302; and high-risk MCP tool calls — src/lib/mcp-browser-server.js:157-168. Remote-origin shell escalates its risk (medium→high, high→critical — src/main/handlers/sync-handlers.js:231-238), but its QR branch is unreachable today: execute-shell-command is registered with requiresApproval 'never' (aartiq-browser/main.js:869), so the capability controller returns approved (src/core/capability-controller.js:77-103) and the command executes directly — src/main/handlers/sync-handlers.js:247-270. Flagged for maintainer review.",
-      "Alternatively, high risk uses the platform approval dialog: an Electron message box whose approve button is labeled 'Approve with Touch ID' — no system biometric API is called — plus PowerShell on Windows and bash on Linux — src/main/handlers/native-approval-manager.js:22-56. The requireBiometricPerSession / requireBiometricEveryTime settings exist as flags (src/lib/ai-action-security.ts:17), but nothing in the codebase invokes a biometric API.",
-      "The renderer only enables Approve when both mobileApproved and pinVerified are true (or the biometric dialog succeeds) — src/components/ai/ClickPermissionModal.tsx:247-302.",
+      "QR + 6-digit PIN covers remote shell commands and high-risk actions: power actions from a paired device — src/main/handlers/sync-handlers.js; desktop AI-initiated high-risk actions, where the desktop generates a QR encoding aartiq://approve?id=<token>&pin=<6-digit> and the paired mobile must return the PIN (the Approve button stays disabled until mobileApproved && pinVerified) — src/components/ai/ClickPermissionModal.tsx:235-302; high-risk MCP tool calls — src/lib/mcp-browser-server.js:157-168; and remote-origin shell execution, which is registered with origin policy { local: 'never', remote: 'always' } and strictly requires single-use, input-hash-bound ticket redemption before execution — src/main/handlers/sync-handlers.js:231-270.",
+      "Native platform approval dialog: dialog buttons are accurately labeled ['Deny', 'Approve'], removing misleading Touch ID text from standard message boxes. Real native biometric verification is implemented: macOS LocalAuthentication (LAPolicy.deviceOwnerAuthentication Touch ID or Mac password), Windows Hello (UserConsentVerifier / WebAuthn), and Linux polkit (BiometricAuthManager). The requireBiometricPerSession / requireBiometricEveryTime flags are strictly enforced and fail closed (deny) if unsupported or cancelled — src/main/handlers/native-approval-manager.js.",
+      "Master PIN (PBKDF2-SHA256 with 100,000 rounds) is stored securely in Native OS Keychains (Apple Keychain, Windows Credential Manager DPAPI, Linux Secret Service) with a 5-attempt lockout, providing hardware-backed credential protection for remote and high-risk approvals — src/lib/MasterPINService.ts.",
+      "The renderer only enables Approve when both mobileApproved and pinVerified are true (or the biometric verification succeeds) — src/components/ai/ClickPermissionModal.tsx:247-302.",
       "Critical risk is denied at the gate — checkShellPermission returns false for critical, src/core/command-validator.js:87-90 — and a human decision at that point is a plain Allow / Deny through the shell permission bridge (src/main/handlers/utils.js:222-229), not a ticket. Single-use, input-hash-bound tickets cover MCP high-risk tool calls and approve-style capability actions — src/core/capability-controller.js:29-100, src/core/approval-ticket-manager.js:139-278, src/lib/approval-gate.js:53-147.",
       "Command only executes after explicit approval; timeouts and missing renderers resolve to deny — src/core/shell-permission-bridge.js:42-71.",
-      "Source files: src/core/command-validator.js, src/lib/permission-store.js, src/main/handlers/sync-handlers.js, src/main/handlers/utils.js, src/main/handlers/native-approval-manager.js, src/components/ai/ClickPermissionModal.tsx, src/core/capability-controller.js"
+      "Source files: src/core/command-validator.js, src/lib/permission-store.js, src/main/handlers/sync-handlers.js, src/main/handlers/utils.js, src/main/handlers/native-approval-manager.js, src/components/ai/ClickPermissionModal.tsx, src/core/capability-controller.js, src/lib/MasterPINService.ts"
     ],
     benefits: [
       "No automated execution of destructive commands",
       "QR approval ensures physical presence",
-      "Mobile app confirms identity",
-      "User approval required for execution"
+      "Mobile app confirms identity via Dual-Gate Permission Relay (Master PIN + Android Screen Lock)",
+      "Real native biometric verification (Touch ID / Windows Hello / polkit)",
+      "Master PIN stored securely in Native OS Keychains"
     ]
   },
   {
@@ -235,16 +237,20 @@ const securityLayers = [
     description: "AI file access is restricted to explicitly approved directories with fine-grained read/write permissions. This is a policy layer; the enforcement boundary is the OS sandbox.",
     howItWorks: [
       "Each directory in the allowlist specifies an access level (Read Only or Read & Write) and recursive flag (src/lib/permission-store.js)",
-      "Path canonicalization resolves symlinks via fs.realpathSync before checking against the allowlist — the resolved path is checked, never the user-supplied string (src/core/directory-allowlist.js)",
-      "Just-in-time permission prompts request approval before accessing new directories",
+      "Default allowlist is narrowed to a single dedicated app workspace directory (~/.aartiq/sandbox-workspace) plus /tmp. No personal profile folders (home, Desktop, Documents, Downloads) are granted by default.",
+      "Sensitive path deny list: ~/.ssh, ~/.gnupg, ~/.aws, ~/.config/gcloud, ~/.azure, ~/.kube, browser profiles, password managers, keychains, shell history, and .env files are unconditionally denied, even if a user allows their parent directory.",
+      "Path canonicalization resolves symlinks via fs.realpathSync before checking against allowlists and deny lists — symlink traversal is strictly blocked (src/core/directory-allowlist.js)",
+      "Deny rules are enforced in OS-level sandbox profiles too: Seatbelt deny rules on macOS, bubblewrap tmpfs mask mounts on Linux, and AppContainer ACLs on Windows.",
+      "Just-in-time permission prompts request approval before accessing new directories, defaulting to read-only with the full resolved path shown.",
       "Batched multi-directory approval allows granting access to multiple paths at once",
       "File management operations (move, copy, open, print) are routed around the shell sandbox",
       "Read/write separation: a read grant must never allow deleting/overwriting — enforced in isPathAllowed() for both read and write operations",
-      "Source files: src/core/directory-allowlist.js, src/lib/permission-store.js, src/main/handlers/permission-handlers.js"
+      "Source files: src/core/directory-allowlist.js, src/lib/permission-store.js, src/core/sandbox.js, src/main/handlers/permission-handlers.js"
     ],
     benefits: [
       "Scopes AI file access to an explicit allowlist — any path outside it is denied with a structured reason",
-      "Live defaults are seeded by src/lib/permission-store.js:13-21 — home, Desktop, Documents, Downloads (read-write), plus /tmp, /Applications, /System/Applications (read) — and served through getAllowedDirectories (src/lib/permission-store.js:197-200). The directory-allowlist.js:24-43 default (app data directory + temp) is exercised only by unit tests, not at runtime. Remove or downgrade these in Settings for a stricter posture",
+      "Default access narrowed to dedicated app workspace (~/.aartiq/sandbox-workspace) + temp directory, protecting personal files",
+      "Sensitive credential directories (~/.ssh, ~/.aws, keychains, .env) strictly denied across both app logic and OS sandbox profiles",
       "Symlink traversal attacks are blocked via realpath resolution",
       "Read-only entries never receive write access — enforced in the sandbox profile (macOS/Linux) and by isPathAllowed() on all platforms",
       "Audit trail of all directory access grants with timestamps (aartiq-audit.jsonl)"

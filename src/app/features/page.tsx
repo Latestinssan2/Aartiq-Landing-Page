@@ -106,15 +106,37 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
         ],
       },
       {
-        name: "Biometric approval (Touch ID / Windows Hello)",
+        name: "Biometric approval (Touch ID / Windows Hello / polkit)",
         description:
-          "Native approval dialogs: macOS shows 'Approve with Touch ID', Windows runs a PowerShell dialog, Linux a bash dialog. Biometric is gated by requireBiometricPerSession (default true) and requireBiometricEveryTime (default false). macOS Touch ID is also invoked directly from the native Swift panels via LAContext.",
+          "Accurate dialog labels (no false biometric claims in message boxes) plus real platform biometric verification: macOS LocalAuthentication (Touch ID / Mac password), Windows Hello (UserConsentVerifier), and Linux polkit (BiometricAuthManager). Enforced fail-closed by requireBiometricPerSession and requireBiometricEveryTime.",
         icon: Fingerprint,
         color: "from-amber-500 to-orange-400",
         refs: [
-          "src/main/handlers/native-approval-manager.js:22-98",
-          "src/components/ai/useAIActionSecurityManager.tsx:120-153",
-          "src/lib/native-panels/ViewModel.swift:255-275",
+          "src/main/handlers/native-approval-manager.js:22-180",
+          "src/lib/native-os-verifier.js:15-85",
+          "src/service/biometric-auth.js:20-65",
+        ],
+      },
+      {
+        name: "Master PIN in Native OS Keychain",
+        description:
+          "Hardware-backed Master PIN with PBKDF2-SHA256 (100,000 rounds) stored securely in native OS credential stores (Apple Keychain, Windows DPAPI / Credential Manager, Linux Secret Service) with a 5-attempt brute-force lockout.",
+        icon: Lock,
+        color: "from-emerald-500 to-cyan-400",
+        refs: [
+          "src/lib/MasterPINService.ts:30-150",
+          "src/components/MasterPINSetup.tsx:20-80",
+        ],
+      },
+      {
+        name: "Dual-Gate Mobile Biometrics & Permission Relay",
+        description:
+          "Combines Master PIN verification with mobile device security (Android Screen Lock / biometrics) via PermissionRelayService for remote action gating and high-risk approval tickets.",
+        icon: ShieldCheck,
+        color: "from-blue-500 to-teal-400",
+        refs: [
+          "src/lib/PermissionRelayService.ts:25-110",
+          "src/lib/WiFiSyncService.ts:676-695",
         ],
       },
     ],
@@ -125,6 +147,17 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
     intro:
       "Aartiq can remember past conversations (RAG vector store on disk) and learn user preferences from chat. Both are OFF by default and can be disabled. There are two storage layers: an IPC/persisted layer (authoritative) and a legacy localStorage layer used by some sidebar widgets.",
     items: [
+      {
+        name: "Unified Session Manager",
+        description:
+          "Aggregates live and past browser sessions, active tabs, navigation history, background automation tasks, runtime permission grants, and sync snapshots into a single unified session pipeline.",
+        icon: ListTree,
+        color: "from-violet-500 to-purple-400",
+        refs: [
+          "src/lib/UnifiedSessionManager.ts:30-195",
+          "src/lib/WiFiSyncService.ts:725-735",
+        ],
+      },
       {
         name: "Cross-session RAG memory",
         description:

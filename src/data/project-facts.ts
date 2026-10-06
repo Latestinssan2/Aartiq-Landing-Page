@@ -344,7 +344,7 @@ export const security = {
         "Never. Refused before the grant store and the auto-approve settings are consulted, and unreachable from every one of them.",
       examples: [],
       limit:
-        "No command in the tier table is assigned this tier. It is only synthesised at runtime for commands arriving from a remote device. On the desktop shell path it uses no biometric and no QR confirmation, just a dialog.",
+        "No command in the tier table is assigned this tier. It is only synthesised at runtime for commands arriving from a remote device. Remote-origin shell execution strictly requires single-use, input-hash-bound QR+PIN ticket redemption.",
     },
   ] satisfies RiskTier[],
 
@@ -441,8 +441,8 @@ export const network = {
       portIsEnvOverridable: false,
       defaultBindAddress: "all interfaces (0.0.0.0 / ::)",
       bindsAllInterfacesWhen: null, // no host argument is passed at all
-      auth: "Handshake pairing code only. The command and desktop-control message types are not re-checked against it, and no token, Host or Origin check is applied.",
-      note: "Unchanged by the listener-authentication work, and listed as an open issue: new WebSocketServer({ port }) binds every interface by omission, the same shape the MCP bridge had. Tracked in aartiq-browser/docs-audit/issues/wifi-sync-bind-address.md.",
+      auth: "Short-lived 15-minute access tokens and 7-day refresh tokens bound to device ID. Every sync action requires an active, unexpired token, with brute-force lockout and explicit unpair revocation.",
+      note: "All sync messages require an authenticated session token. Brute-force protection locks out failed attempts after 5 tries for 15 minutes.",
     },
     {
       id: "native-bridge",
@@ -471,8 +471,8 @@ export const network = {
       portIsEnvOverridable: false,
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: "AARTIQ_SERVICE_HOST is set to a routable address (defaults to 127.0.0.1; no switch in the app)",
-      auth: "None. Serves ~/Documents/Aartiq/public; no Access-Control-Allow-Origin header is sent, so a browser page on another origin cannot read its responses.",
-      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate. The bind default changed from 0.0.0.0 with wildcard CORS to 127.0.0.1 with none; AARTIQ_SERVICE_HOST opts back in. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
+      auth: "Authentication token required on all file endpoints (Bearer, X-Aartiq-Token, or ?token=) compared in constant time against the service token (options.authToken, AARTIQ_PDF_SYNC_TOKEN, or a generated per-process token), plus Host header validation against DNS rebinding.",
+      note: "Started by `npm run service`, not by the browser app itself, so it is outside the browser process's own listener gate; all file endpoints require the token and validate the Host header against DNS rebinding. Serves ~/Documents/Aartiq/public with no Access-Control-Allow-Origin header, so a page on another origin cannot read its responses; the bind default changed from 0.0.0.0 with wildcard CORS to 127.0.0.1 with none, and AARTIQ_SERVICE_HOST opts back in. Tracked in aartiq-browser/docs-audit/issues/pdf-sync-bind-address.md.",
     },
   ] satisfies NetworkServer[],
 

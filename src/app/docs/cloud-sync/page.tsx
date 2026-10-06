@@ -158,14 +158,20 @@ const securityFeatures = [
     source: "src/lib/WiFiSyncService.ts"
   },
   {
-    title: "Known devices",
-    description: "A device you have paired is remembered, and you decide per device whether it may auto-connect",
+    title: "Short-lived access tokens",
+    description: "Pairing issues short-lived access tokens and refresh tokens bound to client device fingerprint; sync messages require an active token",
+    icon: Key,
+    source: "src/lib/WiFiSyncService.ts"
+  },
+  {
+    title: "Known devices & revocation",
+    description: "Paired devices are tracked and can be unshared or revoked immediately, invalidating tokens and closing connections",
     icon: Shield,
     source: "src/lib/WiFiSyncService.ts"
   },
   {
-    title: "Blocked devices",
-    description: "A blocked device is refused at the handshake and cannot connect",
+    title: "Blocked devices & rate limiting",
+    description: "Blocked devices are refused at the handshake, and repeated failed attempts trigger lockout",
     icon: AlertTriangle,
     source: "src/lib/WiFiSyncService.ts"
   },
@@ -177,7 +183,7 @@ const securityFeatures = [
   },
   {
     title: "What is not here",
-    description: "No approval QR gate, no pairing expiry timer, and no per-device audit log. Sync messages are written to the developer console and are not retained as a record you can review",
+    description: "No per-device audit log. Sync messages are written to the developer console and are not retained as a record you can review",
     icon: AlertTriangle
   }
 ];
