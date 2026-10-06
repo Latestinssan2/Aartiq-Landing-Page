@@ -192,7 +192,7 @@ const securityModel: SecurityItem[] = [
     icon: Globe,
     title: 'Loopback by default',
     color: 'text-amber-400',
-    text: `All three HTTP listeners bind to loopback by default. The agent API uses ${net.agentApi.defaultBindAddress} and exposes every interface only when remote is explicitly turned on; the MCP SSE bridge resolves its bind host through resolveBindHost() (mcp-browser-server.js:1678-1681) and listens on 127.0.0.1 unless the security_mcpBridgeRemote setting is turned on (main.js:9161, default off). The WiFi sync and PDF sync services are the two listeners that do bind all interfaces — without a token — which the README states plainly.`,
+    text: `All three HTTP listeners bind to loopback by default. The agent API uses ${net.agentApi.defaultBindAddress} and exposes every interface only when remote is explicitly turned on; the MCP SSE bridge resolves its bind host through resolveBindHost() (mcp-browser-server.js:1678-1681) and listens on 127.0.0.1 unless the security_mcpBridgeRemote setting is turned on (main.js:9161, default off). Beyond those three, the WiFi sync service binds all interfaces on purpose so the phone can reach it over the LAN (AARTIQ_WIFI_SYNC_HOST narrows the bind), with Host and Origin checked at the WebSocket upgrade and every sync action carrying the device's access token; the PDF sync service binds loopback and requires a token on every file endpoint. The README states both plainly.`,
     refs: [
       { label: 'bridge-client.js:3-4', url: `${GH}/aartiq-mcp/server/bridge-client.js#L3-L4` },
       { label: 'src/lib/agent-api/providers.ts:22,78', url: `${GH}/aartiq-browser/src/lib/agent-api/providers.ts#L22-L78` },
