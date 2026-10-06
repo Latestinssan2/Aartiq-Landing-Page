@@ -1,15 +1,15 @@
 {
-  "generated": "2026-09-13T14:32:02.512Z",
-  "version": "0.3.7",
+  "generated": "2026-10-06T18:34:19.584Z",
+  "version": "0.3.8",
   "desktop": {
-    "total": 230,
-    "totalLines": 59710,
+    "total": 241,
+    "totalLines": 64251,
     "byCategory": {
-      "components": 144,
+      "components": 149,
       "core": 0,
       "automation": 0,
       "service": 0,
-      "lib": 86
+      "lib": 92
     },
     "components": [
       {
@@ -23,7 +23,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "dompurify",
@@ -77,7 +77,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -109,7 +109,7 @@
           "PDF",
           "OCR"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -459,7 +459,7 @@
       {
         "name": "AIChatSidebar.tsx",
         "path": "AIChatSidebar.tsx",
-        "lines": 8392,
+        "lines": 8483,
         "description": "Chat Sidebar",
         "tags": [
           "React",
@@ -477,7 +477,7 @@
           "Linux",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -486,14 +486,13 @@
             "zustand/react/shallow",
             "tesseract.js",
             "react-markdown",
-            "remark-gfm",
-            "remark-math",
-            "remark-breaks",
-            "rehype-katex",
             "react-syntax-highlighter",
             "react-syntax-highlighter/dist/cjs/styles/prism/dracula"
           ],
           "importsInternal": [
+            "./ai/markdownPlugins",
+            "./ai/normalizeCitationLinks",
+            "./ai/filePaths",
             "./ai/ThinkingPanel",
             "./ai/ActionChainTimeline",
             "./ai/CollapsibleOCRMessage",
@@ -894,7 +893,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1054,7 +1053,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1144,7 +1143,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1197,7 +1196,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1240,7 +1239,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1332,7 +1331,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1447,7 +1446,7 @@
       {
         "name": "AutomationPlanApproval.tsx",
         "path": "AutomationPlanApproval.tsx",
-        "lines": 411,
+        "lines": 499,
         "description": "Automation Plan Approval",
         "tags": [
           "React",
@@ -1456,13 +1455,15 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
             "framer-motion"
           ],
-          "importsInternal": [],
+          "importsInternal": [
+            "./DeviceImage"
+          ],
           "interfaces": [
             {
               "name": "PlanOperation",
@@ -1572,6 +1573,7 @@
             "AutomationPlan"
           ],
           "apiUsage": [
+            "electronAPI",
             "framer-motion",
             "lucide-icons"
           ],
@@ -1594,7 +1596,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1680,7 +1682,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -1736,7 +1738,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1793,7 +1795,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1843,7 +1845,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1882,7 +1884,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "framer-motion",
@@ -1914,7 +1916,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -1954,7 +1956,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2010,6 +2012,72 @@
         }
       },
       {
+        "name": "DeviceImage.tsx",
+        "path": "DeviceImage.tsx",
+        "lines": 94,
+        "description": "Device Image",
+        "tags": [
+          "React",
+          "Sync",
+          "macOS",
+          "Windows"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "react",
+            "lucide-react"
+          ],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "DeviceImageProps",
+              "properties": [
+                {
+                  "name": "deviceType",
+                  "type": "'phone' | 'tablet' | 'laptop' | 'desktop' | string",
+                  "required": false
+                },
+                {
+                  "name": "deviceImage",
+                  "type": "'android-phone' | 'iphone' | 'macbook' | 'imac' | 'windows-pc' | string",
+                  "required": false
+                },
+                {
+                  "name": "size",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "isOnline",
+                  "type": "boolean",
+                  "required": false
+                },
+                {
+                  "name": "isPermanentSynced",
+                  "type": "boolean",
+                  "required": false
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "react-utility",
+          "exports": [
+            "default DeviceImage"
+          ],
+          "apiUsage": [
+            "lucide-icons"
+          ],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "DinoGame.tsx",
         "path": "DinoGame.tsx",
         "lines": 243,
@@ -2018,7 +2086,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2065,7 +2133,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2107,7 +2175,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -2170,7 +2238,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -2242,7 +2310,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2315,7 +2383,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2402,7 +2470,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2433,7 +2501,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2461,7 +2529,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "framer-motion",
@@ -2500,7 +2568,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2681,7 +2749,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2726,7 +2794,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2746,6 +2814,63 @@
         }
       },
       {
+        "name": "MasterPINSetup.tsx",
+        "path": "MasterPINSetup.tsx",
+        "lines": 263,
+        "description": "MasterPINSetup",
+        "tags": [
+          "React",
+          "Security",
+          "Automation",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "react",
+            "framer-motion"
+          ],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "MasterPINSetupProps",
+              "properties": [
+                {
+                  "name": "isOpen",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "onClose",
+                  "type": "() => void",
+                  "required": true
+                },
+                {
+                  "name": "onSuccess",
+                  "type": "() => void",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ],
+          "componentType": "react-utility",
+          "exports": [
+            "default MasterPINSetup"
+          ],
+          "apiUsage": [
+            "electronAPI",
+            "framer-motion",
+            "lucide-icons"
+          ],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "McpApprovalPopup.tsx",
         "path": "McpApprovalPopup.tsx",
         "lines": 177,
@@ -2755,7 +2880,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -2813,15 +2938,16 @@
       {
         "name": "McpSettings.tsx",
         "path": "McpSettings.tsx",
-        "lines": 617,
+        "lines": 643,
         "description": "Mcp Settings",
         "tags": [
           "React",
           "Node.js",
+          "Core",
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2829,7 +2955,8 @@
             "framer-motion"
           ],
           "importsInternal": [
-            "@/store/useAppStore"
+            "@/store/useAppStore",
+            "@/lib/mcp-bridge-url"
           ],
           "interfaces": [
             {
@@ -2930,7 +3057,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2967,7 +3094,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -2997,7 +3124,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "framer-motion",
@@ -3038,7 +3165,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3077,7 +3204,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3246,7 +3373,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3289,7 +3416,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -3330,7 +3457,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3410,7 +3537,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3435,7 +3562,7 @@
       {
         "name": "PermissionSettings.tsx",
         "path": "PermissionSettings.tsx",
-        "lines": 1109,
+        "lines": 1118,
         "description": "Permission Settings",
         "tags": [
           "React",
@@ -3447,12 +3574,14 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
           ],
-          "importsInternal": [],
+          "importsInternal": [
+            "@/lib/shell-command-tiers"
+          ],
           "interfaces": [],
           "hooks": [
             "useState",
@@ -3489,7 +3618,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3529,7 +3658,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3669,7 +3798,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3708,7 +3837,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3746,7 +3875,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3778,7 +3907,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3850,7 +3979,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3893,7 +4022,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -3936,7 +4065,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -3975,7 +4104,7 @@
       {
         "name": "SettingsPanel.tsx",
         "path": "SettingsPanel.tsx",
-        "lines": 1263,
+        "lines": 1265,
         "description": "Settings Panel",
         "tags": [
           "React",
@@ -3990,7 +4119,7 @@
           "Windows",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4057,7 +4186,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4147,6 +4276,7 @@
         "tags": [
           "React",
           "Node.js",
+          "Core",
           "Security",
           "AI",
           "Sync",
@@ -4155,7 +4285,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4204,7 +4334,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -4289,7 +4419,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4349,7 +4479,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4389,7 +4519,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -4450,7 +4580,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -4519,7 +4649,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -4578,7 +4708,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4613,7 +4743,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4715,7 +4845,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -4847,7 +4977,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -4878,7 +5008,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5000,7 +5130,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5041,7 +5171,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5091,7 +5221,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5137,7 +5267,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -5175,7 +5305,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5215,11 +5345,12 @@
       {
         "name": "AISetupGuide.tsx",
         "path": "ai/AISetupGuide.tsx",
-        "lines": 1023,
+        "lines": 1022,
         "description": "Setup Guide",
         "tags": [
           "React",
           "Node.js",
+          "Core",
           "Security",
           "AI",
           "Automation",
@@ -5227,14 +5358,15 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
             "framer-motion"
           ],
           "importsInternal": [
-            "@/store/useAppStore"
+            "@/store/useAppStore",
+            "@/lib/mcp-bridge-url"
           ],
           "interfaces": [
             {
@@ -5294,7 +5426,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5385,7 +5517,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -5788,7 +5920,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5920,7 +6052,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -5976,7 +6108,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -6098,7 +6230,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6229,21 +6361,25 @@
       {
         "name": "CollapsibleOCRMessage.tsx",
         "path": "ai/CollapsibleOCRMessage.tsx",
-        "lines": 159,
+        "lines": 152,
         "description": "CollapsibleOCRMessage",
         "tags": [
           "React",
           "Node.js",
+          "AI",
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
             "lucide-react"
           ],
-          "importsInternal": [],
+          "importsInternal": [
+            "./filePaths",
+            "@/store/useAppStore"
+          ],
           "interfaces": [
             {
               "name": "CollapsibleOCRMessageProps",
@@ -6272,6 +6408,7 @@
           ],
           "apiUsage": [
             "electronAPI",
+            "zustand-store",
             "lucide-icons"
           ],
           "keyFunctions": [
@@ -6292,7 +6429,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6334,7 +6471,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6459,7 +6596,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6635,7 +6772,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -6733,7 +6870,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6786,7 +6923,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6832,7 +6969,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -6891,7 +7028,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -6955,7 +7092,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7033,7 +7170,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7153,7 +7290,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7247,7 +7384,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7368,7 +7505,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7478,7 +7615,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -7537,7 +7674,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -7617,7 +7754,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -7791,7 +7928,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -8003,7 +8140,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8100,7 +8237,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8126,7 +8263,7 @@
       {
         "name": "SmartMessageContent.tsx",
         "path": "ai/SmartMessageContent.tsx",
-        "lines": 789,
+        "lines": 791,
         "description": "Smart Message Content",
         "tags": [
           "React",
@@ -8135,7 +8272,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8331,7 +8468,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8379,7 +8516,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8463,7 +8600,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8517,9 +8654,129 @@
         }
       },
       {
+        "name": "filePaths.ts",
+        "path": "ai/filePaths.ts",
+        "lines": 241,
+        "description": "FilePaths",
+        "tags": [
+          "Node.js",
+          "AI",
+          "PDF",
+          "Plugin",
+          "macOS",
+          "Windows"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "LinkToken",
+              "properties": [
+                {
+                  "name": "kind",
+                  "type": "'url' | 'path' | 'text'",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "Span",
+              "properties": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "LinkToken",
+            "looksLikeUrl",
+            "looksLikeFilePath",
+            "isClickableFilePath",
+            "preprocessFilePaths",
+            "tokenizeUrlsAndPaths"
+          ],
+          "apiUsage": [],
+          "keyFunctions": []
+        }
+      },
+      {
+        "name": "markdownPlugins.ts",
+        "path": "ai/markdownPlugins.ts",
+        "lines": 25,
+        "description": "MarkdownPlugins",
+        "tags": [
+          "React",
+          "AI",
+          "Plugin",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "remark-gfm",
+            "remark-math",
+            "remark-breaks",
+            "rehype-katex",
+            "react-markdown"
+          ],
+          "importsInternal": [],
+          "interfaces": [],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "markdownRemarkPlugins",
+            "markdownRehypePlugins"
+          ],
+          "apiUsage": [
+            "markdown"
+          ],
+          "keyFunctions": []
+        }
+      },
+      {
+        "name": "normalizeCitationLinks.ts",
+        "path": "ai/normalizeCitationLinks.ts",
+        "lines": 27,
+        "description": "Citation Links",
+        "tags": [
+          "AI",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [],
+          "interfaces": [],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "normalizeCitationLinks"
+          ],
+          "apiUsage": [],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "useAIActionSecurityManager.tsx",
         "path": "ai/useAIActionSecurityManager.tsx",
-        "lines": 706,
+        "lines": 731,
         "description": "Action Security Manager",
         "tags": [
           "React",
@@ -8528,7 +8785,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8536,7 +8793,8 @@
             "lucide-react"
           ],
           "importsInternal": [
-            "./ClickPermissionModal"
+            "./ClickPermissionModal",
+            "@/lib/shell-command-tiers"
           ],
           "interfaces": [
             {
@@ -8761,7 +9019,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8808,7 +9066,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8889,7 +9147,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -8948,7 +9206,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9001,7 +9259,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9053,7 +9311,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9137,7 +9395,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9217,7 +9475,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9268,7 +9526,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9385,7 +9643,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9470,7 +9728,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9578,7 +9836,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9638,7 +9896,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -9719,7 +9977,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9749,7 +10007,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -9806,7 +10064,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9841,7 +10099,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -9876,7 +10134,7 @@
           "Windows",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -10133,7 +10391,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -10289,7 +10547,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10325,7 +10583,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10366,7 +10624,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10398,7 +10656,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10433,7 +10691,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10541,7 +10799,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10573,7 +10831,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10636,7 +10894,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10669,7 +10927,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10731,7 +10989,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10764,7 +11022,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10871,7 +11129,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -10919,7 +11177,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11001,7 +11259,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11088,7 +11346,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -11119,7 +11377,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11173,7 +11431,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11237,7 +11495,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11292,7 +11550,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11355,7 +11613,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11411,7 +11669,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11483,7 +11741,7 @@
           "macOS",
           "Flutter"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react",
@@ -11534,7 +11792,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -11594,7 +11852,7 @@
       {
         "name": "AICommandParser.ts",
         "path": "AICommandParser.ts",
-        "lines": 867,
+        "lines": 872,
         "description": "Command Parser",
         "tags": [
           "Node.js",
@@ -11606,7 +11864,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -11751,7 +12009,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -12030,7 +12288,7 @@
         "tags": [
           "Automation"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -12078,7 +12336,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -12246,7 +12504,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "@tensorflow/tfjs"
@@ -12271,7 +12529,7 @@
       {
         "name": "CloudSyncService.ts",
         "path": "CloudSyncService.ts",
-        "lines": 532,
+        "lines": 591,
         "description": "Cloud Sync Service",
         "tags": [
           "Node.js",
@@ -12280,13 +12538,14 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "events",
             "firebase/database",
             "firebase/auth",
-            "firebase/storage"
+            "firebase/storage",
+            "crypto"
           ],
           "importsInternal": [
             "./FirebaseService",
@@ -12380,6 +12639,72 @@
         }
       },
       {
+        "name": "DeviceIdentifier.ts",
+        "path": "DeviceIdentifier.ts",
+        "lines": 123,
+        "description": "Device Identifier",
+        "tags": [
+          "Node.js",
+          "AI",
+          "macOS",
+          "Windows",
+          "Linux"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "os",
+            "child_process"
+          ],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "LocalDeviceMetadata",
+              "properties": [
+                {
+                  "name": "deviceId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "hostname",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceType",
+                  "type": "'laptop' | 'desktop' | 'workstation'",
+                  "required": true
+                },
+                {
+                  "name": "deviceImage",
+                  "type": "'macbook' | 'imac' | 'windows-laptop' | 'windows-pc' | 'linux-pc'",
+                  "required": true
+                },
+                {
+                  "name": "platform",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "osVersion",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "LocalDeviceMetadata",
+            "DeviceIdentifier"
+          ],
+          "apiUsage": [],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "FirebaseService.ts",
         "path": "FirebaseService.ts",
         "lines": 190,
@@ -12387,7 +12712,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "firebase/app",
@@ -12418,7 +12743,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "firebase/database",
@@ -12451,7 +12776,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -12534,9 +12859,108 @@
         }
       },
       {
+        "name": "MasterPINService.ts",
+        "path": "MasterPINService.ts",
+        "lines": 246,
+        "description": "MasterPIN service",
+        "tags": [
+          "Node.js",
+          "macOS",
+          "Flutter"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "crypto",
+            "path",
+            "os",
+            "electron",
+            "electron-store"
+          ],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "MasterPinData",
+              "properties": [
+                {
+                  "name": "salt",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "hash",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "createdAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "lastVerifiedAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "failedAttempts",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "lockedUntil",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "nativeStorageBackend",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "PinVerifyResult",
+              "properties": [
+                {
+                  "name": "verified",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "locked",
+                  "type": "boolean",
+                  "required": false
+                },
+                {
+                  "name": "remainingAttempts",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "error",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "MasterPinData",
+            "PinVerifyResult",
+            "MasterPINService",
+            "masterPinService"
+          ],
+          "apiUsage": [],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "P2PFileSyncService.ts",
         "path": "P2PFileSyncService.ts",
-        "lines": 691,
+        "lines": 825,
         "description": "File Sync Service",
         "tags": [
           "Node.js",
@@ -12546,7 +12970,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "events",
@@ -12702,7 +13126,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -12753,6 +13177,235 @@
         }
       },
       {
+        "name": "PermissionRelayService.ts",
+        "path": "PermissionRelayService.ts",
+        "lines": 257,
+        "description": "Permission Relay Service",
+        "tags": [
+          "Node.js",
+          "Security",
+          "Sync",
+          "Automation",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "events",
+            "crypto"
+          ],
+          "importsInternal": [
+            "./UnifiedSessionManager",
+            "./MasterPINService"
+          ],
+          "interfaces": [
+            {
+              "name": "PlanOperationDetail",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "type",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "description",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "target",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "risk",
+                  "type": "RiskLevel",
+                  "required": true
+                },
+                {
+                  "name": "command",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "details",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "policyDenied",
+                  "type": "boolean",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "PermissionRelayRequest",
+              "properties": [
+                {
+                  "name": "requestId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "taskName",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "taskType",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "description",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "command",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "riskLevel",
+                  "type": "RiskLevel",
+                  "required": true
+                },
+                {
+                  "name": "operations",
+                  "type": "PlanOperationDetail[]",
+                  "required": true
+                },
+                {
+                  "name": "directories",
+                  "type": "string[]",
+                  "required": true
+                },
+                {
+                  "name": "urls",
+                  "type": "string[]",
+                  "required": true
+                },
+                {
+                  "name": "estimatedDuration",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "requiresNetwork",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "requiresFileAccess",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "factors",
+                  "type": "string[]",
+                  "required": true
+                },
+                {
+                  "name": "mitigations",
+                  "type": "string[]",
+                  "required": true
+                },
+                {
+                  "name": "requiresBiometric",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "isRemote",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "originDeviceId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "originDeviceName",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "createdAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "expiresAt",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "PermissionRelayResponse",
+              "properties": [
+                {
+                  "name": "requestId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "approved",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "pinVerified",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "screenLockVerified",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "respondedByDeviceId",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "respondedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "reason",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "PlanOperationDetail",
+            "PermissionRelayRequest",
+            "PermissionRelayResponse",
+            "PermissionRelayService",
+            "permissionRelayService"
+          ],
+          "apiUsage": [
+            "websocket"
+          ],
+          "keyFunctions": []
+        }
+      },
+      {
         "name": "SearchContextStore.ts",
         "path": "SearchContextStore.ts",
         "lines": 215,
@@ -12761,7 +13414,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -12841,7 +13494,7 @@
           "macOS",
           "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -12968,7 +13621,7 @@
         "lines": 8,
         "description": "Shell Command Parser",
         "tags": [],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -13023,7 +13676,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "fs",
@@ -13060,7 +13713,7 @@
           "OCR",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -13118,7 +13771,7 @@
           "Sync",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "events"
@@ -13273,7 +13926,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -13437,7 +14090,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -13501,7 +14154,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -13569,17 +14222,452 @@
         }
       },
       {
-        "name": "WiFiSyncService.ts",
-        "path": "WiFiSyncService.ts",
-        "lines": 511,
-        "description": "Wi Fi Sync Service",
+        "name": "UnifiedSessionManager.ts",
+        "path": "UnifiedSessionManager.ts",
+        "lines": 380,
+        "description": "Unified Session Manager",
         "tags": [
           "Node.js",
           "AI",
-          "Sync",
+          "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [
+            "fs",
+            "path",
+            "os",
+            "electron",
+            "events",
+            "crypto"
+          ],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "SessionTab",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "url",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "title",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "favicon",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "position",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "isActive",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "openedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "lastAccessedAt",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "SessionHistoryEntry",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "url",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "title",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "visitedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "duration",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "referrer",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "SessionTask",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "name",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "status",
+                  "type": "'completed' | 'failed' | 'running' | 'queued'",
+                  "required": true
+                },
+                {
+                  "name": "riskLevel",
+                  "type": "RiskLevel",
+                  "required": true
+                },
+                {
+                  "name": "steps",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "completedSteps",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "startedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "completedAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "command",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "error",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "SessionAIChat",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "startedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "messages",
+                  "type": "{",
+                  "required": true
+                },
+                {
+                  "name": "role",
+                  "type": "'user' | 'assistant' | 'system'",
+                  "required": true
+                },
+                {
+                  "name": "content",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "timestamp",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "SessionPermissionLog",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "timestamp",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "action",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "riskLevel",
+                  "type": "RiskLevel",
+                  "required": true
+                },
+                {
+                  "name": "decision",
+                  "type": "'approved' | 'rejected' | 'auto_approved' | 'pending'",
+                  "required": true
+                },
+                {
+                  "name": "approvedBy",
+                  "type": "'desktop' | 'mobile' | 'auto'",
+                  "required": true
+                },
+                {
+                  "name": "verificationMethod",
+                  "type": "'pin' | 'biometric' | 'screen_lock' | 'pin_and_screen_lock'",
+                  "required": false
+                },
+                {
+                  "name": "deviceId",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "details",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "DeviceInfo",
+              "properties": [
+                {
+                  "name": "deviceId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceName",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceType",
+                  "type": "'desktop' | 'mobile'",
+                  "required": true
+                },
+                {
+                  "name": "platform",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "hostname",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "UnifiedSession",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceInfo",
+                  "type": "DeviceInfo",
+                  "required": true
+                },
+                {
+                  "name": "startedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "endedAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "isActive",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "tabs",
+                  "type": "SessionTab[]",
+                  "required": true
+                },
+                {
+                  "name": "history",
+                  "type": "SessionHistoryEntry[]",
+                  "required": true
+                },
+                {
+                  "name": "automationTasks",
+                  "type": "SessionTask[]",
+                  "required": true
+                },
+                {
+                  "name": "aiConversations",
+                  "type": "SessionAIChat[]",
+                  "required": true
+                },
+                {
+                  "name": "permissions",
+                  "type": "SessionPermissionLog[]",
+                  "required": true
+                },
+                {
+                  "name": "syncState",
+                  "type": "'local' | 'synced' | 'pending'",
+                  "required": true
+                },
+                {
+                  "name": "lastSyncedAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "version",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "SessionSummary",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "deviceName",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "startedAt",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "endedAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "isActive",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "tabsCount",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "historyCount",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "tasksCount",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "aiChatsCount",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "permissionsCount",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "activeUrl",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "RiskLevel",
+            "SessionTab",
+            "SessionHistoryEntry",
+            "SessionTask",
+            "SessionAIChat",
+            "SessionPermissionLog",
+            "DeviceInfo",
+            "UnifiedSession",
+            "SessionSummary",
+            "UnifiedSessionManager",
+            "unifiedSessionManager"
+          ],
+          "apiUsage": [],
+          "keyFunctions": []
+        }
+      },
+      {
+        "name": "WiFiSyncService.ts",
+        "path": "WiFiSyncService.ts",
+        "lines": 1123,
+        "description": "Wi Fi Sync Service",
+        "tags": [
+          "Node.js",
+          "Core",
+          "AI",
+          "Sync",
+          "Automation",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "events",
@@ -13590,7 +14678,9 @@
             "crypto",
             "electron-store"
           ],
-          "importsInternal": [],
+          "importsInternal": [
+            "./DeviceIdentifier"
+          ],
           "interfaces": [
             {
               "name": "KnownSyncDevice",
@@ -13609,6 +14699,16 @@
                   "name": "deviceType",
                   "type": "'mobile' | 'desktop'",
                   "required": true
+                },
+                {
+                  "name": "deviceModel",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "deviceImage",
+                  "type": "string",
+                  "required": false
                 },
                 {
                   "name": "ip",
@@ -13631,6 +14731,41 @@
                   "required": true
                 },
                 {
+                  "name": "revoked",
+                  "type": "boolean",
+                  "required": false
+                },
+                {
+                  "name": "permanentToken",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "accessToken",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "accessTokenExpiresAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "refreshToken",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "refreshTokenExpiresAt",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "deviceBinding",
+                  "type": "string",
+                  "required": false
+                },
+                {
                   "name": "autoConnect",
                   "type": "boolean",
                   "required": true
@@ -13649,6 +14784,11 @@
                   "name": "lastSeen",
                   "type": "number",
                   "required": false
+                },
+                {
+                  "name": "pairedAt",
+                  "type": "number",
+                  "required": false
                 }
               ]
             }
@@ -13656,6 +14796,11 @@
           "hooks": [],
           "componentType": "utility",
           "exports": [
+            "TrustLevel",
+            "ACCESS_TOKEN_TTL_MS",
+            "IDLE_DEVICE_TTL_MS",
+            "MAX_FAILED_PAIRING_ATTEMPTS",
+            "LOCKOUT_DURATION_MS",
             "KnownSyncDevice",
             "WiFiSyncService",
             "getWiFiSync"
@@ -13664,7 +14809,10 @@
             "websocket"
           ],
           "keyFunctions": [
-            "beacon"
+            "getPermissionRelayService",
+            "getUnifiedSessionManager",
+            "beacon",
+            "response"
           ]
         }
       },
@@ -13676,7 +14824,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -13837,7 +14985,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -13895,7 +15043,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -13939,7 +15087,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -13981,7 +15129,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -14051,7 +15199,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -14259,13 +15407,15 @@
       {
         "name": "bootstrap.ts",
         "path": "agent-api/bootstrap.ts",
-        "lines": 90,
+        "lines": 116,
         "description": "Bootstrap",
         "tags": [
           "Security",
-          "macOS"
+          "PDF",
+          "macOS",
+          "Windows"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "electron"
@@ -14294,6 +15444,11 @@
                   "required": false
                 },
                 {
+                  "name": "search",
+                  "type": "SearchProviderLike",
+                  "required": false
+                },
+                {
                   "name": "config",
                   "type": "Partial<AgentApiConfig>",
                   "required": false
@@ -14313,13 +15468,13 @@
       {
         "name": "bridge.ts",
         "path": "agent-api/bridge.ts",
-        "lines": 109,
+        "lines": 229,
         "description": "Bridge",
         "tags": [
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14329,6 +15484,10 @@
             "../autofill/vault"
           ],
           "interfaces": [
+            {
+              "name": "SearchProviderLike",
+              "properties": []
+            },
             {
               "name": "PageAdapter",
               "properties": []
@@ -14350,6 +15509,11 @@
                   "name": "pageAdapter",
                   "type": "PageAdapter",
                   "required": false
+                },
+                {
+                  "name": "search",
+                  "type": "SearchProviderLike",
+                  "required": false
                 }
               ]
             }
@@ -14357,6 +15521,7 @@
           "hooks": [],
           "componentType": "utility",
           "exports": [
+            "SearchProviderLike",
             "PageAdapter",
             "BridgeDeps",
             "InProcessBridge",
@@ -14369,13 +15534,13 @@
       {
         "name": "providers.ts",
         "path": "agent-api/providers.ts",
-        "lines": 81,
+        "lines": 89,
         "description": "Providers",
         "tags": [
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14430,7 +15595,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14451,14 +15616,15 @@
       {
         "name": "server.ts",
         "path": "agent-api/server.ts",
-        "lines": 132,
+        "lines": 167,
         "description": "Server",
         "tags": [
+          "Node.js",
           "Security",
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "http",
@@ -14470,11 +15636,13 @@
             "./registry",
             "./tools",
             "./providers",
+            "../local-server-auth",
             "./types",
             "../guardrails",
             "../agent/agent-registry",
             "../snapshot/manager",
-            "../autofill/vault"
+            "../autofill/vault",
+            "./bridge"
           ],
           "interfaces": [
             {
@@ -14511,6 +15679,11 @@
                   "required": false
                 },
                 {
+                  "name": "search",
+                  "type": "SearchProviderLike",
+                  "required": false
+                },
+                {
                   "name": "config",
                   "type": "Partial<AgentApiConfig>",
                   "required": false
@@ -14538,14 +15711,15 @@
       {
         "name": "tools.ts",
         "path": "agent-api/tools.ts",
-        "lines": 199,
+        "lines": 419,
         "description": "Tools",
         "tags": [
           "Security",
+          "AI",
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14562,21 +15736,22 @@
           "apiUsage": [],
           "keyFunctions": [
             "str",
-            "bool"
+            "bool",
+            "num"
           ]
         }
       },
       {
         "name": "types.ts",
         "path": "agent-api/types.ts",
-        "lines": 79,
+        "lines": 96,
         "description": "Types",
         "tags": [
           "Security",
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14585,7 +15760,8 @@
             "../agent/agent-registry",
             "../snapshot/manager",
             "../autofill/vault",
-            "../extensions/ChromeExtensionManager"
+            "../extensions/ChromeExtensionManager",
+            "./bridge"
           ],
           "interfaces": [
             {
@@ -14619,6 +15795,16 @@
                   "name": "remote",
                   "type": "boolean",
                   "required": true
+                },
+                {
+                  "name": "token",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "remoteHosts",
+                  "type": "string[]",
+                  "required": false
                 }
               ]
             },
@@ -14658,6 +15844,11 @@
                 {
                   "name": "extensions",
                   "type": "ChromeExtensionManager",
+                  "required": false
+                },
+                {
+                  "name": "search",
+                  "type": "SearchProviderLike",
                   "required": false
                 },
                 {
@@ -14749,7 +15940,7 @@
           "Windows",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -14852,7 +16043,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -14970,7 +16161,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15032,7 +16223,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15083,7 +16274,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15106,7 +16297,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15192,7 +16383,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15301,7 +16492,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -15417,7 +16608,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15459,7 +16650,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15521,7 +16712,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15592,7 +16783,7 @@
           "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15619,7 +16810,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15676,7 +16867,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15752,7 +16943,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15809,7 +17000,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -15881,7 +17072,7 @@
           "macOS",
           "Linux"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "fs",
@@ -15942,7 +17133,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "crypto"
@@ -16005,7 +17196,7 @@
           "Plugin",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16082,12 +17273,13 @@
       {
         "name": "firebaseConfigStorage.ts",
         "path": "firebaseConfigStorage.ts",
-        "lines": 51,
+        "lines": 98,
         "description": "Config Storage",
         "tags": [
+          "Node.js",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16140,6 +17332,7 @@
             "firebaseConfigStorage"
           ],
           "apiUsage": [
+            "electronAPI",
             "firebase"
           ],
           "keyFunctions": []
@@ -16153,7 +17346,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -16284,7 +17477,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -16341,7 +17534,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16445,7 +17638,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -16499,7 +17692,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16620,7 +17813,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -16649,7 +17842,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16675,7 +17868,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -16754,7 +17947,7 @@
           "Automation",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17063,7 +18256,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17120,7 +18313,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17150,7 +18343,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17257,7 +18450,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17282,7 +18475,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17308,7 +18501,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17333,7 +18526,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17358,7 +18551,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17385,7 +18578,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17533,7 +18726,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17557,7 +18750,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -17682,7 +18875,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -17842,6 +19035,328 @@
         }
       },
       {
+        "name": "research-pipeline.ts",
+        "path": "research-pipeline.ts",
+        "lines": 679,
+        "description": "Research Pipeline",
+        "tags": [
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [],
+          "interfaces": [
+            {
+              "name": "ResearchBudget",
+              "properties": [
+                {
+                  "name": "maxQueries",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "resultsPerQuery",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "pagesToFetch",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "maxFollowUpRounds",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "days",
+                  "type": "number",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "Claim",
+              "properties": [
+                {
+                  "name": "key",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "subject",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "predicate",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "text",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "domain",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "url",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "ClaimFinding",
+              "properties": [
+                {
+                  "name": "key",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "subject",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "predicate",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "verdict",
+                  "type": "Verdict",
+                  "required": true
+                },
+                {
+                  "name": "domains",
+                  "type": "string[]",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "Contradiction",
+              "properties": [
+                {
+                  "name": "type",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "LastSource",
+              "properties": [
+                {
+                  "name": "url",
+                  "type": "string | null",
+                  "required": true
+                },
+                {
+                  "name": "title",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "domain",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "publishedAt",
+                  "type": "Date | null",
+                  "required": true
+                },
+                {
+                  "name": "reliable",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "reason",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "ResearchSearchResult",
+              "properties": [
+                {
+                  "name": "title",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "url",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "snippet",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "publishedAt",
+                  "type": "unknown",
+                  "required": false
+                },
+                {
+                  "name": "source",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "ResearchDeps",
+              "properties": []
+            },
+            {
+              "name": "ResearchRunOptions",
+              "properties": [
+                {
+                  "name": "query",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "queries",
+                  "type": "string[]",
+                  "required": false
+                },
+                {
+                  "name": "budget",
+                  "type": "Partial<ResearchBudget>",
+                  "required": false
+                },
+                {
+                  "name": "researchId",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "ResearchOutcome",
+              "properties": [
+                {
+                  "name": "researchId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "query",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "budget",
+                  "type": "ResearchBudget",
+                  "required": true
+                },
+                {
+                  "name": "queriesUsed",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "pagesFetched",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "pagesRead",
+                  "type": "number",
+                  "required": true
+                },
+                {
+                  "name": "skippedQueries",
+                  "type": "string[]",
+                  "required": true
+                },
+                {
+                  "name": "stoppedReason",
+                  "type": "string | null",
+                  "required": true
+                },
+                {
+                  "name": "timestampsReliable",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "lastSource",
+                  "type": "LastSource",
+                  "required": true
+                },
+                {
+                  "name": "findings",
+                  "type": "ClaimFinding[]",
+                  "required": true
+                },
+                {
+                  "name": "contradictions",
+                  "type": "Contradiction[]",
+                  "required": true
+                },
+                {
+                  "name": "coverage",
+                  "type": "ResearchCoverageSummary",
+                  "required": true
+                },
+                {
+                  "name": "sources",
+                  "type": "ResearchSourceSummary[]",
+                  "required": true
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "ResearchBudget",
+            "DEFAULT_BUDGET",
+            "clampBudget",
+            "domainOf",
+            "parsePublished",
+            "Claim",
+            "extractClaims",
+            "Verdict",
+            "ClaimFinding",
+            "Contradiction",
+            "verifyClaims",
+            "LastSource",
+            "pickLastSource",
+            "ResearchSearchResult",
+            "ResearchDeps",
+            "ResearchRunOptions",
+            "ResearchOutcome"
+          ],
+          "apiUsage": [],
+          "keyFunctions": [
+            "LIMITS",
+            "out",
+            "ms"
+          ]
+        }
+      },
+      {
         "name": "researchState.ts",
         "path": "researchState.ts",
         "lines": 202,
@@ -17849,7 +19364,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18191,7 +19706,7 @@
         "tags": [
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18208,22 +19723,21 @@
       {
         "name": "manager.ts",
         "path": "snapshot/manager.ts",
-        "lines": 178,
+        "lines": 393,
         "description": "Manager",
         "tags": [
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
-          "importsInternal": [
-            "./types"
-          ],
+          "importsInternal": [],
           "interfaces": [],
           "hooks": [],
           "componentType": "utility",
           "exports": [
+            "AX_MARKER_ATTR",
             "SnapshotManager"
           ],
           "apiUsage": [],
@@ -18231,21 +19745,118 @@
             "scopeMatch",
             "visit",
             "walk",
+            "ATTR",
+            "INTERACTIVE_ROLES",
+            "SKIP_TAGS",
+            "textOf",
             "collect",
             "node"
           ]
         }
       },
       {
+        "name": "page-scripts.ts",
+        "path": "snapshot/page-scripts.ts",
+        "lines": 426,
+        "description": "Page Scripts",
+        "tags": [
+          "Node.js",
+          "PDF",
+          "macOS"
+        ],
+        "lastModified": "2026-10-06",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [
+            "./manager"
+          ],
+          "interfaces": [
+            {
+              "name": "FieldOutcome",
+              "properties": [
+                {
+                  "name": "axId",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "ok",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
+                  "name": "reason",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "value",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "checked",
+                  "type": "boolean",
+                  "required": false
+                }
+              ]
+            }
+          ],
+          "hooks": [],
+          "componentType": "utility",
+          "exports": [
+            "FieldOutcome",
+            "clickScript",
+            "fillScript",
+            "typeScript",
+            "fillFormScript",
+            "formSubmitScript",
+            "elementActionScript",
+            "domQueryScript",
+            "pageTextSearchScript"
+          ],
+          "apiUsage": [],
+          "keyFunctions": [
+            "ATTR",
+            "resolveEl",
+            "protoFor",
+            "setNativeValue",
+            "fire",
+            "isCheckable",
+            "isContentEditable",
+            "scrollTo",
+            "truthy",
+            "readBack",
+            "setChecked",
+            "fillOne",
+            "field",
+            "incoming",
+            "next",
+            "spec",
+            "wantSubmit",
+            "expected",
+            "action",
+            "sel",
+            "limit",
+            "attrs",
+            "includeText",
+            "row",
+            "q",
+            "scope",
+            "cs"
+          ]
+        }
+      },
+      {
         "name": "types.ts",
         "path": "snapshot/types.ts",
-        "lines": 49,
+        "lines": 96,
         "description": "Types",
         "tags": [
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18286,6 +19897,11 @@
                 {
                   "name": "backendNodeId",
                   "type": "string | number",
+                  "required": false
+                },
+                {
+                  "name": "axId",
+                  "type": "string",
                   "required": false
                 },
                 {
@@ -18344,6 +19960,11 @@
                   "required": true
                 },
                 {
+                  "name": "actionable",
+                  "type": "boolean",
+                  "required": true
+                },
+                {
                   "name": "depth",
                   "type": "number",
                   "required": true
@@ -18351,6 +19972,11 @@
                 {
                   "name": "backendNodeId",
                   "type": "string | number",
+                  "required": false
+                },
+                {
+                  "name": "axId",
+                  "type": "string",
                   "required": false
                 },
                 {
@@ -18387,6 +20013,11 @@
                   "name": "scopeSelector",
                   "type": "string",
                   "required": false
+                },
+                {
+                  "name": "maxNodes",
+                  "type": "number",
+                  "required": false
                 }
               ]
             },
@@ -18409,6 +20040,81 @@
                   "required": true
                 }
               ]
+            },
+            {
+              "name": "PageSearchMatch",
+              "properties": [
+                {
+                  "name": "ref",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "role",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "name",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "href",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "field",
+                  "type": "'name' | 'value' | 'href' | 'role'",
+                  "required": true
+                },
+                {
+                  "name": "context",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "PageSearchOptions",
+              "properties": [
+                {
+                  "name": "query",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "name": "role",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "actionableOnly",
+                  "type": "boolean",
+                  "required": false
+                },
+                {
+                  "name": "scopeSelector",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "limit",
+                  "type": "number",
+                  "required": false
+                },
+                {
+                  "name": "in",
+                  "type": "('name' | 'value' | 'href' | 'role')[]",
+                  "required": false
+                }
+              ]
             }
           ],
           "hooks": [],
@@ -18418,7 +20124,9 @@
             "RawAxNode",
             "SnapshotNode",
             "SnapshotOptions",
-            "SnapshotResult"
+            "SnapshotResult",
+            "PageSearchMatch",
+            "PageSearchOptions"
           ],
           "apiUsage": [],
           "keyFunctions": []
@@ -18434,7 +20142,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18466,7 +20174,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [
@@ -18498,7 +20206,7 @@
           "PDF",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18595,7 +20303,7 @@
           "Security",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18618,7 +20326,7 @@
           "React",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [
             "react"
@@ -18651,7 +20359,7 @@
           "AI",
           "macOS"
         ],
-        "lastModified": "2026-09-13",
+        "lastModified": "2026-10-06",
         "codeAnalysis": {
           "importsExternal": [],
           "importsInternal": [],
@@ -18736,7 +20444,7 @@
     "components": []
   },
   "summary": {
-    "total": 230,
-    "totalLines": 59710
+    "total": 241,
+    "totalLines": 64251
   }
 }
