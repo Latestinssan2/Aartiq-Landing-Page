@@ -324,7 +324,7 @@ export const security = {
       autoApprove: "No. There is no setting that auto-approves a medium shell command.",
       examples: ["cp", "mv", "mkdir", "touch", "npm", "git", "node", "python", "curl", "wget", "osascript"],
       limit:
-        'An unrecognised command lands here rather than in low, so this tier also means "we have never heard of it". "Allow Always" is withheld for network-capable and script-capable binaries, but a local write like cp or mkdir can still take an exact-match permanent grant.',
+        'An unrecognised command lands here rather than in low, so this tier also means "we have never heard of it". "Allow Always" is withheld for network-capable and script-capable binaries, but a local write like cp or mkdir can still take an exact-match Always grant — valid for 30 days.',
     },
     {
       id: "high",
@@ -334,7 +334,7 @@ export const security = {
         "Only if a grant exists for that exact command line, or a SHELL_HIGH / SHELL_ALL grant was made deliberately.",
       examples: ["chmod", "find . -delete", "kill", "dd", "mount", "iptables", "shutdown"],
       limit:
-        'A permanent grant is never offered for a destructive command, so the Always button is absent here and Allow Once is the strongest answer available. `chmod` sits in this tier because it matches a destructive pattern, not because it is privileged in the usual sense — it was already high and moving it down would have weakened a default.',
+        'An Allow Always grant is never offered for a destructive command, so the Always button is absent here and Allow Once is the strongest answer available. `chmod` sits in this tier because it matches a destructive pattern, not because it is privileged in the usual sense — it was already high and moving it down would have weakened a default.',
     },
     {
       id: "critical",
@@ -410,8 +410,8 @@ export const security = {
     "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
     "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade now refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. The background task service (3999) and the PDF sync server bound 0.0.0.0 with a wildcard CORS header until the bind default became 127.0.0.1, with AARTIQ_SERVICE_HOST as the explicit opt-in and no CORS allow-origin header sent at all. See network.servers.",
     "The session tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts — but remote mode is still not a finished design: there is no per-client credential to revoke, no pairing UI, and the binds are not operator-named.",
-    '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching, and a permanent grant has no lifetime. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
-    "A permanent grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match permanent grants.",
+    '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching — it records what the command says, not what it will do — and every grant now expires after 30 days, swept with an audit-log entry, so the dialog asks again. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
+    "An Allow Always grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match Always grants, which expire after 30 days.",
     "The native bridge and the Agent API both defaulted to port 46203, so if both started one failed to bind and the error was logged and swallowed — not visible from outside. The Agent API now defaults to 46204 and the native bridge keeps 46203, so the two no longer collide.",
   ],
 } as const;
