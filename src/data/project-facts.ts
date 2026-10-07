@@ -173,21 +173,22 @@ export interface GeneratedRepoFacts {
 
 export const version = {
   /** aartiq-browser/package.json "version" */
-  semver: "0.3.7",
+  semver: "0.3.8",
   /** GitHub release tag_name for the latest published release. */
-  tag: "v0.3.7",
+  tag: "v0.3.8",
   /** releases/latest .published_at */
-  releaseDate: "2026-09-13",
+  releaseDate: "2026-10-04",
   /** Not prerelease, not draft, CI green. */
   status: "stable" as const,
   /**
-   * Release codename. Two different values were live at once before this
-   * ("AppContainer" in version.ts, "Nebula" in version-server.ts); v0.3.7 is the
-   * AppContainer release, and it is the one every page should show.
+   * Release codename, as published in release-notes.ts for the current tag —
+   * v0.3.8 is Palisade. (Two different values were once live at once:
+   * "AppContainer" in version.ts, "Nebula" in version-server.ts. The codename
+   * is written once, here, and every page reads it.)
    */
-  codename: "AppContainer",
+  codename: "Palisade",
   repository: "https://github.com/Latestinssan/Aartiq",
-  releaseNotes: "release_notes/v0.3.7.md",
+  releaseNotes: "release_notes/v0.3.8.md",
 };
 
 // ---------------------------------------------------------------------------
@@ -195,19 +196,22 @@ export const version = {
 // ---------------------------------------------------------------------------
 
 export const project = {
-  lastUpdated: "2026-09-13",
+  lastUpdated: "2026-10-07",
   /**
    * Rendered verbatim wherever project status is shown. Do not paraphrase it
    * per page — that is how the docs drifted apart in the first place.
+   * tests/docs-listener-claims-match-source.test.js (M15) pins the README and
+   * the overview page to the same shared sentence, so a change here is a change
+   * in three places at once: this statement, the README, and the overview page.
    */
   status: {
-    headline: "Maintenance phase — AI-assisted, human-governed.",
+    headline: "AI-assisted development — human-governed.",
     statement:
-      "Aartiq is in an AI-assisted maintenance phase. AI agents may help review and " +
-      "organise issues, analyse bugs, improve documentation, and prepare proposed fixes. " +
-      "AI assistance does not replace human responsibility: anything touching security, " +
-      "permissions, user data, releases, or project direction is reviewed, approved, and " +
-      "owned by a human. New feature work is paused while that happens.",
+      "Aartiq is a solo project in active AI-assisted development: AI agents handle " +
+      "day-to-day issue triage, analysis, and fix preparation, and a human reviews and " +
+      "approves every change to security, permissions, user data, or releases before it " +
+      "ships. The repository stays public, existing releases stay available, and bug " +
+      "reports go to GitHub issues, triaged in the order things break.",
     /** What is explicitly NOT true, so no page implies otherwise. */
     notAbandoned: "The project is not abandoned or discontinued.",
   },
@@ -533,26 +537,27 @@ export const ci = {
       "Manual dispatch only. There is no push or pull_request trigger, so a green run is not evidence about the latest commit.",
   },
   jobs: {
-    defined: 4,
+    defined: 5,
     detail:
-      "All four jobs were green on the run above. Dispatch inputs can reduce this to 3 (skip-full-suite) or 1 (windows-test-pattern), so this is a default-dispatch count rather than an invariant.",
-    timeout: "30 minutes on the full-suite job; the three sandbox jobs have no timeout configured.",
+      "All five jobs were green on the run above — the four Jest jobs tabled here plus a typecheck job (tsc --noEmit) that reports no test counts. Dispatch inputs can reduce the Jest jobs to 3 (skip-full-suite) or 1 (windows-test-pattern), so this is a default-dispatch count rather than an invariant.",
+    timeout:
+      "30 minutes on the full-suite job, 10 minutes on the typecheck job; the three sandbox jobs have no timeout configured.",
     nodeVersion: "24",
   },
   latestRun: {
-    id: 34769503518,
-    runNumber: 52,
-    url: "https://github.com/Latestinssan/Aartiq/actions/runs/34769503518",
+    id: 37621797787,
+    runNumber: 75,
+    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37621797787",
     event: "workflow_dispatch",
-    headSha: "acc703ae",
-    date: "2026-09-13",
+    headSha: "029cc82c",
+    date: "2026-10-07",
     conclusion: "success",
   },
   /** Per-job jest summary lines, read from the run's job logs. */
   perJob: [
-    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 537, skipped: 40, failed: 0, declared: 577 },
+    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 1395, skipped: 40, failed: 0, declared: 1435 },
     { name: "Run Jest (Windows AppContainer sandbox runtime)", os: "windows-latest", passed: 61, skipped: 30, failed: 0, declared: 91 },
-    { name: "Run Jest (macOS Seatbelt sandbox runtime)", os: "macos-latest", passed: 104, skipped: 0, failed: 0, declared: 104 },
+    { name: "Run Jest (macOS Seatbelt sandbox runtime)", os: "macos-latest", passed: 105, skipped: 0, failed: 0, declared: 105 },
     { name: "Run Jest (Linux bubblewrap sandbox runtime)", os: "ubuntu-latest", passed: 57, skipped: 21, failed: 0, declared: 78 },
   ],
   /**
@@ -560,10 +565,10 @@ export const ci = {
    * every published count carries its environment.
    *
    * This must not restate a current count. The per-job figures above belong to
-   * run 34769503518 at acc703ae, and the local macOS suite has grown well past
-   * the 577 tests that commit declared — so a second set of numbers here reads
-   * as a present-tense claim and contradicts the generated line beside it. Point
-   * at the generated number instead of repeating one that has expired.
+   * run 37621797787 at 029cc82c, and the local macOS suite can grow any day —
+   * so a second set of numbers here reads as a present-tense claim and
+   * contradicts the generated line beside it. Point at the generated number
+   * instead of repeating one that has expired.
    */
   platformVarianceNote:
     "The per-job figures above belong to that run and commit, not to the current tree, " +
@@ -618,7 +623,9 @@ export const benchmarks = {
     { metric: "App Bundle Size", value: "1.2 GB", notes: "Frameworks: 276 MB, Resources: 958 MB" },
   ],
   provenance:
-    "TODO(verify) — no benchmark script, raw output file, or instrumentation exists in either repository. These figures cannot currently be reproduced or checked. A published page also claimed the benchmark scripts were included in the repository; that claim was false and has been removed.",
+    "TODO(verify) — no script, raw output file, or instrumentation exists in either repository for these startup figures, so they cannot currently be reproduced or checked. " +
+    "A separate harness for the security-critical hot paths does ship in the repository (`npm run bench`, see BENCHMARKS.md): it measures the permission classifier, Always eligibility, grant gate, auth gate, path allowlist and key derivation — not application startup. " +
+    "A published page also claimed the startup benchmark scripts were included in the repository; that claim was false and has been removed.",
   caveat:
     "Startup means time to first visible window, not complete service initialisation. Results vary by hardware, operating system, and configuration.",
 } as const;

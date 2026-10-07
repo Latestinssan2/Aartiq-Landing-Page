@@ -1166,15 +1166,15 @@ export default function Home() {
               <AlertTriangle size={14} /> 🚧 Project Status
             </div>
             <h2 className="mb-10 max-w-4xl text-4xl font-black uppercase tracking-tighter sm:text-6xl leading-[0.95]">
-              Development is currently <span className="text-amber-400">paused.</span>
+              Development is <span className="text-amber-400">AI-assisted.</span>
             </h2>
 
             <div className="max-w-3xl space-y-6 text-lg font-medium leading-relaxed text-white/40">
               <p>
-                Development is paused — and it is <span className="text-white/70">led by AI, not by a human developer</span>. AI agents do the planning, writing, testing, and maintenance; the founder sets the direction and reviews consequential changes. There is no paid team behind the product.
+                Development is AI-assisted — <span className="text-white/70">led by AI, not by a single human developer</span>. AI agents do the planning, writing, testing, and maintenance; the founder sets the direction and reviews consequential changes. There is no paid team behind the product.
               </p>
               <p>
-                Current state: release <span className="text-white/70">{projectVersion.tag}</span> (AppContainer + Job Object sandboxing on Windows, agent API &amp; tool server, CRX3 extension validation). The suite runs on manual dispatch — latest green run is linked from the test suite page — with all four jobs passing.
+                Current state: release <span className="text-white/70">{projectVersion.tag}</span> — local listener auth, Master PIN approvals, shell commands that always ask, and AppContainer + Job Object sandboxing on Windows. The suite runs on manual dispatch — latest green run is linked from the test suite page — with all five jobs passing.
               </p>
               <p>
                 One gap remains: the CRX3 signature-verifier suite is skipped until its verifier parses the header correctly (see Known Limits on the{' '}
@@ -1187,7 +1187,7 @@ export default function Home() {
 
             <div className="mt-16 rounded-[40px] border border-amber-500/20 bg-amber-500/[0.04] p-10 lg:p-14 text-center">
               <p className="text-2xl font-black uppercase tracking-tighter text-white sm:text-3xl">
-                Aartiq isn't abandoned. It's <span className="text-amber-400">paused</span> — by design, with review.
+                Aartiq isn't abandoned. It's <span className="text-amber-400">in active development</span> — AI-led, with review.
               </p>
               <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-relaxed text-white/40">
                 Development is driven by AI, but the human stays in the loop for security, permissions, and user data — capabilities ship only with review.
