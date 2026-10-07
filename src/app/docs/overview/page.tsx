@@ -538,16 +538,13 @@ export default function OverviewPage() {
           <AlertTriangle size={14} /> 🚧 Project Status
         </div>
         <h2 className="mb-6 text-4xl font-black uppercase tracking-tighter sm:text-5xl">
-          Aartiq™ is temporarily <span className="text-amber-400">on hold.</span>
+          Aartiq™ is in <span className="text-amber-400">AI-assisted development.</span>
         </h2>
         <div className="space-y-5 text-base font-medium leading-relaxed text-white/40">
           <p>
-            Aartiq is a solo project maintained in an AI-assisted rhythm: AI agents handle day-to-day issue
-            triage, analysis, and fix preparation, and a human reviews and approves every change to security,
-            permissions, user data, or releases before it ships. Development currently runs at a limited pace
-            around academic commitments — feature work pauses and resumes in bursts rather than on a fixed
-            schedule. The repository stays public, existing releases stay available, and bug reports go to
-            GitHub issues, triaged in the order things break.
+            Aartiq is a solo project in active AI-assisted development: AI agents handle day-to-day issue triage, analysis, and fix preparation,
+            and a human reviews and approves every change to security, permissions, user data, or releases before it ships. The repository stays
+            public, existing releases stay available, and bug reports go to GitHub issues, triaged in the order things break.
           </p>
         </div>
 

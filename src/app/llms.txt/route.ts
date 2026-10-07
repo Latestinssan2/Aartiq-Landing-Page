@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { platforms } from "@/data/facts";
+import { platforms, version } from "@/data/facts";
 
 const BASE = 'https://aartiq.ponsrischool.in';
 
@@ -86,7 +86,7 @@ Aartiq is built on a small set of firm beliefs:
 - **Co-author**: Latestinssan
 - **Repository**: https://github.com/Latestinssan/Aartiq
 - **Website**: https://aartiq.ponsrischool.in
-- **Last updated**: 2026-09-13 (v0.3.7)
+- **Last updated**: ${version.releaseDate} (v${version.semver})
 
 ---
 
