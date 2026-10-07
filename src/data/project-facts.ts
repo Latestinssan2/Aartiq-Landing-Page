@@ -628,6 +628,68 @@ export const benchmarks = {
     "A published page also claimed the startup benchmark scripts were included in the repository; that claim was false and has been removed.",
   caveat:
     "Startup means time to first visible window, not complete service initialisation. Results vary by hardware, operating system, and configuration.",
+  /**
+   * Security hot paths — unlike the startup figures above, every value here
+   * comes from the harness that ships in the repository (`npm run bench`, raw
+   * output kept beside it). Refresh by running it: 5 repetitions, median per
+   * corpus, numbers copied verbatim from the JSON output.
+   */
+  hotPaths: {
+    date: "2026-10-07",
+    machine: "Apple M4 Pro (12-core), 24 GB, Node v24.14.0, darwin/arm64",
+    method: "median of 5 repetitions over a fixed corpus",
+    results: [
+      {
+        metric: "Shell command classifier",
+        value: "835 ns",
+        spread: "29.9%",
+        source: "src/lib/shell-command-tiers.js",
+        notes: "classifyShellCommand — tier, capability, URL and destructive rules for one command line",
+      },
+      {
+        metric: "Always-grant eligibility",
+        value: "407 ns",
+        spread: "25.8%",
+        source: "src/lib/shell-command-tiers.js",
+        notes: "alwaysApprovalEligibility — may Allow Always be offered, and why not",
+      },
+      {
+        metric: "Grant gate lookup",
+        value: "163 ns",
+        spread: "15.3%",
+        source: "src/lib/permission-store.js",
+        notes: "normalizeCommandPattern + canAutoExecute — half the corpus granted, half not",
+      },
+      {
+        metric: "Local auth gate",
+        value: "625 ns",
+        spread: "20.2%",
+        source: "src/lib/local-server-auth.js",
+        notes: "checkLocalRequest — Host, Origin, lockout map, URL parse, constant-time token compare",
+      },
+      {
+        metric: "Path allowlist check",
+        value: "97.2 µs",
+        spread: "3.1%",
+        source: "src/core/directory-allowlist.js",
+        notes: "isPathAllowed — realpath canonicalize, sensitive-path deny, allowlist walk",
+      },
+      {
+        metric: "Key derivation — PBKDF2, 600k",
+        value: "44.1 ms",
+        spread: "0.8%",
+        source: "node:crypto (documented parameters)",
+        notes: "PBKDF2 with 600,000 iterations, SHA-256 — the unlock cost the E2EE docs specify",
+      },
+      {
+        metric: "Key derivation — MasterPIN, 100k",
+        value: "7.38 ms",
+        spread: "1.5%",
+        source: "src/lib/MasterPINService.js",
+        notes: "MasterPINService.hashPin — unlock path, matches the Flutter side",
+      },
+    ],
+  },
 } as const;
 
 // ---------------------------------------------------------------------------

@@ -55,6 +55,8 @@ const serverById = (id: string) => {
 };
 
 export const net = {
+  /** Every listener, in table order — for full listener tables. */
+  servers: network.servers,
   mcpBridge: serverById("mcp-bridge"),
   wifiSync: serverById("wifi-sync"),
   nativeBridge: serverById("native-bridge"),

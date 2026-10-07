@@ -217,6 +217,7 @@ const securityLayers = [
       "The renderer only enables Approve when both mobileApproved and pinVerified are true (or the biometric verification succeeds) — src/components/ai/ClickPermissionModal.tsx:247-302.",
       "Critical risk is denied at the gate — checkShellPermission returns false for critical, src/core/command-validator.js:87-90 — and a human decision at that point is a plain Allow / Deny through the shell permission bridge (src/main/handlers/utils.js:222-229), not a ticket. Single-use, input-hash-bound tickets cover MCP high-risk tool calls and approve-style capability actions — src/core/capability-controller.js:29-100, src/core/approval-ticket-manager.js:139-278, src/lib/approval-gate.js:53-147.",
       "Command only executes after explicit approval; timeouts and missing renderers resolve to deny — src/core/shell-permission-bridge.js:42-71.",
+      "Permission writes that arrive over the native macOS / CLI bridge are routed through src/lib/native-bridge-permission-routes.js into the same PermissionStore the gate reads, so a grant made over the bridge reaches checkShellPermission without a restart, an invalid access level fails closed, and the write is appended to the audit trail",
       "Source files: src/core/command-validator.js, src/lib/permission-store.js, src/main/handlers/sync-handlers.js, src/main/handlers/utils.js, src/main/handlers/native-approval-manager.js, src/components/ai/ClickPermissionModal.tsx, src/core/capability-controller.js, src/lib/MasterPINService.ts"
     ],
     benefits: [
@@ -782,6 +783,28 @@ export default function SecurityPage() {
             </motion.div>
           ))}
         </div>
+
+        <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] p-6">
+          <div className="mb-3 flex items-center gap-3">
+            <ShieldCheck size={20} className="text-emerald-400" />
+            <h4 className="font-bold text-white">What an "Allow Always" answer stores</h4>
+          </div>
+          <ul className="space-y-2 text-sm text-white/50">
+            <li>
+              • An exact match on the full normalised command line the user was shown — not a prefix and
+              not the binary alone, so a command that reads differently next time no longer matches.
+            </li>
+            <li>
+              • Every grant carries a 30-day lifetime; the gate sweeps it with an audit-log entry and the
+              dialog asks again (src/lib/approval-gate.js, pinned by tests/allow-always-lifetime.test.js).
+            </li>
+            <li>
+              • Only binaries in the classifier's table are offered Allow Always at all — anything the
+              classifier has never seen is offered Allow Once only, because a grant for an undescribed
+              command is a promise about behaviour rather than about text.
+            </li>
+          </ul>
+        </div>
       </motion.section>
 
       {/* Risk Levels */}
@@ -983,6 +1006,85 @@ export default function SecurityPage() {
               ))}
             </ul>
           </div>
+        </div>
+      </motion.section>
+
+      {/* Network Listeners */}
+      <motion.section
+        id="network-listeners"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.47 }}
+      >
+        <div className="mb-16">
+          <p className="mb-4 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+            Listeners
+          </p>
+          <h2 className="text-4xl font-black uppercase tracking-tighter sm:text-5xl">
+            Network <span className="text-white/20">Listeners</span>
+          </h2>
+          <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
+            Every socket the application opens, and what actually protects it.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
+                  <th className="px-6 py-4">Service</th>
+                  <th className="px-6 py-4">Port</th>
+                  <th className="px-6 py-4">Default bind address</th>
+                  <th className="px-6 py-4">Reachable from LAN when</th>
+                  <th className="px-6 py-4">Authentication</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {net.servers.map((s) => (
+                  <tr key={s.id} className="align-top border-b border-white/5 last:border-b-0">
+                    <td className="px-6 py-4 font-medium text-white/70">{s.name}</td>
+                    <td className="px-6 py-4 font-mono text-sky-400">{s.port}</td>
+                    <td className="px-6 py-4 font-mono text-xs text-white/50">{s.defaultBindAddress}</td>
+                    <td className="max-w-xs px-6 py-4 text-xs text-white/40">
+                      {s.bindsAllInterfacesWhen ??
+                        "never — the host is a literal in the source, not a switch anyone can flip"}
+                    </td>
+                    <td className="max-w-md px-6 py-4 text-xs text-white/50">{s.auth}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p className="mt-6 max-w-3xl text-sm text-white/40">
+          One of these binds all interfaces by default —{" "}
+          {net.servers
+            .filter((s) => s.defaultBindAddress.startsWith("all"))
+            .map((s) => `${s.name} (${s.port})`)
+            .join(", ")}
+          — and only the host environment variable narrows the bind. If you run Aartiq on a shared or
+          untrusted network, that is the part to think about first.
+        </p>
+
+        <div className="mt-6 rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
+          <h3 className="mb-4 text-sm font-black uppercase tracking-wider text-white/70">
+            Documented, but not listeners
+          </h3>
+          <ul className="space-y-2 text-sm text-white/50">
+            {net.retired.map((p) => (
+              <li key={p.port}>
+                • Port {p.port} ({p.name}) — {p.status}
+              </li>
+            ))}
+            <li>
+              • Port {net.discovery.port} — {net.discovery.status}
+            </li>
+            <li>
+              • Port {net.devRenderer.port} — {net.devRenderer.purpose}
+            </li>
+          </ul>
         </div>
       </motion.section>
 
@@ -1351,9 +1453,19 @@ Security <span className="text-white/20">Test Coverage</span>
               <p className="text-sm text-white/50">
                 JS contract (isolation flags, fail-closed network/allowlist policy) passes everywhere; the
                 runtime matrix — suspended AppContainer start, OS-enforced ACL allowlist, verified job basis,
-                grandchild containment, secret isolation, and KILL_ON_JOB_CLOSE — runs on Windows CI (windows-latest)
-                and is currently GREEN (5/5 containment tests passing, verified sandbox results), as proven by the
-                three-platform CI run linked in the Verification section above.
+                grandchild containment, secret isolation, and KILL_ON_JOB_CLOSE — runs on Windows CI
+                (windows-latest), where run #{ci.latestRun.runNumber} reported {windowsJob.passed} passing
+                and {windowsJob.failed} failed of {windowsJob.declared}, every containment test returning a
+                verified sandbox result. The design and source were also reviewed independently:{" "}
+                <a
+                  href="https://github.com/Latestinssan/Aartiq/blob/main/Audit%20Report/2026-09-13_Windows_AppContainer_Sandbox_Audit/SECURITY_AUDIT.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-emerald-300 underline decoration-dotted hover:text-emerald-200"
+                >
+                  Windows AppContainer Sandbox Audit (2026-09-13)
+                </a>
+                .
               </p>
             </div>
             <div className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
