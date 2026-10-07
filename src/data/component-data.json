@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-07T01:54:47.350Z",
+  "generated": "2026-10-07T11:54:19.971Z",
   "version": "0.3.8",
   "desktop": {
     "total": 241,
-    "totalLines": 64280,
+    "totalLines": 64310,
     "byCategory": {
       "components": 149,
       "core": 0,
@@ -4327,7 +4327,7 @@
       {
         "name": "SyncSettings.tsx",
         "path": "SyncSettings.tsx",
-        "lines": 706,
+        "lines": 714,
         "description": "Sync Settings",
         "tags": [
           "React",
@@ -12530,7 +12530,7 @@
       {
         "name": "CloudSyncService.ts",
         "path": "CloudSyncService.ts",
-        "lines": 591,
+        "lines": 613,
         "description": "Cloud Sync Service",
         "tags": [
           "Node.js",
@@ -20447,6 +20447,6 @@
   },
   "summary": {
     "total": 241,
-    "totalLines": 64280
+    "totalLines": 64310
   }
 }
