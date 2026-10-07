@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useVersion } from "@/lib/useVersion";
-import { benchmarks, derived, network, version, project } from "@/data/facts";
+import { benchmarks, derived, network, version, project, legal, skills } from "@/data/facts";
 import { 
   Bot, 
   ShieldCheck, 
@@ -24,6 +24,7 @@ import {
   Heart,
   Brain,
   Bookmark,
+  BookOpen,
   AlertTriangle,
   Scale,
   Quote,
@@ -476,6 +477,55 @@ export default function OverviewPage() {
           </div>
         </div>
 
+        {/* Security hot paths — measured by the shipped harness */}
+        <div className="mt-8 rounded-[2rem] border border-white/5 bg-white/[0.02] p-8">
+          <h3 className="mb-2 text-sm font-black uppercase tracking-[0.3em] text-white/40">Security Hot Paths</h3>
+          <p className="mb-6 max-w-3xl text-sm text-white/50">
+            The startup figures above carry their benchmark release because no script produced them
+            (see the provenance note); every number below does have one. Measured on{" "}
+            {benchmarks.hotPaths.date} — {benchmarks.hotPaths.method}, on {benchmarks.hotPaths.machine}.
+            Reproduce with{" "}
+            <code className="rounded bg-white/5 px-1.5 py-0.5 font-mono text-xs text-emerald-300">npm run bench</code>{" "}
+            — protocol in{" "}
+            <a
+              href="https://github.com/Latestinssan/Aartiq/blob/main/aartiq-browser/BENCHMARKS.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-sky-400 hover:text-sky-300"
+            >
+              BENCHMARKS.md
+            </a>
+            .
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="pb-3 text-xs font-black uppercase tracking-wider text-white/40">Hot Path</th>
+                  <th className="pb-3 text-xs font-black uppercase tracking-wider text-white/40">What It Checks</th>
+                  <th className="pb-3 text-xs font-black uppercase tracking-wider text-white/40">Median</th>
+                  <th className="pb-3 text-xs font-black uppercase tracking-wider text-white/40">Spread</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm text-white/60">
+                {benchmarks.hotPaths.results.map((row) => (
+                  <tr key={row.metric} className="border-b border-white/5">
+                    <td className="py-3 pr-4">
+                      <span className="font-medium text-white/70">{row.metric}</span>
+                      <span className="block font-mono text-[10px] text-white/30">{row.source}</span>
+                    </td>
+                    <td className="py-3 pr-4 text-xs text-white/40">{row.notes}</td>
+                    <td className="py-3">
+                      <code className="rounded bg-white/5 px-2 py-1 text-xs font-mono text-emerald-300">{row.value}</code>
+                    </td>
+                    <td className="py-3 text-xs text-white/40">±{row.spread}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Measure it yourself */}
         <div className="mt-8 rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-8">
           <h3 className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-amber-400/60">
@@ -574,6 +624,36 @@ export default function OverviewPage() {
         </div>
       </motion.section>
 
+      {/* Glossary */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.18 }}
+        className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-10 lg:p-16"
+      >
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-400">
+          <BookOpen size={14} /> Glossary
+        </div>
+        <h2 className="mb-8 text-4xl font-black uppercase tracking-tighter sm:text-5xl">
+          Words that <span className="text-white/20">mean exactly one thing</span>
+        </h2>
+        <p className="mb-10 max-w-3xl text-lg font-medium leading-relaxed text-white/40">
+          The product uses these terms in several files. This is the single definition — if another
+          document words them differently, this table is what it should say.
+        </p>
+        <div className="grid gap-5 md:grid-cols-2">
+          {skills.glossary.map((entry) => (
+            <div key={entry.term} className="rounded-[1.5rem] border border-white/5 bg-white/[0.03] p-6">
+              <h3 className="mb-2 text-sm font-black uppercase tracking-wider text-sky-400">
+                {entry.term}
+              </h3>
+              <p className="text-sm font-medium leading-relaxed text-white/50">{entry.definition}</p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
       {/* License */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
@@ -593,29 +673,39 @@ export default function OverviewPage() {
               <tr className="border-b border-white/10">
                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Component</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">License</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">License file</th>
               </tr>
             </thead>
             <tbody className="text-sm font-medium text-white/60">
-              <tr className="border-b border-white/5">
-                <td className="px-6 py-4">Aartiq Browser (desktop, mobile, all core code)</td>
-                <td className="px-6 py-4"><span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-400">Apache License 2.0</span></td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4">Aartiq MCP Server (aartiq-mcp/)</td>
-                <td className="px-6 py-4"><span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-sky-400">MIT License</span></td>
-              </tr>
+              {legal.table.map((row) => (
+                <tr key={row.component} className="border-b border-white/5 last:border-b-0">
+                  <td className="px-6 py-4">{row.component}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-wider ${
+                        row.license === "MIT"
+                          ? "border-sky-500/20 bg-sky-500/10 text-sky-400"
+                          : row.license === "Apache-2.0"
+                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                            : "border-white/10 bg-white/5 text-white/50"
+                      }`}
+                    >
+                      {row.license}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 font-mono text-xs text-white/50">{row.licenseFile}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
         <p className="mt-6 text-sm font-medium leading-relaxed text-white/40">
-          The MCP server is MIT-licensed for maximum compatibility with Claude Desktop and other MCP clients.
-          All other components remain Apache 2.0.
+          The MCP server is MIT-licensed for maximum compatibility with Claude Desktop and other MCP
+          clients; everything in the product itself — desktop, mobile, and all core code — remains
+          Apache 2.0, and the documentation site you are reading is a private, unlicensed repository.
         </p>
         <p className="mt-6 rounded-[1.5rem] border border-amber-500/10 bg-amber-500/[0.03] p-6 text-sm font-medium leading-relaxed text-white/40">
-          "Aartiq™ is a trademark of <span className="text-white/70">Latestinssan</span>.
-          While our source code is freely available under the Apache 2.0 License, this license does not grant
-          permission to use the trade name, logos, or branding of Aartiq. Any modified distributions of this
-          browser must be rebranded under a completely different name."
+          {legal.trademark.paragraph}
         </p>
         <p className="mt-6 text-xs font-black uppercase tracking-[0.4em] text-white/30">
           © 2026 Aartiq™. All rights reserved.

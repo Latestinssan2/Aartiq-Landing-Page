@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { commandCount } from "@/data/facts";
 import { 
   Bot, 
   FileText, 
@@ -35,7 +36,6 @@ const commandCategories = [
     color: "from-blue-500/20 to-indigo-500/20",
     borderColor: "border-blue-500/30",
     iconColor: "text-blue-400",
-    commands: ["NAVIGATE", "SEARCH", "WEB_SEARCH", "RELOAD", "GO_BACK", "GO_FORWARD"],
     source: "src/lib/browser-navigation-service.js"
   },
   {
@@ -45,7 +45,6 @@ const commandCategories = [
     color: "from-sky-500/20 to-cyan-500/20",
     borderColor: "border-sky-500/30",
     iconColor: "text-sky-400",
-    commands: ["READ_PAGE_CONTENT", "LIST_OPEN_TABS", "CLICK_ELEMENT", "FIND_AND_CLICK", "FILL_FORM", "MULTI_FILL_FORM", "DOM_SEARCH", "SWITCH_TAB", "CLOSE_TAB", "SCROLL_TO", "CLICK_AT", "SCREENSHOT_AND_ANALYZE", "DEEP_RESEARCH", "ORGANIZE_TABS"],
     source: "src/core/window-manager.js, src/components/BrowserViewContainer.tsx"
   },
   {
@@ -55,7 +54,6 @@ const commandCategories = [
     color: "from-purple-500/20 to-pink-500/20",
     borderColor: "border-purple-500/30",
     iconColor: "text-purple-400",
-    commands: ["CREATE_PDF_JSON", "CREATE_FILE_JSON"],
     source: "src/lib/PDFCommandParser.ts, src/core/pdf-generator.js"
   },
   {
@@ -65,7 +63,6 @@ const commandCategories = [
     color: "from-amber-500/20 to-orange-500/20",
     borderColor: "border-amber-500/30",
     iconColor: "text-amber-400",
-    commands: ["SHELL_COMMAND"],
     source: "src/lib/ShellCommandParser.ts, src/core/shell-executor.js"
   },
   {
@@ -75,7 +72,6 @@ const commandCategories = [
     color: "from-emerald-500/20 to-teal-500/20",
     borderColor: "border-emerald-500/30",
     iconColor: "text-emerald-400",
-    commands: ["SET_VOLUME", "SET_BRIGHTNESS", "OPEN_APP"],
     source: "src/core/system-controls.js"
   },
   {
@@ -85,7 +81,6 @@ const commandCategories = [
     color: "from-rose-500/20 to-red-500/20",
     borderColor: "border-rose-500/30",
     iconColor: "text-rose-400",
-    commands: ["OCR_SCREEN", "OCR_COORDINATES", "CLICK_APP_ELEMENT"],
     source: "src/lib/tesseract-service.js, src/lib/screen-vision-service.js"
   },
   {
@@ -95,7 +90,6 @@ const commandCategories = [
     color: "from-cyan-500/20 to-sky-500/20",
     borderColor: "border-cyan-500/30",
     iconColor: "text-cyan-400",
-    commands: ["LIST_AUTOMATIONS", "DELETE_AUTOMATION"]
   },
   {
     id: "scheduling",
@@ -104,7 +98,6 @@ const commandCategories = [
     color: "from-indigo-500/20 to-violet-500/20",
     borderColor: "border-indigo-500/30",
     iconColor: "text-indigo-400",
-    commands: ["SCHEDULE_TASK"],
     source: "src/service/scheduler.js"
   },
   {
@@ -114,7 +107,6 @@ const commandCategories = [
     color: "from-fuchsia-500/20 to-pink-500/20",
     borderColor: "border-fuchsia-500/30",
     iconColor: "text-fuchsia-400",
-    commands: ["GENERATE_IMAGE", "APPLE_INTELLIGENCE_IMAGE", "APPLE_INTELLIGENCE_SUMMARY", "PLAY_VIDEO", "SEARCH_VIDEO", "GENERATE_DIAGRAM", "GENERATE_PDF"],
     source: "src/components/AIChatSidebar.tsx"
   },
   {
@@ -124,7 +116,6 @@ const commandCategories = [
     color: "from-teal-500/20 to-emerald-500/20",
     borderColor: "border-teal-500/30",
     iconColor: "text-teal-400",
-    commands: ["LIST_BOOKMARKS", "ADD_BOOKMARK", "REMOVE_BOOKMARK", "CLEAR_BOOKMARKS", "LIST_HISTORY", "CLEAR_HISTORY"],
     source: "src/components/AIChatSidebar.tsx"
   },
   {
@@ -134,7 +125,6 @@ const commandCategories = [
     color: "from-violet-500/20 to-purple-500/20",
     borderColor: "border-violet-500/30",
     iconColor: "text-violet-400",
-    commands: ["LIST_SKILLS", "LOAD_SKILL", "SETTINGS_QUERY", "SETTINGS_UPDATE", "OPEN_SETTINGS_PANEL"],
     source: "src/lib/SkillRegistry.ts"
   },
   {
@@ -144,7 +134,6 @@ const commandCategories = [
     color: "from-violet-500/20 to-purple-500/20",
     borderColor: "border-violet-500/30",
     iconColor: "text-violet-400",
-    commands: ["THINK", "PLAN", "EXPLAIN_CAPABILITIES"]
   },
   {
     id: "integrations",
@@ -153,7 +142,6 @@ const commandCategories = [
     color: "from-orange-500/20 to-amber-500/20",
     borderColor: "border-orange-500/30",
     iconColor: "text-orange-400",
-    commands: ["PLUGIN_COMMAND"],
     source: "src/lib/plugin-manager.js, src/lib/plugin-sdk.js"
   }
 ];
@@ -331,21 +319,22 @@ const commands = [
   {
     name: "SHELL_COMMAND",
     category: "shell",
-    description: "Execute terminal commands on the host operating system. All shell commands require explicit user approval.",
+    description: "Execute terminal commands on the host operating system. With the default settings every command waits for an explicit approval before it runs.",
     format: "JSON",
     riskLevel: "High",
     requiresApproval: true,
-    approvalType: "QR / Shift+Tab",
+    approvalType: "QR + PIN (high) / Allow Once, Always Allow, Deny",
     parameters: [
       { name: "command", type: "string", required: true, description: "The shell command to execute" },
       { name: "shell", type: "string", required: false, description: "Shell type: bash, zsh, powershell, cmd" }
     ],
     safetyFeatures: [
-      "Syntactic firewall filters dangerous patterns (SecurityValidator.js)",
-      "Command is displayed for user review before execution",
-      "Rated HIGH risk — never auto-executes; gated by checkShellPermission (command-validator.js:77)",
-      "High-risk commands require QR + PIN or Touch ID approval (ClickPermissionModal.tsx)",
-      "Executed inside the fail-closed OS sandbox (sandbox-executor.js)",
+      "Syntactic firewall filters dangerous patterns before anything runs (SecurityValidator.js)",
+      "Every command line is classified into one of four risk tiers and checked by checkShellPermission against the permission store — with no store configured the gate denies (fail-closed), src/core/command-validator.js:78",
+      "The approval dialog offers Allow Once / Always Allow / Deny; Shift+Tab is the keyboard shortcut for Allow Once (ClickPermissionModal.tsx:306)",
+      "An Always Allow answer is keyed on the full normalised command line and carries a 30-day lifetime, after which the gate asks again (docs-audit/issues/allow-always-granularity.md)",
+      "High-risk commands require QR + PIN from a paired mobile (ClickPermissionModal.tsx)",
+      "Executed inside the fail-closed OS sandbox — Seatbelt / bubblewrap / AppContainer (sandbox-executor.js)",
       "Every run is logged for audit (ActionLogsStore.ts)"
     ],
     example: {
@@ -403,7 +392,7 @@ const commands = [
     format: "Bracket",
     riskLevel: "Medium",
     requiresApproval: true,
-    approvalType: "Shift+Tab",
+    approvalType: "Allow Once / Always Allow / Deny (Shift+Tab = Allow Once)",
     parameters: [
       { name: "app", type: "string", required: true, description: "Application name or bundle ID" },
       { name: "url", type: "string", required: false, description: "URL or deep link to open" }
@@ -433,48 +422,7 @@ const commands = [
       natural: "Read the text on my screen"
     }
   },
-  {
-    name: "OCR_COORDINATES",
-    category: "ocr",
-    description: "Resolve coordinates for visible text in desktop apps so Aartiq can target external UI reliably.",
-    format: "JSON",
-    riskLevel: "Low",
-    requiresApproval: false,
-    parameters: [
-      { name: "text", type: "string", required: true, description: "Text to find" },
-      { name: "threshold", type: "number", required: false, description: "Match confidence threshold 0-1" }
-    ],
-    example: {
-      json: `{
-  "command": "OCR_COORDINATES",
-  "text": "Submit Button"
-}`,
-      natural: "Find the coordinates of the Submit Button"
-    }
-  },
-  {
-    name: "CLICK_APP_ELEMENT",
-    category: "ocr",
-    description: "Click on an element in an external application using native-first visual matching and coordinate resolution.",
-    format: "JSON",
-    riskLevel: "High",
-    requiresApproval: true,
-    approvalType: "QR",
-    parameters: [
-      { name: "app", type: "string", required: true, description: "Application name" },
-      { name: "text", type: "string", required: true, description: "Text of element to click" },
-      { name: "x", type: "number", required: false, description: "X coordinate override" },
-      { name: "y", type: "number", required: false, description: "Y coordinate override" }
-    ],
-    example: {
-      json: `{
-  "command": "CLICK_APP_ELEMENT",
-  "app": "Terminal",
-  "text": "Run"
-}`,
-      natural: "Click the Run button in Terminal"
-    }
-  },
+
 
   // Automation Commands
   {
@@ -605,7 +553,7 @@ const commands = [
     format: "JSON/Bracket",
     riskLevel: "Medium",
     requiresApproval: true,
-    approvalType: "Shift+Tab (auto-approve if low-risk)",
+    approvalType: "Allow Once / Always Allow / Deny (Shift+Tab = Allow Once)",
     parameters: [
       { name: "text", type: "string", required: true, description: "Text of the element to click" },
       { name: "matchType", type: "string", required: false, description: "exact, contains, startsWith" },
@@ -1183,6 +1131,338 @@ const commands = [
       natural: "What can you do?"
     }
   },
+
+  // COMMAND_REGISTRY coverage — every command in src/lib/AICommandParser.ts has a card.
+  // Navigation
+  {
+    name: "SEARCH_RESULTS",
+    category: "navigation",
+    description: "Fetch Google search result URLs directly, without opening a tab.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "query", type: "string", required: true, description: "Search query" },
+      { name: "count", type: "number", required: false, description: "Maximum results to return" }
+    ],
+    example: {
+      json: `{
+  "type": "SEARCH_RESULTS",
+  "query": "latest AI news",
+  "count": 5
+}`,
+      natural: "Give me the top results for the latest AI news"
+    }
+  },
+  // Browser / tab intelligence
+  {
+    name: "OPEN_VIEW",
+    category: "browser",
+    description: "Switch between browser workspace views.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "view", type: "string", required: true, description: "View to switch to, e.g. coding" }
+    ],
+    example: {
+      json: `[OPEN_VIEW: coding]`,
+      natural: "Switch to the coding view"
+    }
+  },
+  {
+    name: "DOM_READ_FILTERED",
+    category: "browser",
+    description: "Read DOM text with an optional filter term, screened through the injection check before it is returned.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "term", type: "string", required: false, description: "Optional filter to narrow the read" }
+    ],
+    example: {
+      json: `[DOM_READ_FILTERED: pricing table]`,
+      natural: "Read the pricing table from this page"
+    }
+  },
+  {
+    name: "ANALYSE_TABS",
+    category: "browser",
+    description: "Analyse all open tabs — list them, read their content, and return one consolidated analysis.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `{
+  "type": "ANALYSE_TABS"
+}`,
+      natural: "Analyse everything I have open"
+    }
+  },
+  {
+    name: "ANALYZE_TABS",
+    category: "browser",
+    description: "US-spelling variant — the parser normalizes it to ANALYSE_TABS and runs the same analysis.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `{
+  "type": "ANALYZE_TABS"
+}`,
+      natural: "Analyze my open tabs"
+    }
+  },
+  {
+    name: "SUMMARIZE_TABS",
+    category: "browser",
+    description: "Summarize content from one or more open tabs — the parser normalizes it to the ANALYSE_TABS flow.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `{
+  "type": "SUMMARIZE_TABS"
+}`,
+      natural: "Summarize my open tabs"
+    }
+  },
+  {
+    name: "READ_TAB_CONTENT",
+    category: "browser",
+    description: "Read the content of one specific open tab.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "tabId", type: "string", required: true, description: "Tab id (see LIST_OPEN_TABS)" }
+    ],
+    example: {
+      json: `{
+  "type": "READ_TAB_CONTENT",
+  "tabId": "tab-1"
+}`,
+      natural: "Read what is on my first tab"
+    }
+  },
+  {
+    name: "COMPARE_TABS",
+    category: "browser",
+    description: "Compare content across multiple open tabs.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "tabIds", type: "array", required: true, description: "Tab ids to compare" }
+    ],
+    example: {
+      json: `{
+  "type": "COMPARE_TABS",
+  "tabIds": ["tab-1", "tab-2"]
+}`,
+      natural: "Compare my first two tabs"
+    }
+  },
+  {
+    name: "FIND_INFORMATION_IN_TABS",
+    category: "browser",
+    description: "Search open tabs for specific information.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "query", type: "string", required: true, description: "What to look for" }
+    ],
+    example: {
+      json: `{
+  "type": "FIND_INFORMATION_IN_TABS",
+  "query": "pricing"
+}`,
+      natural: "Find the pricing page across my tabs"
+    }
+  },
+  {
+    name: "CREATE_TAB_RESEARCH_CONTEXT",
+    category: "browser",
+    description: "Create a research context from the currently open tabs.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `{
+  "type": "CREATE_TAB_RESEARCH_CONTEXT"
+}`,
+      natural: "Turn my open tabs into a research context"
+    }
+  },
+  {
+    name: "GROUP_TABS",
+    category: "browser",
+    description: "Group open tabs by strategy: ai, domain, priority, or recency.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "strategy", type: "string", required: false, description: "Grouping strategy (default ai)" }
+    ],
+    example: {
+      json: `{
+  "type": "GROUP_TABS",
+  "strategy": "ai"
+}`,
+      natural: "Group my tabs by topic"
+    }
+  },
+  // Automation
+  {
+    name: "RECORD_WORKFLOW",
+    category: "automation",
+    description: "Start or stop workflow recording — actions taken while recording are captured as a replayable step list.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "action", type: "string", required: true, description: "start or stop" }
+    ],
+    example: {
+      json: `[RECORD_WORKFLOW: start]`,
+      natural: "Start recording what I do"
+    }
+  },
+  {
+    name: "PLAY_WORKFLOW",
+    category: "automation",
+    description: "Replay a previously recorded workflow, step by step.",
+    format: "Bracket",
+    riskLevel: "Medium",
+    requiresApproval: true,
+    approvalType: "Allow Once / Always Allow / Deny",
+    parameters: [
+      { name: "name", type: "string", required: true, description: "Workflow name" }
+    ],
+    example: {
+      json: `[PLAY_WORKFLOW: my-workflow]`,
+      natural: "Replay my login workflow"
+    }
+  },
+  {
+    name: "OPEN_AUTOMATION_SETTINGS",
+    category: "automation",
+    description: "Open the automation settings panel.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `[OPEN_AUTOMATION_SETTINGS]`,
+      natural: "Open the automation settings"
+    }
+  },
+  // Scheduling
+  {
+    name: "OPEN_SCHEDULING_MODAL",
+    category: "scheduling",
+    description: "Open the scheduling modal, optionally pre-filled from a pipe-separated cron | type | name | description string.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "prefill", type: "string", required: false, description: "cron | type | name | description" }
+    ],
+    example: {
+      json: `[OPEN_SCHEDULING_MODAL: 0 8 * * *|pdf-generate|Daily Report|Generate PDF]`,
+      natural: "Open the scheduler for a daily report"
+    }
+  },
+  // Meta
+  {
+    name: "WAIT",
+    category: "meta",
+    description: "Pause execution for a duration in milliseconds.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "ms", type: "number", required: true, description: "Milliseconds to pause" }
+    ],
+    example: {
+      json: `[WAIT: 2000]`,
+      natural: "Wait two seconds before continuing"
+    }
+  },
+  {
+    name: "STATUS",
+    category: "meta",
+    description: "Show a custom processing indicator to the user.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "text", type: "string", required: true, description: "Status text to display" }
+    ],
+    example: {
+      json: `{
+  "type": "STATUS",
+  "text": "Searching..."
+}`,
+      natural: "Show that you are searching"
+    }
+  },
+  // Skills & Settings
+  {
+    name: "OPEN_MCP_SETTINGS",
+    category: "skills",
+    description: "Open the MCP servers settings panel.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [],
+    example: {
+      json: `[OPEN_MCP_SETTINGS]`,
+      natural: "Open the MCP settings"
+    }
+  },
+  {
+    name: "SET_THEME",
+    category: "skills",
+    description: "Switch between dark and light mode.",
+    format: "Bracket",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "theme", type: "string", required: true, description: "dark or light" }
+    ],
+    example: {
+      json: `[SET_THEME: dark]`,
+      natural: "Switch to dark mode"
+    }
+  },
+  {
+    name: "SET_CHAT_STYLE",
+    category: "skills",
+    description: "Customize chat font size, glow mode and preset.",
+    format: "JSON",
+    riskLevel: "Low",
+    requiresApproval: false,
+    parameters: [
+      { name: "fontSize", type: "number", required: false, description: "Chat font size" },
+      { name: "glowMode", type: "string", required: false, description: "Glow style, e.g. gradient" },
+      { name: "glowPreset", type: "string", required: false, description: "Glow color preset, e.g. sunset-fire" }
+    ],
+    example: {
+      json: `{
+  "type": "SET_CHAT_STYLE",
+  "fontSize": 14,
+  "glowMode": "gradient",
+  "glowPreset": "sunset-fire"
+}`,
+      natural: "Make the chat text a bit bigger with a sunset glow"
+    }
+  },
 ];
 
 const commandStatus = {
@@ -1218,7 +1498,7 @@ export default function AICommandsPage() {
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/5 px-5 py-2">
           <Bot size={14} className="text-sky-400" />
           <span className="text-[10px] font-black uppercase tracking-[0.4em] text-sky-400">
-            Command Reference
+            Command Reference · {commandCount} Commands
           </span>
         </div>
 
@@ -1230,9 +1510,10 @@ export default function AICommandsPage() {
           Aartiq turns AI output into structured commands before anything runs. The parser is
           <strong className="text-white/70"> JSON-first</strong>, then HTML-comment, then bracket tags. The shell
           verb is <code className="font-mono text-sky-400/80">SHELL_COMMAND</code> (there is no
-          <code className="font-mono text-rose-400/80"> RUN_SHELL</code>); it is rated
-          <strong className="text-rose-400/80"> HIGH risk</strong> and never auto-executes.
-          Commands are executed one at a time with per-step human approval.
+          <code className="font-mono text-rose-400/80"> RUN_SHELL</code>); every shell command line is
+          classified into <strong className="text-rose-400/80">four risk tiers</strong> and has to pass
+          <code className="font-mono text-sky-400/80"> checkShellPermission</code>. With the default
+          settings, nothing runs until the approval dialog is answered — one command at a time.
         </p>
 
         <div className="mt-8 rounded-2xl border border-sky-500/20 bg-sky-500/5 p-6 text-sm leading-relaxed text-white/60">
@@ -1458,6 +1739,12 @@ export default function AICommandsPage() {
                   </div>
                 </div>
                 <p className="mt-2 text-white/50">{selectedCommand.description}</p>
+                {"approvalType" in selectedCommand && selectedCommand.approvalType && (
+                  <p className="mt-2 text-xs text-white/40">
+                    Approval:{" "}
+                    <span className="font-bold text-white/60">{selectedCommand.approvalType}</span>
+                  </p>
+                )}
               </div>
             </div>
 

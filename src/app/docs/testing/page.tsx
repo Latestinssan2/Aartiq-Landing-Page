@@ -62,6 +62,45 @@ const suiteFocus: Record<string, string> = {
   "autofill.vault": "Encrypted autofill vault (AES-GCM, passphrase-derived key)",
   "theme": "Theme and UI-mode switching",
   snapshot: "Snapshot / accessibility-tree reference stability",
+  "shell-command-tiers": "Shell tier invariants: destructive pattern floors, unknown binaries, URL arguments, blocked-command rejection, Allow Always eligibility, command key normalization",
+  "shell-approval-defaults": "Startup store contents, denials by risk tier, prompting rules, exact-match Always grants, MCP classifier parity, fail-closed fallbacks, legacy grant migration",
+  "research-pipeline": "Budget normalization, domain and date parsing, claim extraction, corroboration and dispute logic, recency selection, run events, hard budget enforcement",
+  "page-scripts-forms": "Stale ref failures, fill and type semantics, per-field form results, gated form submission, element actions, read-only CSS and prose search",
+  "local-server-auth": "Bind host resolution, token extraction precedence, Host and Origin checks, request gate rejections, loopback bridge sockets, MCP pairing URL flow",
+  "docs-platform-integration-match-source": "Docs gate: platform action reachability, undelivered scheme handling, IPC channel registration, dropped features and shortcut ids claims pinned to source",
+  "agent-api-bridge-tools": "Bridge ref resolution and staleness, snapshot options, page reading tools, navigation stamp reset, search delegation, tool descriptors, fill versus submit gating",
+  "web-search-service": "Provider key resolution and fallback order, result count clamps, keyed versus scraped labeling, news provider routing, result parsing, key-safe provider info",
+  "apple-intelligence-genmoji": "Genmoji export identity, single-command spawn with JSON prompt transport, off-macOS refusal, IPC channel exposure, helper OS floors, docs command coverage",
+  "research-progress-plumbing": "Job reducer transitions, progress clamping and step handling, terminal failure stages, event filtering, main and preload wiring, superseded job filtering",
+  "snapshot-ref-binding": "axId stamping and marker cleanup, ref lifecycle and staleness, structural node refusal, single-page search filters, limits and miss behavior",
+  "file-paths": "URL versus file path detection, path wrapping preprocessing, tokenizer classification, code block protection, idempotence, rendered link and chip output",
+  "docs-deep-links-match-source": "Docs gate: deep-link command statuses, dead command reachability, documented parameters, retired route and mechanism claims pinned to source",
+  "docs-sync-match-source": "Docs gate: Cloud Sync trust levels, discovery mechanism, size and duration limits, feature capabilities and encryption scoping claims pinned to source",
+  "sensitive-paths-deny": "Sensitive-path denial over allowlisted homes and workspaces, symlink realpath resolution, read-only directory defaults, broad grant narrowing, sandbox deny blocks",
+  "sync-auth-tokens": "Pairing token issuance, listener authentication and lifetime checks, refresh device binding, unpair revocation, pairing lockout, HTTP token and Host validation",
+  "cloud-sync-error-surface": "Rejected cloud write logging and error emission across source and compiled twins, failure forwarding to renderer, status line surfacing, success silence",
+  "docs-listener-claims-match-source": "Docs gate: listener binding, token coverage, approval tier tables, enforcement layer and tool count claims pinned to source",
+  "allow-always-lifetime": "Grant lifetime policy constant, grant record persistence and revocation, gate lifetime enforcement and sweeping, pre-lifetime grant migration",
+  "permission-store-system-root": "System root rejection in allowed directories, trailing slash handling, exact-match path boundary rule, normal directory acceptance, rejection auditing",
+  "approval-gate-concurrency": "Ticket single redemption under concurrency, sequential replay refusal, input hash burning, scope mismatch and status reporting, live redemption path",
+  "wifi-sync-upgrade": "WebSocket upgrade Origin and Host gating, DNS rebinding and foreign origin refusal over real sockets, access token gating of unpair",
+  "network-listener-hardening": "Loopback-only binding for bridge and services, wildcard-free listen calls, distinct default ports across agent API and native bridge, routing targets",
+  "remote-shell-approval": "Remote origin shell approval registration policy, QR and PIN ticket flow, invalid and tampered input denial, single use redemption, sandbox fallback",
+  "native-bridge-permissions": "Permission grant, revoke and read routes, immediate gate visibility, lost-update resistance, invalid level fail-closed handling, audit trail",
+  "session-token": "Per-listener token file creation and mode, cross-restart persistence, listener separation, corrupt file replacement, unwritable home fallback, rotation",
+  "citation-links": "Citation bracket to markdown link normalization, verbatim URL copying, idempotence, rendered href correctness, plain text and bracket preservation",
+  "docs-shortcuts-match-source": "Docs gate: published shortcut table, registered accelerator parity, duplicate and unbound entries, scoped key descriptions and conflict surfacing claims pinned to source",
+  "native-approval-biometrics": "Dialog label honesty, deny handling, biometric flag enforcement with fail-closed verification and unsupported platforms, per session caching",
+  "licence-audit-rename": "Root licence text, manifest and installer licence declaration, persisted audit file rename migration without clobbering, chat export default naming",
+  "linux-ipc-registration": "Linux bridge channel registration uniqueness against main, preload invoked channel ownership, platform guard error objects on non-Linux",
+  "pairing-auth": "Deterministic master key signature computation and verification, wrong key and tampered signature rejection, fail-closed missing inputs, replay window",
+  "sync-handlers-window": "Live window resolution for prompt delivery, honest failure when windows are gone, destroyed window safety, captured window fallback, windowless status",
+  "wifi-sync-pairing": "Pairing code stability across restarts, unknown device code checks, paired device id recognition with trusted legacy ids, untrusted legacy rejection",
+  "benchmark-smoke": "Benchmark runner completion, expected benchmark presence and timing shape, environment capture, KDF work floors, unknown only flag rejection",
+  "local-server-auth-lockout": "Remote address failure counting and lockout, lock clearing on success, shared address family counters, loopback exemption, socketless local handling",
+  "ai-command-parser-plan": "PLAN and THINK payload field extraction, bracket form parsing, reasoning note capture so plan and thinking text stays populated",
+  "approval-gate": "Approval ticket race prevention, one-time consumption, sequential replay refusal, mismatched input burning",
+  "markdown-render": "Currency text kept literal in chat markdown, dollar amounts preserved across sentences, double dollar math still rendered",
 };
 
 const testSuites = tests.perSuite.map((s) => ({
@@ -75,6 +114,16 @@ const testSuites = tests.perSuite.map((s) => ({
 const crxSkip = tests.skipBreakdown.find((b) => b.reason.includes("CRX3"))?.count ?? 0;
 const regressionCount =
   testSuites.find((s) => s.file === "security-fixes")?.count ?? 0;
+
+const ciTotals = ci.perJob.reduce(
+  (acc, j) => ({
+    passed: acc.passed + j.passed,
+    skipped: acc.skipped + j.skipped,
+    failed: acc.failed + j.failed,
+    declared: acc.declared + j.declared,
+  }),
+  { passed: 0, skipped: 0, failed: 0, declared: 0 }
+);
 
 const covered = [
   "Fail-closed by construction: every sandbox setup, validation, or policy failure returns a structured SANDBOX_* error and the command is never silently run unsandboxed — there is no automatic fallback path",
@@ -230,6 +279,90 @@ export default function TestingPage() {
         </div>
       </motion.section>
 
+      {/* Latest CI run */}
+      <motion.section
+        id="ci-run"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <div className="mb-16">
+          <p className="mb-4 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+            Continuous Integration
+          </p>
+          <h2 className="text-4xl font-black uppercase tracking-tighter sm:text-5xl">
+            Latest <span className="text-white/20">CI Run</span>
+          </h2>
+          <p className="mt-6 max-w-3xl text-sm text-white/40">
+            {ci.jobs.detail} The run below is{" "}
+            <a
+              href={ci.latestRun.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold text-emerald-300 hover:text-emerald-200"
+            >
+              #{ci.latestRun.runNumber}
+            </a>{" "}
+            ({ci.latestRun.event}, {ci.latestRun.date}, conclusion: {ci.latestRun.conclusion}).
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02]">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
+                <th className="px-6 py-4">Job</th>
+                <th className="px-6 py-4">OS</th>
+                <th className="px-6 py-4">Passed</th>
+                <th className="px-6 py-4">Skipped</th>
+                <th className="px-6 py-4">Failed</th>
+                <th className="px-6 py-4">Declared</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm">
+              {ci.perJob.map((j) => (
+                <tr key={j.name} className="border-b border-white/5 transition hover:bg-white/[0.02]">
+                  <td className="px-6 py-4 font-mono text-xs text-sky-400">{j.name}</td>
+                  <td className="px-6 py-4 text-xs text-white/50">{j.os}</td>
+                  <td className="px-6 py-4 font-bold text-emerald-400">{j.passed}</td>
+                  <td className="px-6 py-4 text-amber-400">{j.skipped}</td>
+                  <td className="px-6 py-4 text-white/50">{j.failed}</td>
+                  <td className="px-6 py-4 text-white/50">{j.declared}</td>
+                </tr>
+              ))}
+              <tr className="border-t border-white/10 text-xs font-black uppercase tracking-wider">
+                <td className="px-6 py-4 text-white/40" colSpan={2}>
+                  All {ci.jobs.defined} jobs
+                </td>
+                <td className="px-6 py-4 text-emerald-400">{ciTotals.passed}</td>
+                <td className="px-6 py-4 text-amber-400">{ciTotals.skipped}</td>
+                <td className="px-6 py-4 text-white/50">{ciTotals.failed}</td>
+                <td className="px-6 py-4 text-white/50">{ciTotals.declared}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.02]">
+          <div className="border-b border-white/5 px-6 py-4">
+            <h3 className="text-sm font-black uppercase tracking-wider text-white">Why tests are skipped</h3>
+            <p className="mt-1 text-xs text-white/40">
+              Breakdown from the generated test facts ({derived.testGeneratedAt.slice(0, 10)}): {tests.tests.skipped} skipped in total.
+            </p>
+          </div>
+          <table className="w-full text-left">
+            <tbody className="text-sm">
+              {tests.skipBreakdown.map((b) => (
+                <tr key={b.reason} className="border-b border-white/5 last:border-b-0">
+                  <td className="px-6 py-3 text-white/60">{b.reason}</td>
+                  <td className="px-6 py-3 text-right font-mono text-xs text-amber-400">{b.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
+
       {/* What's covered */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
@@ -259,6 +392,7 @@ export default function TestingPage() {
 
       {/* Known limits */}
       <motion.section
+        id="known-limits"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -290,6 +424,29 @@ export default function TestingPage() {
               <li key={i} className="flex items-start gap-4 text-sm text-white/60">
                 <AlertTriangle size={18} className="mt-0.5 shrink-0 text-amber-400" />
                 {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-6 rounded-[2rem] border border-white/5 bg-white/[0.02] p-10">
+          <div className="mb-6 flex items-center gap-4">
+            <AlertTriangle size={32} className="text-amber-400/70" />
+            <div>
+              <h3 className="text-xl font-black uppercase tracking-wider">
+                Known limits in the product
+              </h3>
+              <p className="text-sm text-white/50">
+                The shared list kept in the source of truth that also renders in the repository
+                README — product-wide, not just this suite.
+              </p>
+            </div>
+          </div>
+          <ul className="space-y-3">
+            {security.knownLimits.map((limit, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm text-white/60">
+                <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-400/70" />
+                {limit}
               </li>
             ))}
           </ul>
