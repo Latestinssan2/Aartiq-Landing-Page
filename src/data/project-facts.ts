@@ -411,13 +411,13 @@ export const security = {
   knownLimits: [
     "Runtime sandbox tests execute only on their own OS. There is no single job that exercises Seatbelt, bubblewrap, and AppContainer at once.",
     "OS-automation tests skip wherever their native tooling or a display is absent (xdotool/xte on Linux, cliclick on macOS). CI installs the tooling and runs them under Xvfb, but a machine without them still skips the suite.",
-    "The CRX3 verifier enforces Chromium's checks — the crx_id must be derived from a key whose signature also verifies, and the signature covers the signed header and the zip archive — but it does not implement Chrome's publisher-key allowlisting: a package signed with an attacker-generated key verifies as that key's own extension id, which makes substituting it equivalent to sideloading a new extension rather than hijacking an existing one.",
+    "The CRX3 verifier enforces Chromium's checks — the crx_id must be derived from a key whose signature also verifies, and the signature covers the signed header and the zip archive — and installFromWebStore binds the install to the id the download URL declares (…x=id%3D<32-char id>…): the verified package's crx_id must equal it, so a URL promising one extension can only install that exact extension, never a validly signed different one. What it still does not implement is Chrome's publisher-key allowlisting — an attacker who controls the URL can name a fresh id of their own key, which stays equivalent to sideloading a new extension rather than hijacking an existing one.",
     "SecurityValidator.js does not guarantee that non-blocked commands are safe — it is a fast first-pass reject layer.",
     "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
-    "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
+    "Seatbelt profiles start from (deny default): an operation class the profile does not explicitly grant is denied, unknown-unknowns included. Three plumbing grants keep real commands working — sysctl-read (read-only introspection), mach-lookup (Mach service-name discovery, so node/python/shell keep working), and file-ioctl (bounded by the file allowlist) — while everything else the old default-allow baseline left open (foreign process-info, user preferences, host-level mach ops) is now denied.",
     "Apple Events cannot be filtered by the current sandbox-exec — probing it rejects a deny rule with \"unbound variable: apple-events\", so the operation is not exposed at all — and a sandboxed command could still ask another app to act on its behalf.",
     "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. See network.servers.",
-    "The session tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts — but remote mode is still not a finished design: there is no per-client credential to revoke, no pairing UI, and the binds are not operator-named.",
+    "The session tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts, and each listener now also accepts per-client credentials — mint one with the primary token (POST /clients), revoke just that one (POST /clients/revoke), peers and primary untouched — but remote mode is still not a finished design: there is no pairing UI, nothing writes a credential to a remote client, and the binds are not operator-named.",
     '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching — it records what the command says, not what it will do — and every grant now expires after 30 days, swept with an audit-log entry, so the dialog asks again. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
     "An Allow Always grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match Always grants, which expire after 30 days.",
   ],
@@ -437,7 +437,7 @@ export const network = {
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen:
         "the security_mcpBridgeRemote setting is exactly true (defaults to false; no UI control sets it)",
-      auth: "A token required on every route including SSE, read-or-created in ~/.aartiq-mcp-token (mode 0600) so a configured client survives restarts. Host must be the loopback host and this listener's own port; any browser Origin must be on an allow-list of the app's own origins.",
+      auth: "A token required on every route including SSE, read-or-created in ~/.aartiq-mcp-token (mode 0600) so a configured client survives restarts. Host must be the loopback host and this listener's own port; any browser Origin must be on an allow-list of the app's own origins. Per-client credentials: POST /clients mints one with the primary token (returned once) and POST /clients/revoke retires just it — its peers and the primary token keep working.",
       note: "The token is generated by the server and persisted in ~/.aartiq-mcp-token (delete the file and restart to rotate), so a Claude Desktop config written earlier keeps working across restarts. New configs pass the token to mcp-remote as an Authorization header fed from the config's env block, so it never enters the argument list; configs written before that still carry it as a URL query parameter until Auto-Configure is re-run.",
     },
     {
@@ -458,7 +458,7 @@ export const network = {
       portIsEnvOverridable: true, // AARTIQ_NATIVE_MAC_UI_PORT
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: null, // host is a hard-coded literal
-      auth: "A token required on every route, read from ~/.aartiq-token (mode 0600), plus the same Host and Origin checks.",
+      auth: "A token required on every route, read from ~/.aartiq-token (mode 0600), plus the same Host and Origin checks. Per-client credentials: POST /clients mints one with the primary token (returned once) and POST /clients/revoke retires just it — its peers and the primary token keep working.",
       note: "The agent API used to share this port, which could leave the bridge with a swallowed EADDRINUSE; the agent API now defaults to 46204, so the two are distinct.",
     },
     {
@@ -468,7 +468,7 @@ export const network = {
       portIsEnvOverridable: false,
       defaultBindAddress: "127.0.0.1",
       bindsAllInterfacesWhen: "config.remote === true (defaults to false; no UI, env var, or IPC path sets it)",
-      auth: "A token required on every HTTP route, read-or-created in ~/.aartiq-agent-token (mode 0600) so an agent configured once keeps working across restarts, plus the same Host and Origin checks. An unknown x-agent-id is still auto-registered, but as a limited-trust agent — it no longer stands in for authentication.",
+      auth: "A token required on every HTTP route, read-or-created in ~/.aartiq-agent-token (mode 0600) so an agent configured once keeps working across restarts, plus the same Host and Origin checks. An unknown x-agent-id is still auto-registered, but as a limited-trust agent — it no longer stands in for authentication. Per-client credentials: POST /clients mints one with the primary token (returned once) and POST /clients/revoke retires just it — its peers and the primary token keep working.",
       note: "Moved off 46203 when the native bridge collision was resolved; aartiq-mcp's BridgeClient targets the native bridge, not this server.",
     },
     {

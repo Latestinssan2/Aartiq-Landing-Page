@@ -177,6 +177,7 @@ ${shellTiers.invariants.map((r) => `- ${r}`).join("\n")}
 - The regex layer is a fast first-pass reject, not the primary defense.
 - Only OS sandboxing and capability scoping are enforcement boundaries; the other layers are policy or heuristic.
 - The CRX3 verifier does not implement Chrome's publisher-key allowlisting: a package signed with an attacker-generated key verifies as that key's own extension id — sideloading their own extension, never hijacking an existing one.
+- installFromWebStore additionally binds the Web Store download URL's declared id (…x=id%3D<32-char id>…) to the verified package's crx_id, so a URL promising one extension can only install that exact extension — substitution by any other validly signed package fails closed.
 
 ---
 
