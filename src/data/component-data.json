@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-08T11:41:03.688Z",
+  "generated": "2026-10-08T13:55:52.828Z",
   "version": "0.3.8",
   "desktop": {
     "total": 379,
-    "totalLines": 116990,
+    "totalLines": 117108,
     "byCategory": {
       "components": 149,
       "core": 16,
@@ -6304,7 +6304,7 @@
       {
         "name": "ClickPermissionModal.tsx",
         "path": "ai/ClickPermissionModal.tsx",
-        "lines": 608,
+        "lines": 645,
         "description": "Click Permission Modal",
         "tags": [
           "React",
@@ -6412,6 +6412,11 @@
                 },
                 {
                   "name": "estimatedImpact",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "ticketId",
                   "type": "string",
                   "required": false
                 }
@@ -8891,13 +8896,14 @@
       {
         "name": "useAIActionSecurityManager.tsx",
         "path": "ai/useAIActionSecurityManager.tsx",
-        "lines": 732,
+        "lines": 750,
         "description": "Action Security Manager",
         "tags": [
           "React",
           "Node.js",
           "Security",
           "AI",
+          "Sync",
           "macOS"
         ],
         "lastModified": "2026-10-08",
@@ -8957,6 +8963,11 @@
                 },
                 {
                   "name": "estimatedImpact",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "name": "ticketId",
                   "type": "string",
                   "required": false
                 }
@@ -25189,7 +25200,7 @@
       {
         "name": "sync-handlers.js",
         "path": "handlers/sync-handlers.js",
-        "lines": 494,
+        "lines": 547,
         "description": "Sync Handlers",
         "tags": [
           "Node.js",
@@ -25938,7 +25949,7 @@
       {
         "name": "preload.js",
         "path": "preload.js",
-        "lines": 935,
+        "lines": 945,
         "description": "Preload",
         "tags": [
           "Node.js",
@@ -26068,7 +26079,7 @@
   },
   "flutter": {
     "total": 66,
-    "totalLines": 28047,
+    "totalLines": 28064,
     "byCategory": {
       "pages": 23,
       "appBar": 8,
@@ -26128,7 +26139,7 @@
       {
         "name": "action_approval_page.dart",
         "path": "action_approval_page.dart",
-        "lines": 382,
+        "lines": 397,
         "description": "Action Approval Page",
         "tags": [
           "Flutter",
@@ -26296,7 +26307,7 @@
       {
         "name": "desktop_control_page.dart",
         "path": "desktop_control_page.dart",
-        "lines": 1264,
+        "lines": 1266,
         "description": "Desktop Control Page",
         "tags": [
           "Flutter",
@@ -27640,6 +27651,6 @@
   },
   "summary": {
     "total": 445,
-    "totalLines": 145037
+    "totalLines": 145172
   }
 }
