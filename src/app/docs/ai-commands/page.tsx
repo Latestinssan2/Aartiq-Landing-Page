@@ -347,7 +347,7 @@ const commands = [
     },
     safeCommands: [
       "system_profiler", "ifconfig", "ipconfig", "netstat", "ping",
-      "curl (GET requests only)", "git status", "ls", "pwd", "df"
+      "git status", "ls", "pwd", "df"
     ],
     blockedCommands: [
       "rm -rf", "sudo", "dd", "mkfs", ":(){:|:&};:", ">/dev/sda"
