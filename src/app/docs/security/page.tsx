@@ -886,7 +886,9 @@ export default function SecurityPage() {
             tool calls, and remote-origin shell commands. A remote shell request never executes directly:
             the capability controller forces approval for it — registered as local "never" / remote
             "always", with a hard rule that remote origin can never resolve to "never" — and issues a
-            single-use ticket pushed to the paired device as a QR + PIN challenge. The command runs only
+            single-use ticket whose PIN is never sent over the network: it lives only on the ticket and
+            in a QR the desktop renders on its own screen. The phone reads the PIN by scanning that QR,
+            the desktop dialog for such a ticket only displays it and can deny, and the command runs only
             after that ticket comes back with its per-ticket PIN and the command's input hash verifies
             (src/main/handlers/sync-handlers.js; guarded by aartiq-browser/tests/remote-shell-approval.test.js).
           </p>
