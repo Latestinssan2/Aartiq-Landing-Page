@@ -1,15 +1,15 @@
 {
-  "generated": "2026-10-08T16:59:09.015Z",
+  "generated": "2026-10-08T17:17:38.884Z",
   "version": "0.3.8",
   "desktop": {
-    "total": 380,
-    "totalLines": 117306,
+    "total": 381,
+    "totalLines": 117706,
     "byCategory": {
       "components": 149,
       "core": 16,
       "automation": 5,
       "service": 17,
-      "lib": 148,
+      "lib": 149,
       "app": 10,
       "hooks": 4,
       "main": 21,
@@ -17055,7 +17055,7 @@
       {
         "name": "server.ts",
         "path": "agent-api/server.ts",
-        "lines": 171,
+        "lines": 177,
         "description": "Server",
         "tags": [
           "Node.js",
@@ -17076,6 +17076,7 @@
             "./tools",
             "./providers",
             "../local-server-auth",
+            "../client-credentials",
             "../session-token",
             "./types",
             "../guardrails",
@@ -18375,6 +18376,43 @@
             "inspectClickableTargets",
             "clickTargetInWebContents",
             "resolveAndClickWithAi"
+          ]
+        },
+        "group": "lib"
+      },
+      {
+        "name": "client-credentials.js",
+        "path": "client-credentials.js",
+        "lines": 361,
+        "description": "Client Credentials",
+        "tags": [
+          "Node.js",
+          "macOS"
+        ],
+        "lastModified": "2026-10-08",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [],
+          "interfaces": [],
+          "hooks": [],
+          "componentType": "service",
+          "exports": [],
+          "apiUsage": [],
+          "keyFunctions": [
+            "clientRegistryPath",
+            "freshClientToken",
+            "hashToken",
+            "readRegistry",
+            "writeRegistry",
+            "mintClientToken",
+            "revokeClientToken",
+            "listClientCredentials",
+            "clientTokenState",
+            "readJsonBody",
+            "finish",
+            "maybeHandleClientAdminRoute",
+            "send",
+            "act"
           ]
         },
         "group": "lib"
@@ -20812,7 +20850,7 @@
       {
         "name": "local-server-auth.js",
         "path": "local-server-auth.js",
-        "lines": 336,
+        "lines": 356,
         "description": "Local Server Auth",
         "tags": [
           "Node.js",
@@ -20972,7 +21010,7 @@
       {
         "name": "mcp-browser-server.js",
         "path": "mcp-browser-server.js",
-        "lines": 1730,
+        "lines": 1737,
         "description": "Mcp Browser Server",
         "tags": [
           "Node.js",
@@ -25771,7 +25809,7 @@
       {
         "name": "main.js",
         "path": "main.js",
-        "lines": 9483,
+        "lines": 9489,
         "description": "Main",
         "tags": [
           "Node.js",
@@ -27683,7 +27721,7 @@
     ]
   },
   "summary": {
-    "total": 446,
-    "totalLines": 145407
+    "total": 447,
+    "totalLines": 145807
   }
 }
