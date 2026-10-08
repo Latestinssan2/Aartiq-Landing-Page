@@ -52,7 +52,7 @@ const suiteFocus: Record<string, string> = {
   "dom-handlers": "Browser DOM IPC handlers",
   "home-intelligence": "Home intelligence logic",
   "extensions.crx-verifier":
-    "CRX3 signature enforcement — deliberately SKIPPED: verifyCrx() wedges the Node 24 OpenSSL verifier on CRX3 header parsing, which previously hung jest until the job timeout. Counted as skipped, never as passing, until the verifier is fixed. See Known Limits.",
+    "CRX3 signature enforcement — Chromium's format: bounds-checked header parse, crx_id ↔ signing-key binding, and signatures over the signed header plus the zip archive (6 tests, runs everywhere)",
   "extensions.permission-analyzer": "Chrome extension manifest permission analysis",
   "guardrails.origin-guard": "Origin trust levels and verb-scoped permission gates",
   "guardrails.prompt-injection": "Prompt-injection detection guards",
@@ -111,7 +111,6 @@ const testSuites = tests.perSuite.map((s) => ({
   focus: suiteFocus[s.suite] ?? "—",
 }));
 
-const crxSkip = tests.skipBreakdown.find((b) => b.reason.includes("CRX3"))?.count ?? 0;
 const regressionCount =
   testSuites.find((s) => s.file === "security-fixes")?.count ?? 0;
 
@@ -127,6 +126,7 @@ const ciTotals = ci.perJob.reduce(
 
 const covered = [
   "Fail-closed by construction: every sandbox setup, validation, or policy failure returns a structured SANDBOX_* error and the command is never silently run unsandboxed — there is no automatic fallback path",
+  "CRX3 extension packages — the verifier suite (6 tests) parses Chromium's header format with bounds-checked varints (malformed input fails closed instead of hanging), binds crx_id to the signing key, checks signatures over the signed header plus the zip archive, and rejects ZIP end-of-central-directory tokens inside the header; it runs in the full-suite job and locally on every platform (publisher-key allowlisting is not implemented — see Known Limits)",
   "macOS Seatbelt — real OS enforcement: writing outside the directory allowlist is denied by the kernel and the file is verified absent; reading a secret outside the allowlist is denied; /tmp is writable; an IP network bind is denied; an AF_UNIX socket bind is denied; signalling a host process is denied while self-signal works; reading/writing through a symlink that escapes the allowlist is denied; a child process spawned by the target is still contained",
   "Linux bubblewrap — closed-by-default namespaces (pid/net/ipc/uts/user/cgroup + new session), correct --bind (write) vs --ro-bind (read-only) mapping, network denied by default, and fail-closed when bwrap is missing OR present-but-incapable of creating the required namespaces (the capability pre-flight)",
   "Windows AppContainer — policy fail-closed (missing runner, invalid allowlist, network-allowlist requests), result parsing, explicit isolation flags ({ filesystem:true, network:true, process:true }), plus a runtime matrix proving suspended AppContainer start + OS-enforced ACL allowlist + verified job assignment + grandchild containment + secret isolation + KILL_ON_JOB_CLOSE",
@@ -151,7 +151,6 @@ const limitations = [
         `${j.name} on ${j.os} ${j.passed} passed / ${j.skipped} skipped / ${j.failed} failed of ${j.declared}`,
     )
     .join("; ")}. Suspended AppContainer start, OS-enforced ACL allowlist, verified job assignment, grandchild containment, secret isolation, and KILL_ON_JOB_CLOSE all return verified sandbox results.`,
-  `The extensions.crx-verifier suite (${crxSkip} tests) is deliberately SKIPPED in CI: verifyCrx() trips a Node 24 OpenSSL decode path (ERR_OSSL_UNSUPPORTED / an event-loop-blocking native call) while parsing the CRX3 header, which previously hung the jest job until the ${ci.jobs.timeout} It is not counted as passing — it stays visible as a skipped suite (${crxSkip} skipped in the totals above) until the verifier's header parsing is fixed and the suite is re-enabled.`,
   "macOS Seatbelt OS-enforcement tests execute only on macOS; they pass on this machine and run in CI on macos-latest. The profile-generation and fail-closed config paths are asserted on every platform.",
   "These are unit and integration tests for core modules. They do NOT cover the full Electron UI, installers, MSIX/MSI packaging, or complete end-to-end user flows.",
   "A sandbox confines what code can do; it is not a proof that the AI's decisions are safe, nor a substitute for least-privilege OS accounts, patched dependencies, or simply not running untrusted code. See the security page's 'What this does NOT guarantee'.",
@@ -437,8 +436,8 @@ export default function TestingPage() {
                 Known limits in the product
               </h3>
               <p className="text-sm text-white/50">
-                The shared list kept in the source of truth that also renders in the repository
-                README — product-wide, not just this suite.
+                The shared list kept in the source of truth — product-wide, not just this suite.
+                The repository README points here instead of duplicating it.
               </p>
             </div>
           </div>

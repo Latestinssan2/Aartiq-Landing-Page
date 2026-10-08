@@ -406,17 +406,16 @@ export const security = {
   /** What the model does NOT promise. Keep these; do not summarise them away. */
   knownLimits: [
     "Runtime sandbox tests execute only on their own OS. There is no single job that exercises Seatbelt, bubblewrap, and AppContainer at once.",
-    "OS-automation tests skip wherever the native tooling is absent (xdotool/xte on Linux, cliclick on macOS).",
-    "The CRX3 signature-verifier suite is skipped because verifyCrx() hangs on a Node 24 / OpenSSL header parse. It is counted as skipped, never as passing, until the verifier is fixed.",
+    "OS-automation tests skip wherever their native tooling or a display is absent (xdotool/xte on Linux, cliclick on macOS). CI installs the tooling and runs them under Xvfb, but a machine without them still skips the suite.",
+    "The CRX3 verifier enforces Chromium's checks — the crx_id must be derived from a key whose signature also verifies, and the signature covers the signed header and the zip archive — but it does not implement Chrome's publisher-key allowlisting: a package signed with an attacker-generated key verifies as that key's own extension id, which makes substituting it equivalent to sideloading a new extension rather than hijacking an existing one.",
     "SecurityValidator.js does not guarantee that non-blocked commands are safe — it is a fast first-pass reject layer.",
     "Visual extraction reduces the DOM-based prompt-injection surface. It does not prevent prompt injection, and it cannot give semantic immunity against instructions rendered into the viewport.",
     "Seatbelt profiles start from (allow default), so not every IPC class is denied by default; Mach IPC stays usable because node/python/shell require it.",
-    "Apple Events cannot be filtered by the current sandbox-exec — the operation is not exposed — so a sandboxed command could still ask another app to act on its behalf.",
-    "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade now refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. The background task service (3999) and the PDF sync server bound 0.0.0.0 with a wildcard CORS header until the bind default became 127.0.0.1, with AARTIQ_SERVICE_HOST as the explicit opt-in and no CORS allow-origin header sent at all. See network.servers.",
+    "Apple Events cannot be filtered by the current sandbox-exec — probing it rejects a deny rule with \"unbound variable: apple-events\", so the operation is not exposed at all — and a sandboxed command could still ask another app to act on its behalf.",
+    "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. See network.servers.",
     "The session tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts — but remote mode is still not a finished design: there is no per-client credential to revoke, no pairing UI, and the binds are not operator-named.",
     '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching — it records what the command says, not what it will do — and every grant now expires after 30 days, swept with an audit-log entry, so the dialog asks again. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
     "An Allow Always grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match Always grants, which expire after 30 days.",
-    "The native bridge and the Agent API both defaulted to port 46203, so if both started one failed to bind and the error was logged and swallowed — not visible from outside. The Agent API now defaults to 46204 and the native bridge keeps 46203, so the two no longer collide.",
   ],
 } as const;
 
@@ -539,23 +538,23 @@ export const ci = {
   jobs: {
     defined: 5,
     detail:
-      "All five jobs were green on the run above — the four Jest jobs tabled here plus a typecheck job (tsc --noEmit) that reports no test counts. Dispatch inputs can reduce the Jest jobs to 3 (skip-full-suite) or 1 (windows-test-pattern), so this is a default-dispatch count rather than an invariant.",
+      "All five jobs were green on the run above — four Jest jobs (full suite, macOS Seatbelt, Linux bubblewrap, Windows AppContainer) plus a typecheck job (tsc --noEmit) that reports no test counts; per-job results live on the testing page. Dispatch inputs can reduce the Jest jobs to 3 (skip-full-suite) or 1 (windows-test-pattern), so this is a default-dispatch count rather than an invariant.",
     timeout:
       "30 minutes on the full-suite job, 10 minutes on the typecheck job; the three sandbox jobs have no timeout configured.",
     nodeVersion: "24",
   },
   latestRun: {
-    id: 37621797787,
-    runNumber: 75,
-    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37621797787",
+    id: 37772437527,
+    runNumber: 83,
+    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37772437527",
     event: "workflow_dispatch",
-    headSha: "029cc82c",
-    date: "2026-10-07",
+    headSha: "a31a5bf5",
+    date: "2026-10-08",
     conclusion: "success",
   },
   /** Per-job jest summary lines, read from the run's job logs. */
   perJob: [
-    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 1395, skipped: 40, failed: 0, declared: 1435 },
+    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 1412, skipped: 26, failed: 0, declared: 1438 },
     { name: "Run Jest (Windows AppContainer sandbox runtime)", os: "windows-latest", passed: 61, skipped: 30, failed: 0, declared: 91 },
     { name: "Run Jest (macOS Seatbelt sandbox runtime)", os: "macos-latest", passed: 105, skipped: 0, failed: 0, declared: 105 },
     { name: "Run Jest (Linux bubblewrap sandbox runtime)", os: "ubuntu-latest", passed: 57, skipped: 21, failed: 0, declared: 78 },
@@ -564,15 +563,15 @@ export const ci = {
    * The same commit yields different pass/skip splits per platform, which is why
    * every published count carries its environment.
    *
-   * This must not restate a current count. The per-job figures above belong to
-   * run 37621797787 at 029cc82c, and the local macOS suite can grow any day —
+   * This must not restate a current count. The per-job figures belong to
+   * run 37772437527 at a31a5bf5, and the local macOS suite can grow any day —
    * so a second set of numbers here reads as a present-tense claim and
    * contradicts the generated line beside it. Point at the generated number
    * instead of repeating one that has expired.
    */
   platformVarianceNote:
-    "The per-job figures above belong to that run and commit, not to the current tree, " +
-    "which has grown since — for a current figure use the generated macOS line above. " +
+    "The per-job figures on the testing page belong to their run and commit, not to the current " +
+    "tree, which may have grown since — for a current figure use the generated macOS line above. " +
     "The same commit yields a different pass/skip split per platform, which is why every " +
     "published count carries its environment.",
 } as const;
