@@ -395,11 +395,15 @@ export const security = {
     },
     commandPolicy: {
       where: "config/command-policy.json",
-      blocks: "25 commands, including wget and curl, plus 36 blocked patterns. Counted from the file.",
-      requiresApproval:
-        "44 entries, and they are prefix patterns rather than bare binaries — `npm install` and `pip install` are listed, bare `npm` and `pip` are not, and the container entries are `docker run` / `docker exec` / `docker compose`. systemctl, service, launchctl, diskutil and crontab are listed. Counted from the file.",
+      status:
+        "Dead config, not the live gate. The file lists 25 blocked commands (including wget and curl) " +
+        "and 36 blocked patterns, but only src/lib/command-validator.js reads it, and that module has no " +
+        "importer anywhere in the app or the tests — nothing loads it at runtime. The live policy is " +
+        "src/lib/shell-command-tiers.js (BLOCKED_COMMANDS = sudo, su, passwd, chgrp, rm; curl and wget are " +
+        "medium tier), enforced through SecurityValidator.js and src/core/command-validator.js.",
       legacyFallback:
-        "src/lib/command-validator.js:45-52 — blocks only 7 commands and requires approval for none. Used only if the policy file fails to load.",
+        "src/lib/command-validator.js:45-52 — blocks only 7 commands and requires approval for none. " +
+        "Would apply only if the dead policy file failed to load; both are unreachable in practice.",
     },
   },
 

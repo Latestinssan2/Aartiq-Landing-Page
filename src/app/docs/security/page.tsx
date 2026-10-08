@@ -141,24 +141,23 @@ const securityLayers = [
       "Commands are scanned for destructive shell primitives and blocked commands (rm, sudo, su, passwd, chgrp, dd if=, mkfs, fork-bomb, command substitution)",
       "Encoded payloads and obfuscation (hex, base64, HTML entities) are decoded via extractBase64Strings and re-checked against injection patterns",
       "Jailbreak patterns ('ignore all previous instructions', etc.) are blocked before content reaches the model",
-      "Network-triggering commands (curl, wget) are flagged, and the OS sandbox denies network by default",
+      "Network-triggering commands (curl, wget) are not blocked here — the risk-tier classifier places them at medium (asked every time, Allow Always withheld for network-capable binaries — src/lib/shell-command-tiers.js), and the OS sandbox denies network by default",
       "This layer is explicitly documented as a fast first-pass reject — not sufficient on its own (SecurityValidator.js header)",
       "Source files: src/lib/SecurityValidator.js, src/lib/Security.ts, src/core/command-validator.js"
     ],
     patterns: {
       blocked: [
-        { pattern: "rm -rf /", description: "Recursive delete of root" },
-        { pattern: "sudo", description: "Blocked command (privilege escalation)" },
+        { pattern: "rm", description: "Rejected outright — BLOCKED_COMMANDS, not approval-gated" },
+        { pattern: "sudo / su / passwd / chgrp", description: "Rejected outright — privilege or account change" },
         { pattern: "dd if=", description: "Direct disk write" },
         { pattern: ":(){ :|:& };:", description: "Fork bomb" },
         { pattern: "$( ... )", description: "Command substitution" },
-        { pattern: "\\x.. hex / chmod 777", description: "Encoded payload / permissive mode" },
-        { pattern: "curl / wget", description: "Network download (flagged; sandbox denies net)" }
+        { pattern: "\\x.. hex / chmod 777", description: "Encoded payload / permissive mode" }
       ],
       monitored: [
-        { pattern: "rm ", description: "File deletion (requires approval)" },
-        { pattern: "chmod / chown", description: "Permission change (requires approval)" },
-        { pattern: "kill / shutdown / mount", description: "Process/system change (requires approval)" }
+        { pattern: "curl / wget", description: "Medium tier — approval every time, no Allow Always; sandbox denies network" },
+        { pattern: "chmod / chown", description: "Permission change (high tier — explicit confirmation)" },
+        { pattern: "kill / shutdown / mount", description: "Process/system change (high tier — explicit confirmation)" }
       ]
     },
     benefits: [
@@ -362,7 +361,7 @@ const threatScenarios = [
   {
     threat: "Remote Code Execution",
     scenario: "AI is tricked into downloading and running malicious code",
-    defense: "Shell commands triggering downloads (curl, wget) are blocked by the firewall. The OS sandbox denies network by default. Any shell execution requires human approval.",
+    defense: "Shell commands triggering downloads (curl, wget) are classified medium risk — asked every time, with no Allow Always option — and the OS sandbox denies network by default, so an approved fetch still cannot reach the network. Any shell execution requires human approval.",
     layer: "HITL + Firewall"
   },
   {
@@ -380,7 +379,7 @@ const threatScenarios = [
   {
     threat: "Network Exfiltration via Shell",
     scenario: "AI is tricked into executing curl to upload sensitive data to an attacker's server",
-    defense: "The sandbox denies network by default: macOS Seatbelt emits (deny network*), Linux bubblewrap runs with --unshare-net, Windows AppContainer carries zero capabilities. curl/wget is additionally flagged by the command validator, and all shell execution requires human approval. Per-domain allowlisting is not supported on any platform.",
+    defense: "The sandbox denies network by default: macOS Seatbelt emits (deny network*), Linux bubblewrap runs with --unshare-net, Windows AppContainer carries zero capabilities. curl/wget is additionally classified medium risk by the command validator — asked every time, no Allow Always — and all shell execution requires human approval. Per-domain allowlisting is not supported on any platform.",
     layer: "OS-Level Sandboxing"
   },
   {
