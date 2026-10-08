@@ -882,9 +882,13 @@ export default function SecurityPage() {
             QR Code <span className="text-white/20">Approval</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-            The QR flow is used for power actions, desktop AI-initiated high-risk actions, and high-risk MCP
-            tool calls. Remote-origin shell is meant to use it too, but currently executes without the QR step
-            (requiresApproval 'never' — aartiq-browser/main.js:869); flagged for maintainer review.
+            The QR flow is used for power actions, desktop AI-initiated high-risk actions, high-risk MCP
+            tool calls, and remote-origin shell commands. A remote shell request never executes directly:
+            the capability controller forces approval for it — registered as local "never" / remote
+            "always", with a hard rule that remote origin can never resolve to "never" — and issues a
+            single-use ticket pushed to the paired device as a QR + PIN challenge. The command runs only
+            after that ticket comes back with its per-ticket PIN and the command's input hash verifies
+            (src/main/handlers/sync-handlers.js; guarded by aartiq-browser/tests/remote-shell-approval.test.js).
           </p>
         </div>
 
@@ -893,9 +897,9 @@ export default function SecurityPage() {
             <Smartphone size={40} className="mb-6 text-sky-400" />
             <h3 className="mb-4 text-xl font-black uppercase tracking-wider">Mobile App Approval</h3>
             <p className="mb-8 text-white/50">
-              Power actions (shutdown, restart, sleep, lock) and desktop AI-initiated high-risk actions require
-              physical confirmation via the paired mobile app (QR + PIN). Remote-origin shell is meant to as
-              well, but executes without the QR step today — see above.
+              Power actions (shutdown, restart, sleep, lock), desktop AI-initiated high-risk actions, and
+              remote-origin shell commands all require confirmation via the paired mobile app (QR + PIN);
+              a remote shell executes only after its single-use ticket is approved with the per-ticket PIN.
             </p>
             
             <div className="space-y-6">
