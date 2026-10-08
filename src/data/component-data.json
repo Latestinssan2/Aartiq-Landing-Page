@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-08T13:55:52.828Z",
+  "generated": "2026-10-08T16:02:08.543Z",
   "version": "0.3.8",
   "desktop": {
     "total": 379,
-    "totalLines": 117108,
+    "totalLines": 117150,
     "byCategory": {
       "components": 149,
       "core": 16,
@@ -14184,7 +14184,7 @@
       {
         "name": "MasterPINService.ts",
         "path": "MasterPINService.ts",
-        "lines": 246,
+        "lines": 288,
         "description": "MasterPIN service",
         "tags": [
           "Node.js",
@@ -14214,6 +14214,11 @@
                   "name": "hash",
                   "type": "string",
                   "required": true
+                },
+                {
+                  "name": "iterations",
+                  "type": "number",
+                  "required": false
                 },
                 {
                   "name": "createdAt",
@@ -26079,7 +26084,7 @@
   },
   "flutter": {
     "total": 66,
-    "totalLines": 28064,
+    "totalLines": 28101,
     "byCategory": {
       "pages": 23,
       "appBar": 8,
@@ -27390,7 +27395,7 @@
       {
         "name": "master_pin_service.dart",
         "path": "services/master_pin_service.dart",
-        "lines": 159,
+        "lines": 196,
         "description": "Master Pin Service",
         "tags": [
           "Flutter",
@@ -27651,6 +27656,6 @@
   },
   "summary": {
     "total": 445,
-    "totalLines": 145172
+    "totalLines": 145251
   }
 }
