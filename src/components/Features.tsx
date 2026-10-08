@@ -54,7 +54,7 @@ const features = [
   },
   {
     name: "Master PIN & OS Keychain",
-    description: "PBKDF2-SHA256 (100,000 rounds) Master PIN secured in Native OS Keychains (Apple Keychain, Windows DPAPI, Linux Secret Service) with 5-attempt lockout — `src/lib/MasterPINService.ts`.",
+    description: "PBKDF2-SHA256 (600,000 rounds) Master PIN secured in Native OS Keychains (Apple Keychain, Windows DPAPI, Linux Secret Service) with 5-attempt lockout — `src/lib/MasterPINService.ts`.",
     icon: Lock,
     color: "text-emerald-400"
   },
