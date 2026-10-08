@@ -176,7 +176,7 @@ ${shellTiers.invariants.map((r) => `- ${r}`).join("\n")}
 ### Known limits
 - The regex layer is a fast first-pass reject, not the primary defense.
 - Only OS sandboxing and capability scoping are enforcement boundaries; the other layers are policy or heuristic.
-- The CRX3 signature-verifier test suite is skipped until its header parsing is fixed, and is counted as skipped rather than passing.
+- The CRX3 verifier does not implement Chrome's publisher-key allowlisting: a package signed with an attacker-generated key verifies as that key's own extension id — sideloading their own extension, never hijacking an existing one.
 
 ---
 

@@ -1176,10 +1176,6 @@ export default function Home() {
               <p>
                 Current state: release <span className="text-white/70">{projectVersion.tag}</span> — local listener auth, Master PIN approvals, shell commands that always ask, and AppContainer + Job Object sandboxing on Windows. The suite runs on manual dispatch — latest green run is linked from the test suite page — with all five jobs passing.
               </p>
-              <p>
-                One gap remains: the CRX3 signature-verifier suite is skipped until its verifier parses the header correctly (see Known Limits on the{' '}
-                <Link href="/docs/testing" className="text-amber-400 hover:underline">test suite page</Link>). It is counted as skipped, never as passing.
-              </p>
               <p className="text-white/70">
                 AI assistance does not replace human responsibility. The philosophy of the product and the governance of the project are the same: AI can assist — and here it leads — but consequential authority stays with a human.
               </p>
