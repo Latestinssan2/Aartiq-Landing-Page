@@ -120,7 +120,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
       {
         name: "Master PIN in Native OS Keychain",
         description:
-          "Hardware-backed Master PIN with PBKDF2-SHA256 (100,000 rounds) stored securely in native OS credential stores (Apple Keychain, Windows DPAPI / Credential Manager, Linux Secret Service) with a 5-attempt brute-force lockout.",
+          "Hardware-backed Master PIN with PBKDF2-SHA256 (600,000 rounds; PINs created at the earlier 100,000-round cost re-hash on first successful unlock) stored securely in native OS credential stores (Apple Keychain, Windows DPAPI / Credential Manager, Linux Secret Service) with a 5-attempt brute-force lockout.",
         icon: Lock,
         color: "from-emerald-500 to-cyan-400",
         refs: [
