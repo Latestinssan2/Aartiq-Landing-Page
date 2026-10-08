@@ -1,15 +1,15 @@
 {
-  "generated": "2026-10-08T16:02:08.543Z",
+  "generated": "2026-10-08T16:59:09.015Z",
   "version": "0.3.8",
   "desktop": {
-    "total": 379,
-    "totalLines": 117150,
+    "total": 380,
+    "totalLines": 117306,
     "byCategory": {
       "components": 149,
       "core": 16,
       "automation": 5,
       "service": 17,
-      "lib": 147,
+      "lib": 148,
       "app": 10,
       "hooks": 4,
       "main": 21,
@@ -12239,7 +12239,7 @@
       {
         "name": "sandbox-executor.js",
         "path": "sandbox-executor.js",
-        "lines": 1244,
+        "lines": 1277,
         "description": "Sandbox Executor",
         "tags": [
           "Node.js",
@@ -18886,10 +18886,11 @@
       {
         "name": "ChromeExtensionManager.js",
         "path": "extensions/ChromeExtensionManager.js",
-        "lines": 345,
+        "lines": 363,
         "description": "Chrome Extension Manager",
         "tags": [
           "Node.js",
+          "Security",
           "Plugin",
           "macOS"
         ],
@@ -19063,6 +19064,33 @@
             "extractCRX",
             "isCRXFile",
             "isExtensionDirectory"
+          ]
+        },
+        "group": "lib"
+      },
+      {
+        "name": "crx-id-binding.js",
+        "path": "extensions/crx-id-binding.js",
+        "lines": 105,
+        "description": "Crx Id Binding",
+        "tags": [
+          "Plugin",
+          "macOS"
+        ],
+        "lastModified": "2026-10-08",
+        "codeAnalysis": {
+          "importsExternal": [],
+          "importsInternal": [],
+          "interfaces": [],
+          "hooks": [],
+          "componentType": "service",
+          "exports": [],
+          "apiUsage": [],
+          "keyFunctions": [
+            "parseDeclaredExtensionId",
+            "storeIdFromHexCrxId",
+            "assertUrlDeclaresExtensionId",
+            "assertCrxIdMatchesUrl"
           ]
         },
         "group": "lib"
@@ -27655,7 +27683,7 @@
     ]
   },
   "summary": {
-    "total": 445,
-    "totalLines": 145251
+    "total": 446,
+    "totalLines": 145407
   }
 }
