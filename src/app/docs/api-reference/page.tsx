@@ -177,7 +177,7 @@ const ipcCategories = [
     color: "from-gray-500/20 to-slate-500/20",
     borderColor: "border-gray-500/30",
     iconColor: "text-gray-400",
-    source: "main.js, src/core/ipc-handlers.js",
+    source: "main.js, src/main/handlers/index.js",
     handlers: [
       { name: "get-app-version", returns: "string", description: "Get the application version" },
       { name: "get-platform", returns: "string", description: "Get the platform (win32, darwin, linux)" },

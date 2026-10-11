@@ -410,7 +410,7 @@ const groups: { category: string; id: string; intro: string; items: Feature[] }[
         refs: [
           "src/lib/native-panels/SidebarView.swift:3-238",
           "src/lib/macos-native-panels.js:7-196",
-          "src/main.js:1184,2092-2093",
+          "main.js:1184,2092-2093",
         ],
       },
       {

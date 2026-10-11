@@ -390,9 +390,9 @@ export default function ContributingPage() {
             <div className="rounded-xl border border-white/5 bg-black/20 p-5">
               <div className="mb-3 flex items-center gap-2">
                 <Book size={16} className="text-emerald-400" />
-                <h4 className="font-bold text-white">Landing_Page/</h4>
+                <h4 className="font-bold text-white">Aartiq-Landing-Page/</h4>
               </div>
-              <p className="text-sm text-white/50">Marketing website and documentation</p>
+              <p className="text-sm text-white/50">Marketing website and documentation (separate repository)</p>
               <ul className="mt-3 space-y-1 text-xs text-white/40">
                 <li>• src/app/docs/ - Documentation</li>
                 <li>• src/components/ - UI components</li>

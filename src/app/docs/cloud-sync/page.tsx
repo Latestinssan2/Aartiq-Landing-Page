@@ -546,7 +546,7 @@ export default function CloudSyncPage() {
             <h3 className="mb-4 text-xl font-black uppercase tracking-wider">Mobile Setup</h3>
             <ol className="space-y-4">
               {[
-                "Download Aartiq from Play Store",
+                "Side-load Aartiq from the downloads page (no Play Store listing)",
                 "Open Settings > Sync on desktop",
                 "Tap 'Scan QR Code' in mobile app",
                 "Point camera at desktop QR code",

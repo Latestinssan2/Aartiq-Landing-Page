@@ -15,16 +15,16 @@ export interface SearchIndex {
 }
 
 export const searchIndex: SearchIndex = {
-  lastUpdated: "2026-07-20",
+  lastUpdated: "2026-10-07",
   pages: [
     // CLI Integration
     {
-      id: "comet-cli",
+      id: "aartiq-cli",
       title: "Aartiq CLI",
       description: "Powerful terminal-based browser control and AI querying",
-      content: "comet-cli terminal command line interface comet ask search screenshot help npm link sudo native bridge server token authentication ~/.aartiq-token headless control automation",
+      content: "aartiq-cli terminal command line interface aartiq ask search screenshot help npm link sudo native bridge server token authentication ~/.aartiq-token headless control automation",
       url: "/docs/native-api#cli",
-      keywords: ["cli", "terminal", "command line", "comet", "ask", "npm link"],
+      keywords: ["cli", "terminal", "command line", "aartiq", "ask", "npm link"],
       type: "page"
     },
     // Siri Advanced Intents
@@ -63,7 +63,7 @@ export const searchIndex: SearchIndex = {
     {
       id: "testing",
       title: "Testing & Test Series",
-      description: "Jest test suite runs in CI on every push and PR across macOS, Linux, and Windows runners — sandboxing (Seatbelt / bubblewrap / AppContainer), security, extraction, and automation. The Windows AppContainer runtime matrix (suspended start, OS-enforced ACL allowlist, verified job assignment, KILL_ON_JOB_CLOSE) is currently PASSING on windows-latest. Counts are declared test blocks; see /docs/testing.",
+      description: "Jest test suite runs in CI on every pull request across macOS, Linux, and Windows runners — sandboxing (Seatbelt / bubblewrap / AppContainer), security, extraction, and automation. The Windows AppContainer runtime matrix (suspended start, OS-enforced ACL allowlist, verified job assignment, KILL_ON_JOB_CLOSE) is currently PASSING on windows-latest. Counts are declared test blocks; see /docs/testing.",
       content: "testing test series jest test suites tests passing coverage sandbox-security directory-allowlist security-validator security-fixes extraction dom-engine dom-handlers webauthn automation skill-loading tab-intelligence component-tests home-intelligence fail-closed Seatbelt bubblewrap bwrap AppContainer Job Object Windows AppContainer runtime matrix suspended-start os-acl-allowlist job-assignment kill-on-close windows-latest currently-passing macOS Linux CI unit integration how to run npx jest",
       url: "/docs/testing",
       keywords: ["tests", "testing", "jest", "test series", "coverage", "sandbox", "AppContainer", "windows-latest", "CI", "npx jest"],
@@ -124,9 +124,9 @@ export const searchIndex: SearchIndex = {
       id: "ai-commands",
       title: "AI Commands Reference",
       description: "Complete list of AI commands for browser automation",
-      content: "AI commands reference NAVIGATE SEARCH WEB_SEARCH RELOAD GO_BACK GO_FORWARD READ_PAGE_CONTENT LIST_OPEN_TABS CLICK_ELEMENT FIND_AND_CLICK FILL_FORM CREATE_PDF_JSON CREATE_FILE_JSON SHELL_COMMAND SET_VOLUME SET_BRIGHTNESS OPEN_APP OCR_SCREEN OCR_COORDINATES CLICK_APP_ELEMENT LIST_AUTOMATIONS DELETE_AUTOMATION SCHEDULE_TASK THINK PLAN PLUGIN_COMMAND Apple Intelligence native API macOS native first OCR cross app click",
+      content: "AI commands reference NAVIGATE SEARCH WEB_SEARCH SEARCH_RESULTS RELOAD GO_BACK GO_FORWARD READ_PAGE_CONTENT LIST_OPEN_TABS SWITCH_TAB CLOSE_TAB CLICK_ELEMENT FIND_AND_CLICK CLICK_AT FILL_FORM MULTI_FILL_FORM DOM_SEARCH DOM_READ_FILTERED SCROLL_TO SCREENSHOT_AND_ANALYZE OCR_SCREEN DEEP_RESEARCH ORGANIZE_TABS GROUP_TABS OPEN_VIEW ANALYSE_TABS ANALYZE_TABS SUMMARIZE_TABS READ_TAB_CONTENT COMPARE_TABS FIND_INFORMATION_IN_TABS CREATE_TAB_RESEARCH_CONTEXT CREATE_PDF_JSON CREATE_FILE_JSON GENERATE_PDF GENERATE_DIAGRAM SHELL_COMMAND SET_VOLUME SET_BRIGHTNESS OPEN_APP ENABLE_CLI SET_THEME WAIT STATUS SCHEDULE_TASK OPEN_SCHEDULING_MODAL LIST_AUTOMATIONS DELETE_AUTOMATION RECORD_WORKFLOW PLAY_WORKFLOW OPEN_AUTOMATION_SETTINGS OPEN_MCP_SETTINGS LIST_BOOKMARKS ADD_BOOKMARK REMOVE_BOOKMARK CLEAR_BOOKMARKS LIST_HISTORY CLEAR_HISTORY LIST_SKILLS LOAD_SKILL SETTINGS_QUERY SETTINGS_UPDATE OPEN_SETTINGS_PANEL SET_CHAT_STYLE GENERATE_IMAGE APPLE_INTELLIGENCE_IMAGE APPLE_INTELLIGENCE_SUMMARY PLAY_VIDEO SEARCH_VIDEO THINK PLAN EXPLAIN_CAPABILITIES PLUGIN_COMMAND Apple Intelligence native API macOS native first OCR cross app click",
       url: "/docs/ai-commands",
-      keywords: ["AI commands", "NAVIGATE", "SEARCH", "WEB_SEARCH", "RELOAD", "CLICK_ELEMENT", "FIND_AND_CLICK", "SHELL_COMMAND", "CREATE_PDF", "OCR", "SET_VOLUME", "OPEN_APP", "automation", "scheduling", "Apple Intelligence", "native helper"],
+      keywords: ["AI commands", "NAVIGATE", "SEARCH", "WEB_SEARCH", "RELOAD", "CLICK_ELEMENT", "FIND_AND_CLICK", "SHELL_COMMAND", "CREATE_PDF_JSON", "OCR", "SET_VOLUME", "OPEN_APP", "automation", "scheduling", "Apple Intelligence", "native helper"],
       type: "page"
     },
     {
@@ -163,7 +163,7 @@ export const searchIndex: SearchIndex = {
       id: "ai-command-ocr",
       title: "OCR Commands",
       description: "Visual intelligence commands for screen recognition",
-      content: "OCR_SCREEN OCR_COORDINATES CLICK_APP_ELEMENT native first OCR screen recognition accessibility text extraction cross app click",
+      content: "OCR_SCREEN SCREENSHOT_AND_ANALYZE native first OCR screen recognition accessibility text extraction cross app click",
       url: "/docs/ai-commands#ocr",
       section: "Visual Intelligence",
       keywords: ["OCR", "screen", "screenshot", "recognition", "image"],
@@ -713,9 +713,9 @@ export const searchIndex: SearchIndex = {
       id: "deep-links",
       title: "Deep Links",
       description: "URL scheme support for Aartiq",
-      content: "deep links URL scheme comet-browser protocol launch execute command open page",
+      content: "deep links URL scheme aartiq-browser protocol launch execute command open page",
       url: "/docs/deep-links",
-      keywords: ["deep links", "URL scheme", "comet-browser", "protocol", "launch"],
+      keywords: ["deep links", "URL scheme", "aartiq-browser", "protocol", "launch"],
       type: "page"
     },
 
@@ -841,7 +841,7 @@ export const searchIndex: SearchIndex = {
       id: "docgen-advanced-engine",
       title: "Advanced Document Generation",
       description: "Generate PDFs, Excel, PowerPoint, and Mermaid diagrams programmatically",
-      content: "AdvancedDocumentEngine MermaidToPDFConverter PDF Excel XLSX PPTX Mermaid flowchart sequence diagram class diagram generateDocument chart watermarks tables images",
+      content: "file-handlers PDFCommandParser PDF Excel XLSX PPTX Mermaid flowchart sequence diagram class diagram generateDocument chart watermarks tables images",
       url: "/docs/document-generation",
       keywords: ["PDF", "Excel", "XLSX", "PPTX", "Mermaid", "document", "generation", "chart", "watermark", "table"],
       type: "page"

@@ -580,7 +580,7 @@ export default function AppleIntegrationPage() {
           <p className="mt-6 max-w-3xl text-lg font-medium leading-relaxed text-white/40">
             Aartiq integrates with Apple's on-device AI capabilities on supported Macs.
             The native Swift bridge handles readiness checks, summarization, and image generation.
-            Source: <code className="rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/lib/native-panels/AppleIntelligenceBridge.swift</code>
+            Source: <code className="rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/lib/native-panels/AppleIntelligencePanelView.swift</code>
           </p>
         </div>
 
@@ -752,7 +752,7 @@ export default function AppleIntegrationPage() {
           <p className="mt-6 max-w-3xl text-lg font-medium leading-relaxed text-white/40">
             The aartiq:// URL scheme enables integration with Apple Shortcuts. Route definitions
             are in
-            <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/lib/SiriShortcutsIntegration.ts</code>.
+            <code className="mx-1 rounded bg-white/5 px-2 py-0.5 font-mono text-sm">src/lib/SiriShortcutsIntegration.js</code>.
             Build automation workflows combining Aartiq with other apps.
           </p>
         </div>

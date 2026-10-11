@@ -169,7 +169,7 @@ const securityLayers = [
     notGuaranteed: [
       "The Syntactic Firewall is a fast first-pass heuristic, NOT a fundamental security boundary.",
       "Regexes and token inspection can be bypassed by creative command construction, aliasing, encoding variations, or multi-step execution chains.",
-      "SecurityValidator.js does not guarantee that non-blocked commands are safe — the OS sandbox (Seatbelt / bubblewrap / AppContainer) and human approval are the primary security boundaries."
+      "SecurityValidator.js does not guarantee that non-blocked commands are safe — the OS sandbox (Seatbelt / bubblewrap / AppContainer) and capability-scoped execution are the enforcement boundaries."
     ]
   },
   {
@@ -245,7 +245,7 @@ const securityLayers = [
       "Batched multi-directory approval allows granting access to multiple paths at once",
       "File management operations (move, copy, open, print) are routed around the shell sandbox",
       "Read/write separation: a read grant must never allow deleting/overwriting — enforced in isPathAllowed() for both read and write operations",
-      "Source files: src/core/directory-allowlist.js, src/lib/permission-store.js, src/core/sandbox.js, src/main/handlers/permission-handlers.js"
+      "Source files: src/core/directory-allowlist.js, src/lib/permission-store.js, src/core/sandbox-executor.js, src/main/handlers/permission-handlers.js"
     ],
     benefits: [
       "Scopes AI file access to an explicit allowlist — any path outside it is denied with a structured reason",
@@ -343,7 +343,7 @@ const threatScenarios = [
   {
     threat: "Social Engineering via Commands",
     scenario: "An attacker tricks the AI into running 'rm -rf /'",
-    defense: "The Syntactic Firewall attempts to block known dangerous shell patterns (rm -rf /, sudo, fork bombs, command substitution) before execution. It is a fast first-pass filter — creative command construction can bypass it. The OS sandbox and approval gates are the real boundaries.",
+    defense: "The Syntactic Firewall attempts to block known dangerous shell patterns (rm -rf /, sudo, fork bombs, command substitution) before execution. It is a fast first-pass filter — creative command construction can bypass it. The OS sandbox and capability-scoped execution are the real boundaries.",
     layer: "Syntactic Firewall"
   },
   {
@@ -482,7 +482,7 @@ export default function SecurityPage() {
         </h1>
 
         <p className="max-w-3xl text-xl font-medium leading-relaxed text-white/50">
-          Aartiq uses a defense-in-depth model with six layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution — but only two of them are enforcement boundaries (the sandbox and approval, applied by the OS); the other four reduce blast radius without being boundaries. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
+          Aartiq uses a defense-in-depth model with six layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution — but only two of them are enforcement boundaries (the OS sandbox and capability-scoped execution, applied by the OS); the other four reduce blast radius without being boundaries. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
         </p>
 
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/40">
@@ -519,9 +519,10 @@ export default function SecurityPage() {
         <div className="mt-8 rounded-2xl border border-white/5 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/40">
           <p>
             The regex blocklist in SecurityValidator.js is documented as a <em>fast first-pass reject layer only</em> —
-            not the primary defense. Primary enforcement continues through the remaining layers: the risk-tiered permission store
-            (checkShellPermission), the capability controller's ticket-based approval (capability-controller.js), and
-            the fail-closed OS sandbox (sandbox-executor.js). The six-layer model cited below reflects this defense-in-depth design.
+            not the primary defense. The two enforcement boundaries are the capability controller's ticket-based
+            approval (capability-controller.js) and the fail-closed OS sandbox (sandbox-executor.js); the
+            risk-tiered permission store (checkShellPermission) is the policy layer that decides what is asked.
+            The six-layer model cited below reflects this defense-in-depth design.
           </p>
         </div>
       </motion.section>
@@ -1274,7 +1275,7 @@ export default function SecurityPage() {
           <div className="rounded-[2rem] border border-amber-500/20 bg-amber-500/5 p-8">
             <FileKey size={32} className="mb-4 text-amber-400" />
             <h3 className="mb-3 text-lg font-black uppercase tracking-wider">Source Files</h3>
-            <p className="text-sm text-white/50">src/lib/firebaseConfigStorage.ts, src/lib/shared-keychain.js</p>
+            <p className="text-sm text-white/50">src/lib/firebaseConfigStorage.ts, src/lib/native-keychain.js</p>
           </div>
 
           <div className="rounded-[2rem] border border-emerald-500/20 bg-emerald-500/5 p-8">
@@ -1388,8 +1389,9 @@ export default function SecurityPage() {
 Security <span className="text-white/20">Test Coverage</span>
           </h2>
           <p className="mt-6 max-w-2xl text-lg font-medium leading-relaxed text-white/40">
-            Every layer above is backed by automated regression tests. The suite is dispatched via GitHub Actions CI (
-            <code className="text-sky-300">.github/workflows/jest.yml</code>) on demand (latest green run:{" "}
+            Every layer above is backed by automated regression tests. The suite runs via GitHub Actions CI (
+            <code className="text-sky-300">.github/workflows/jest.yml</code>) automatically on every pull
+            request, and stays manually dispatchable for re-runs (latest green run:{" "}
             <a
               href={ci.latestRun.url}
               target="_blank"
@@ -1398,7 +1400,7 @@ Security <span className="text-white/20">Test Coverage</span>
             >
               #{ci.latestRun.runNumber}
             </a>
-            ). It is not triggered on every push.
+            ). There is no push trigger.
           </p>
           <a
             href={ci.latestRun.url}

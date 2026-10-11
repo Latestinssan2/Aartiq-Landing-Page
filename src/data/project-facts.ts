@@ -519,25 +519,30 @@ export const ci = {
    * adding or removing a workflow forces the SSOT (and therefore AGENTS.md) to be
    * updated. The count is 13: docs-gate.yml exists only on the ci/docs-gate
    * branch and has not landed on main, so it is not counted here.
+   *
+   * Three workflows have an automatic trigger — release.yml (tag push),
+   * sync-component-docs.yml (push to main) and jest.yml (pull_request) — and all
+   * three are also manually dispatchable. The other ten are workflow_dispatch only.
    */
   workflows: {
     count: 13,
-    manualOnly: 11,
+    manualOnly: 10,
     tagPush: 1,
     pushToMain: 1,
-    pullRequest: 0,
+    pullRequest: 1,
     note:
-      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main, and the remaining eleven are workflow_dispatch. docs-gate.yml lives on the ci/docs-gate branch and does not run on main.",
+      "release.yml fires on version tag push, sync-component-docs.yml fires on push to main, and jest.yml fires on every pull_request. All three also stay manually dispatchable; the remaining ten are workflow_dispatch only. docs-gate.yml lives on the ci/docs-gate branch and does not run on main.",
   },
   /**
-   * jest.yml declares only `workflow_dispatch`. There is no `push:` and no
-   * `pull_request:` key, so this suite does not run on every commit.
+   * jest.yml declares both `pull_request` and `workflow_dispatch` (it has no
+   * `push:` key). Every PR runs the full matrix automatically; the dispatch
+   * inputs exist for fast Windows-only iteration, sandbox-only runs and re-runs.
    */
   trigger: {
-    type: "on-demand" as const,
-    events: ["workflow_dispatch"],
+    type: "pull_request" as const,
+    events: ["pull_request", "workflow_dispatch"],
     detail:
-      "Manual dispatch only. There is no push or pull_request trigger, so a green run is not evidence about the latest commit.",
+      "Runs the full matrix automatically on every pull request, so the gate does not depend on someone remembering to dispatch it, and stays manually dispatchable for the skip-full-suite and windows-test-pattern inputs and for re-runs. There is no push trigger.",
   },
   jobs: {
     defined: 5,
@@ -548,17 +553,17 @@ export const ci = {
     nodeVersion: "24",
   },
   latestRun: {
-    id: 37772437527,
-    runNumber: 83,
-    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37772437527",
-    event: "workflow_dispatch",
-    headSha: "a31a5bf5",
+    id: 37817113470,
+    runNumber: 94,
+    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37817113470",
+    event: "pull_request",
+    headSha: "8132937a",
     date: "2026-10-08",
     conclusion: "success",
   },
   /** Per-job jest summary lines, read from the run's job logs. */
   perJob: [
-    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 1412, skipped: 26, failed: 0, declared: 1438 },
+    { name: "Run Jest (aartiq-browser)", os: "ubuntu-latest", passed: 1465, skipped: 26, failed: 0, declared: 1491 },
     { name: "Run Jest (Windows AppContainer sandbox runtime)", os: "windows-latest", passed: 61, skipped: 30, failed: 0, declared: 91 },
     { name: "Run Jest (macOS Seatbelt sandbox runtime)", os: "macos-latest", passed: 105, skipped: 0, failed: 0, declared: 105 },
     { name: "Run Jest (Linux bubblewrap sandbox runtime)", os: "ubuntu-latest", passed: 57, skipped: 21, failed: 0, declared: 78 },
@@ -568,7 +573,7 @@ export const ci = {
    * every published count carries its environment.
    *
    * This must not restate a current count. The per-job figures belong to
-   * run 37772437527 at a31a5bf5, and the local macOS suite can grow any day —
+   * run 37817113470 at 8132937a, and the local macOS suite can grow any day —
    * so a second set of numbers here reads as a present-tense claim and
    * contradicts the generated line beside it. Point at the generated number
    * instead of repeating one that has expired.

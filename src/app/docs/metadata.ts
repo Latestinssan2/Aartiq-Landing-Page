@@ -95,8 +95,8 @@ export const docsPages: Record<string, { title: string; description: string; key
   },
   "deep-links": {
     title: "Deep Links",
-    description: "URL scheme support (comet-browser://) for launching browser and executing commands",
-    keywords: ["deep links", "URL scheme", "comet-browser", "protocol"],
+    description: "URL scheme support (aartiq:// and aartiq-browser://) for launching browser and executing commands",
+    keywords: ["deep links", "URL scheme", "aartiq-browser", "protocol"],
   },
   plugins: {
     title: "Plugins",

@@ -12,7 +12,7 @@ const features = [
   },
   {
     name: "JSON PDF Generation",
-    description: "Structured multi-page document generation with icons, table of contents, and detail level control — `src/lib/AdvancedDocumentEngine.ts`.",
+    description: "Structured multi-page document generation with icons, table of contents, and detail level control — `src/main/handlers/file-handlers.js`.",
     icon: Sparkles,
     color: "text-purple-400"
   },

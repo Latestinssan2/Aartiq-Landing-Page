@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { net, platforms, security, shellTiers } from "@/data/facts";
+import { net, platforms, security, shellTiers, commandCount, project, version } from "@/data/facts";
 
 const BASE = 'https://aartiq.ponsrischool.in';
 
@@ -30,7 +30,7 @@ Aartiq is a privacy-focused browser that integrates AI directly into the browsin
 
 - **aartiq-browser**: Electron desktop app (main.js, Next.js UI on dev port ${net.devRenderer.port}, Background Service)
 - **flutter_browser_app**: Flutter mobile companion (WiFi sync, remote desktop, push notifications)
-- **Landing_Page**: Documentation site (Next.js)
+- **Aartiq-Landing-Page**: documentation and marketing site (Next.js, separate repository)
 
 ### Communication Protocols
 - HTTP (Next.js): Port ${net.devRenderer.port} (development UI only — not started in a packaged build)
@@ -42,7 +42,7 @@ Aartiq is a privacy-focused browser that integrates AI directly into the browsin
 - Security.ts / SecurityValidator.js — Command validation, risk levels, injection detection
 - AIChatSidebar.tsx — Main AI chat interface
 - AICommandParser.ts — Parses AI output into executable commands
-- AdvancedDocumentEngine.ts — PDF/XLSX/PPTX generation
+- file-handlers.js — PDF/XLSX/PPTX/DOCX generation
 - Plugin Manager — Dynamic Node.js plugin loading with SDK
 - Tesseract Service — OCR via Tesseract.js
 
@@ -92,48 +92,104 @@ All AI commands use a structured JSON format:
 }
 \`\`\`
 
-### Navigation Commands
-- \`NAVIGATE\`: { url: string } — Navigate to URL
-- \`SEARCH\`: { query: string } — Search using default search engine
-- \`WEB_SEARCH\`: { query: string } — Web search and return results
-- \`RELOAD\`: {} — Reload current page
-- \`GO_BACK\`: {} — Go back in history
-- \`GO_FORWARD\`: {} — Go forward in history
+The supported set is the ${commandCount}-command \`COMMAND_REGISTRY\` in
+\`aartiq-browser/src/lib/AICommandParser.ts\`. Parameter details and examples for
+every command are on ${BASE}/docs/ai-commands.
+
+### Navigation
+- \`NAVIGATE\` — Go to a specific URL
+- \`SEARCH\` — Search using the default engine
+- \`WEB_SEARCH\` — Real-time web search with RAG
+- \`SEARCH_RESULTS\` — Get search result URLs directly (no tab opened)
+- \`RELOAD\` — Refresh the active browser tab
+- \`GO_BACK\` — Go back in browser history
+- \`GO_FORWARD\` — Go forward in browser history
 
 ### Page Interaction
-- \`READ_PAGE_CONTENT\`: {} — Extract and return page text content
-- \`LIST_OPEN_TABS\`: {} — List all open tabs
-- \`CLICK_ELEMENT\`: { selector: string } — Click element by CSS selector
-- \`FIND_AND_CLICK\`: { text: string } — Find and click element containing text
-- \`FILL_FORM\`: { selector: string, value: string } — Fill a form field
+- \`READ_PAGE_CONTENT\` — Read DOM text from the active tab (fast)
+- \`LIST_OPEN_TABS\` — List all open browser tabs
+- \`SWITCH_TAB\` — Switch to a tab by ID or index
+- \`CLOSE_TAB\` — Close a specific tab by ID
+- \`CLICK_ELEMENT\` — Click a web element by selector
+- \`FIND_AND_CLICK\` — Find text on screen and click it
+- \`CLICK_AT\` — Click at screen coordinates (x, y)
+- \`FILL_FORM\` — Fill a form field by selector with a value
+- \`MULTI_FILL_FORM\` — Fill multiple form fields atomically from a JSON map
+- \`DOM_SEARCH\` — Search within the current page DOM
+- \`DOM_READ_FILTERED\` — Read DOM with filtering and an injection check
+- \`SCROLL_TO\` — Scroll to a DOM element
+- \`SCREENSHOT_AND_ANALYZE\` — See the page using Vision/OCR
+- \`DEEP_RESEARCH\` — Deep research with iterative search, source ranking and coverage analysis
+- \`ORGANIZE_TABS\` — Use AI to group all open tabs
+- \`GROUP_TABS\` — Group open tabs by AI, domain, priority or recency
+- \`OPEN_VIEW\` — Switch browser workspace views
+- \`ANALYSE_TABS\` — Analyse all open tabs and return one consolidated analysis
+- \`ANALYZE_TABS\` — US-spelling variant of ANALYSE_TABS
+- \`SUMMARIZE_TABS\` — Summarize content from one or more open tabs
+- \`READ_TAB_CONTENT\` — Read the content of one specific open tab
+- \`COMPARE_TABS\` — Compare content across multiple open tabs
+- \`FIND_INFORMATION_IN_TABS\` — Search open tabs for specific information
+- \`CREATE_TAB_RESEARCH_CONTEXT\` — Build a research context from the open tabs
 
 ### File & Document Commands
-- \`CREATE_PDF_JSON\`: { title: string, content: any } — Generate PDF from JSON
-- \`CREATE_DOCX\`: { title: string, content: any } — Generate Word document
-- \`CREATE_XLSX\`: { title: string, rows: any[] } — Generate Excel spreadsheet
-- \`CREATE_PPTX\`: { title: string, slides: any[] } — Generate PowerPoint
-- \`CREATE_FILE_JSON\`: { path: string, content: string } — Write file to disk
+- \`CREATE_PDF_JSON\` — Generate a structured, multi-page PDF (preferred)
+- \`CREATE_FILE_JSON\` — Create PDF/PPTX/DOCX from structured JSON
+- \`GENERATE_PDF\` — Create a PDF from markdown (fallback)
+- \`GENERATE_DIAGRAM\` — Create charts and diagrams with Mermaid.js
 
 ### OS Automation
-- \`SHELL_COMMAND\`: { command: string } — Execute shell command (requires permission)
-- \`SET_VOLUME\`: { level: number } — Set system volume (0-100)
-- \`SET_BRIGHTNESS\`: { level: number } — Set display brightness (0-100)
-- \`OPEN_APP\`: { name: string, path?: string } — Launch an application
+- \`SHELL_COMMAND\` — Execute a terminal command (permission-gated)
+- \`SET_VOLUME\` — Set system audio volume
+- \`SET_BRIGHTNESS\` — Set screen brightness level
+- \`OPEN_APP\` — Launch a desktop application
+- \`ENABLE_CLI\` — Enable the Aartiq CLI terminal tool
+- \`SET_THEME\` — Switch between dark and light mode
+- \`WAIT\` — Pause execution for a duration (ms)
+- \`STATUS\` — Show a custom processing indicator to the user
 
 ### Screen & OCR Commands
-- \`OCR_SCREEN\`: {} — OCR the visible screen content
-- \`OCR_COORDINATES\`: { x: number, y: number, width: number, height: number } — OCR a screen region
-- \`CLICK_APP_ELEMENT\`: { text: string } — Click an OS-native UI element containing text
+- \`OCR_SCREEN\` — OCR screen or region content (native OS OCR first, image OCR as fallback)
 
-### Scheduling Commands
-- \`SCHEDULE_TASK\`: { cron: string, command: string, params?: object } — Schedule a recurring task
-- \`LIST_AUTOMATIONS\`: {} — List all scheduled automations
-- \`DELETE_AUTOMATION\`: { taskId: string } — Delete a scheduled task
+### Scheduling & Automation Commands
+- \`SCHEDULE_TASK\` — Schedule a recurring automation task (JSON format)
+- \`OPEN_SCHEDULING_MODAL\` — Open the scheduling modal, optionally pre-filled
+- \`LIST_AUTOMATIONS\` — List all scheduled automation tasks
+- \`DELETE_AUTOMATION\` — Delete an automation using its ID
+- \`RECORD_WORKFLOW\` — Start or stop workflow recording
+- \`PLAY_WORKFLOW\` — Replay a previously recorded workflow
+- \`OPEN_AUTOMATION_SETTINGS\` — Open the automation settings panel
+- \`OPEN_MCP_SETTINGS\` — Open the MCP servers settings panel
+
+### Bookmarks & History
+- \`LIST_BOOKMARKS\` — List browser bookmarks
+- \`ADD_BOOKMARK\` — Add a bookmark
+- \`REMOVE_BOOKMARK\` — Remove a bookmark by URL
+- \`CLEAR_BOOKMARKS\` — Remove all browser bookmarks
+- \`LIST_HISTORY\` — List and search browsing history
+- \`CLEAR_HISTORY\` — Clear all browser history
+
+### Skills & Settings
+- \`LIST_SKILLS\` — List all available skill guides
+- \`LOAD_SKILL\` — Load a specific skill guide into context
+- \`SETTINGS_QUERY\` — Read current settings for a category
+- \`SETTINGS_UPDATE\` — Request a settings change (requires user approval)
+- \`OPEN_SETTINGS_PANEL\` — Open a settings panel for the user
+- \`SET_CHAT_STYLE\` — Customize chat font size, glow mode and preset
+
+### Media & Generation
+- \`GENERATE_IMAGE\` — Generate an AI image from a prompt
+- \`APPLE_INTELLIGENCE_IMAGE\` — Generate an image with Apple Intelligence (macOS)
+- \`APPLE_INTELLIGENCE_SUMMARY\` — Summarize text with Apple Intelligence (macOS)
+- \`PLAY_VIDEO\` — Play a YouTube video inline in chat
+- \`SEARCH_VIDEO\` — Search YouTube and auto-play the top result
 
 ### AI & Reasoning Commands
-- \`THINK\`: { prompt: string } — Deep reasoning step
-- \`PLAN\`: { goal: string } — Generate multi-step plan
-- \`PLUGIN_COMMAND\`: { plugin: string, command: string, params?: object } — Execute a plugin command
+- \`THINK\` — Show AI reasoning steps
+- \`PLAN\` — Show future execution steps
+- \`EXPLAIN_CAPABILITIES\` — List all available AI features
+
+### Integrations
+- \`PLUGIN_COMMAND\` — Execute a plugin-defined command
 
 ---
 
@@ -359,7 +415,7 @@ Extensions directory: ~/Library/Application Support/Aartiq/extensions/ (macOS)
 - **Founded**: 2024
 - **Authors**: Latestinssan
 - **Repository**: https://github.com/Latestinssan/Aartiq
-- **Last updated**: 2026-07-20
+- **Last updated**: ${project.lastUpdated} (v${version.semver} "${version.codename}", ${version.releaseDate})
 `;
 
   return new NextResponse(content, {
