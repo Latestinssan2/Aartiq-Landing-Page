@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-08T11:55:29.937Z",
+  "generatedAt": "2026-10-11T13:49:09.686Z",
   "environment": {
     "os": "Darwin 27.0.0",
     "platform": "darwin",
@@ -8,14 +8,14 @@
     "label": "macOS (local)"
   },
   "suites": {
-    "total": 65,
-    "passed": 65,
+    "total": 68,
+    "passed": 68,
     "failed": 0,
     "skipped": 0
   },
   "tests": {
-    "declared": 1438,
-    "passed": 1426,
+    "declared": 1491,
+    "passed": 1479,
     "skipped": 12,
     "failed": 0
   },
@@ -175,6 +175,13 @@
       "declared": 24
     },
     {
+      "suite": "client-credentials",
+      "passed": 22,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 22
+    },
+    {
       "suite": "file-paths",
       "passed": 22,
       "skipped": 0,
@@ -194,6 +201,20 @@
       "skipped": 0,
       "failed": 0,
       "declared": 19
+    },
+    {
+      "suite": "crx-url-binding",
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 17
+    },
+    {
+      "suite": "docs-listener-claims-match-source",
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 17
     },
     {
       "suite": "docs-sync-match-source",
@@ -245,7 +266,7 @@
       "declared": 13
     },
     {
-      "suite": "docs-listener-claims-match-source",
+      "suite": "remote-shell-approval",
       "passed": 13,
       "skipped": 0,
       "failed": 0,
@@ -294,13 +315,6 @@
       "declared": 10
     },
     {
-      "suite": "remote-shell-approval",
-      "passed": 10,
-      "skipped": 0,
-      "failed": 0,
-      "declared": 10
-    },
-    {
       "suite": "native-bridge-permissions",
       "passed": 9,
       "skipped": 0,
@@ -323,6 +337,13 @@
     },
     {
       "suite": "docs-shortcuts-match-source",
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0,
+      "declared": 7
+    },
+    {
+      "suite": "master-pin-pbkdf2",
       "passed": 7,
       "skipped": 0,
       "failed": 0,

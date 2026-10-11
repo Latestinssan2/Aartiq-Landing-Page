@@ -79,7 +79,7 @@ const steps = [
           "Tap 'Install' when prompted",
           "Launch Aartiq from your app drawer"
         ],
-        note: "For iOS, the app is available via TestFlight beta."
+        note: "For iOS, the app is built unsigned by CI and is not distributed — there is no App Store or TestFlight listing."
       }
     }
   },
@@ -88,7 +88,7 @@ const steps = [
     title: "Initial Setup",
     description: "Configure your AI provider and permissions",
     icon: Settings,
-    fileRef: "src/lib/Security.ts, src/lib/AIChatSidebar.tsx",
+    fileRef: "src/lib/Security.ts, src/components/AIChatSidebar.tsx",
     content: {
       steps: [
         { title: "Welcome Screen", desc: "You'll see the welcome/setup screen. Select your preferred theme." },
@@ -123,7 +123,7 @@ const steps = [
         "PDF viewer with sync support"
       ],
       setup: [
-        "Download the Aartiq mobile app from the Play Store",
+        "Side-load the Aartiq mobile app from the downloads page (there is no Google Play listing)",
         "Open Settings > Sync in the desktop app",
         "Scan the QR code displayed on desktop",
         "Enter the 6-digit verification code",
@@ -136,7 +136,7 @@ const steps = [
     title: "Verify Installation",
     description: "Test that everything is working",
     icon: CheckCircle2,
-    fileRef: "src/core/command-executor.js, src/lib/AdvancedDocumentEngine.ts",
+    fileRef: "src/core/command-executor.js, src/main/handlers/file-handlers.js",
     content: {
       checks: [
         { item: "Browser Launch", desc: "Aartiq opens without errors" },

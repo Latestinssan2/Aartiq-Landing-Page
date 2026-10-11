@@ -78,7 +78,7 @@ const featureHighlights = [
   },
   {
     name: "Document Engine",
-    description: "PDF/Excel/PPTX generation. Source: src/lib/AdvancedDocumentEngine.ts, src/lib/PDFCommandParser.ts",
+    description: "PDF/Excel/PPTX generation. Source: src/main/handlers/file-handlers.js, src/lib/PDFCommandParser.ts",
     icon: FileText,
     color: "from-purple-500/20 to-pink-500/20",
     glow: "rgba(168, 85, 247, 0.4)"
@@ -106,7 +106,7 @@ const featureHighlights = [
   },
   {
     name: "Multi-Platform",
-    description: "macOS (src/lib/native-panels/), Windows (src/lib/platform/WindowsIntegration.ts), Linux (src/lib/platform/LinuxIntegration.ts), Android (flutter_browser_app/)",
+    description: "macOS (src/lib/native-panels/), Windows (src/lib/windows-integration.js), Linux (src/lib/linux-integration.js), Android (flutter_browser_app/)",
     icon: Globe,
     color: "from-pink-500/20 to-rose-500/20",
     glow: "rgba(244, 114, 182, 0.4)"
@@ -961,7 +961,7 @@ export default function Home() {
             <Link href="/docs/testing" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><GitBranch size={24} /></div>
               <h3 className="mb-2 text-lg font-black uppercase tracking-[0.1em] text-white">CI Verification</h3>
-              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">The security suite runs in CI on manual dispatch, not on every push — which is why each run is linked rather than implied.</p>
+              <p className="mb-4 text-sm font-medium leading-relaxed text-white/40">The security suite runs automatically in CI on every pull request, and stays manually dispatchable for re-runs — which is why each run is linked rather than implied.</p>
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 group-hover:underline">See the CI config →</span>
             </Link>
             <Link href="/docs/testing" className="group rounded-[36px] border border-white/5 bg-[#0a0c10]/50 p-8 transition hover:border-cyan-400/40">
@@ -1174,7 +1174,7 @@ export default function Home() {
                 Development is AI-assisted — <span className="text-white/70">led by AI, not by a single human developer</span>. AI agents do the planning, writing, testing, and maintenance; the founder sets the direction and reviews consequential changes. There is no paid team behind the product.
               </p>
               <p>
-                Current state: release <span className="text-white/70">{projectVersion.tag}</span> — local listener auth, Master PIN approvals, shell commands that always ask, and AppContainer + Job Object sandboxing on Windows. The suite runs on manual dispatch — latest green run is linked from the test suite page — with all five jobs passing.
+                Current state: release <span className="text-white/70">{projectVersion.tag}</span> — local listener auth, Master PIN approvals, shell commands that always ask, and AppContainer + Job Object sandboxing on Windows. The suite runs automatically on every pull request — the latest green run is linked from the test suite page — with all five jobs passing.
               </p>
               <p className="text-white/70">
                 AI assistance does not replace human responsibility. The philosophy of the product and the governance of the project are the same: AI can assist — and here it leads — but consequential authority stays with a human.

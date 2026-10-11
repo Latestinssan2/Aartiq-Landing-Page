@@ -6,10 +6,14 @@ This directory contains the public marketing site and documentation for Aartiq.
 
 ## Current Release
 
-- Version: `0.3.2`
-- Codename: `Nebula`
-- Channel: `alpha`
-- Release date: `2026-07-10`
+- Version: `0.3.8`
+- Codename: `Palisade`
+- Channel: `stable`
+- Release date: `2026-10-04`
+
+These values live once in `src/data/project-facts.ts` (`version`); this README
+mirrors them, and `Aartiq/scripts/check-docs.ts` fails if a page hard-codes a
+different tracked version.
 
 ## Purpose
 
@@ -23,74 +27,57 @@ The landing page is the public-facing source of truth for:
 ## Structure
 
 ```text
-Landing_Page/
+Aartiq-Landing-Page/
 ├── public/
-│   ├── llms.txt
+│   ├── LLM.md
 │   ├── robots.txt
-│   ├── sitemap.xml
 │   └── .well-known/ai-plugin.json
 ├── src/
 │   ├── app/
 │   │   ├── docs/
 │   │   ├── api/
-│   │   └── llms.txt/
+│   │   ├── llms.txt/
+│   │   └── sitemap.ts
 │   ├── components/
 │   ├── data/
 │   └── lib/
+├── AI-GUIDE.md
 └── README.md
 ```
 
 ## Documentation Pages
 
-These pages should stay aligned with `Landing_Page/AI-GUIDE.md`:
+These pages should stay aligned with `AI-GUIDE.md`:
 
 - `/docs/getting-started`
+- `/docs/keyboard-shortcuts`
 - `/docs/overview`
 - `/docs/components`
 - `/docs/changelog`
 - `/docs/cloud-sync`
 - `/docs/ai-commands`
+- `/docs/skills`
 - `/docs/security`
 - `/docs/automation`
 - `/docs/native-api`
+- `/docs/apple-integration`
+- `/docs/windows-integration`
+- `/docs/linux-integration`
 - `/docs/deep-links`
 - `/docs/plugins`
 - `/docs/extensions`
 - `/docs/api-reference`
 - `/docs/troubleshooting`
+- `/docs/testing`
 - `/docs/contributing`
 
 ## AI Command Documentation Rules
 
 - Public docs should treat structured JSON as the primary command format.
-- `/docs/ai-commands`, `src/lib/search-index.ts`, `public/llms.txt`, and `src/app/llms.txt/route.ts` should stay in sync.
-- The canonical public command set is:
-  - `NAVIGATE`
-  - `SEARCH`
-  - `WEB_SEARCH`
-  - `RELOAD`
-  - `GO_BACK`
-  - `GO_FORWARD`
-  - `READ_PAGE_CONTENT`
-  - `LIST_OPEN_TABS`
-  - `CLICK_ELEMENT`
-  - `FIND_AND_CLICK`
-  - `FILL_FORM`
-  - `CREATE_PDF_JSON`
-  - `CREATE_FILE_JSON`
-  - `SHELL_COMMAND`
-  - `SET_VOLUME`
-  - `SET_BRIGHTNESS`
-  - `OPEN_APP`
-  - `OCR_SCREEN`
-  - `OCR_COORDINATES`
-  - `CLICK_APP_ELEMENT`
-  - `SCHEDULE_TASK`
-  - `LIST_AUTOMATIONS`
-  - `DELETE_AUTOMATION`
-  - `THINK`
-  - `PLAN`
-  - `PLUGIN_COMMAND`
+- `/docs/ai-commands`, `src/lib/search-index.ts`, and `src/app/llms.txt/route.ts` should stay in sync.
+- The supported set is the `COMMAND_REGISTRY` in
+  `aartiq-browser/src/lib/AICommandParser.ts`; the full reference with parameters
+  and examples lives at `/docs/ai-commands`.
 
 ## Maintenance Checklist
 
@@ -98,8 +85,9 @@ When landing-page docs change, also review:
 
 - `src/lib/version.ts`
 - `src/lib/search-index.ts`
-- `public/llms.txt`
+- `public/LLM.md`
 - `src/app/llms.txt/route.ts`
+- `src/app/sitemap.ts`
 - `src/app/docs/metadata.ts`
 
 ## Development
