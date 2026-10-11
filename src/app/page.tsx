@@ -1032,7 +1032,7 @@ export default function Home() {
                   Small project. <br /> <span className="text-cyan-400">Fully inspectable.</span>
                 </h2>
                 <p className="mb-12 text-xl font-medium leading-relaxed text-white/40 max-w-xl">
-                  Aartiq is young — a handful of stars, two contributors, no PRs yet. That is not a weakness here: every capability claim above links to its source or test. You can read the whole thing in an afternoon.
+                  Aartiq is young. That is not a weakness here: every capability claim above links to its source or test. You can read the whole thing in an afternoon.
                 </p>
                 <div className="flex flex-wrap gap-5">
                   <a href="https://github.com/Latestinssan/Aartiq" target="_blank" className="flex items-center gap-4 rounded-full bg-white/5 px-10 py-5 text-xs font-black uppercase tracking-[0.3em] text-white transition hover:bg-white/10">
@@ -1398,7 +1398,7 @@ export default function Home() {
            </div>
            <div className="mt-40 flex flex-col items-center justify-between gap-10 border-t border-white/5 pt-20 md:flex-row">
                <div className="flex flex-col gap-2">
-                   <p className="text-xs font-black uppercase tracking-[0.5em] text-white/30">© 2026 Aartiq™. All rights reserved.</p>
+                   <p className="text-xs font-black uppercase tracking-[0.5em] text-white/30">© 2026 Latestinssan. Aartiq™ is a trademark of Latestinssan.</p>
                   <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em]">
                     Built by <span className="text-white/20">Latestinssan</span> — v{version || '...'}
                   </p>

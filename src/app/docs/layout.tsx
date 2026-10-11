@@ -427,28 +427,72 @@ export default function DocsLayout({
         </main>
 
         {/* Right TOC (Table of Contents) - Desktop Only */}
-        <aside className="hidden xl:block xl:w-64 xl:shrink-0 xl:fixed xl:top-16 xl:right-0 xl:bottom-0 xl:overflow-y-auto xl:border-l xl:border-white/5 xl:bg-[#03040b] xl:p-8">
-          <p className="mb-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
-            On this page
-          </p>
-          <nav className="space-y-3">
-            <a href="#introduction" className="block text-xs font-medium text-white/40 hover:text-sky-400 transition">
-              Introduction
-            </a>
-            <a href="#installation" className="block text-xs font-medium text-white/40 hover:text-sky-400 transition">
-              Installation
-            </a>
-            <a href="#configuration" className="block text-xs font-medium text-white/40 hover:text-sky-400 transition">
-              Configuration
-            </a>
-            <a href="#first-steps" className="block text-xs font-medium text-white/40 hover:text-sky-400 transition">
-              First Steps
-            </a>
-          </nav>
-        </aside>
+        <PageToc key={pathname} />
       </div>
     </div>
     </>
+  );
+}
+
+/**
+ * PageToc — the "On this page" outline, derived from the real headings of the
+ * current page. The previous hard-coded anchors (#introduction, #installation,
+ * #configuration, #first-steps) only existed on some pages and were dead links
+ * everywhere else, so the outline is now built from `main`'s h2/h3 elements at
+ * runtime: headings without an id get a slugged id so the anchor link works.
+ * The aside renders nothing when a page has no headings.
+ */
+function PageToc() {
+  const [items, setItems] = useState<{ id: string; text: string; level: 2 | 3 }[]>([]);
+
+  useEffect(() => {
+    const main = document.querySelector("main");
+    if (!main) return;
+    const used = new Set<string>();
+    const entries: { id: string; text: string; level: 2 | 3 }[] = [];
+    const slugify = (text: string, index: number) => {
+      const base =
+        text
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "") || `section-${index + 1}`;
+      let id = base;
+      let n = 2;
+      while (used.has(id)) id = `${base}-${n++}`;
+      return id;
+    };
+    main.querySelectorAll("h2, h3").forEach((heading, index) => {
+      const text = (heading.textContent || "").trim();
+      if (!text) return;
+      const existing = heading.id && heading.id.trim();
+      const id = existing || slugify(text, index);
+      if (!existing) heading.id = id;
+      used.add(id);
+      entries.push({ id, text, level: heading.tagName === "H3" ? 3 : 2 });
+    });
+    setItems(entries);
+  }, []);
+
+  if (items.length === 0) return null;
+  return (
+    <aside className="hidden xl:block xl:w-64 xl:shrink-0 xl:fixed xl:top-16 xl:right-0 xl:bottom-0 xl:overflow-y-auto xl:border-l xl:border-white/5 xl:bg-[#03040b] xl:p-8">
+      <p className="mb-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+        On this page
+      </p>
+      <nav className="space-y-3">
+        {items.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className={`block text-xs font-medium text-white/40 transition hover:text-sky-400 ${
+              item.level === 3 ? "pl-3 text-white/30" : ""
+            }`}
+          >
+            {item.text}
+          </a>
+        ))}
+      </nav>
+    </aside>
   );
 }
 

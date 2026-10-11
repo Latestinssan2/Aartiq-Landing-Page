@@ -187,6 +187,12 @@ export const version = {
    * is written once, here, and every page reads it.)
    */
   codename: "Palisade",
+  /**
+   * First release that shipped the Windows AppContainer sandbox (v0.3.7,
+   * codename "AppContainer"). v0.3.7 release notes describe it; the security
+   * page must not credit the current release with introducing it.
+   */
+  firstAppContainerVersion: "0.3.7",
   repository: "https://github.com/Latestinssan/Aartiq",
   releaseNotes: "release_notes/v0.3.8.md",
 };
@@ -288,10 +294,11 @@ export const security = {
    */
   layerSummary:
     `The model has ${SECURITY_LAYERS.length} layers. Only ` +
-    `${SECURITY_LAYERS.filter((l) => l.strength === "enforcement boundary").length} ` +
-    "of them are enforcement boundaries in the strict sense — controls the OS applies that " +
-    "application code cannot bypass. The rest are policy and first-pass checks, and are " +
-    "labelled as such rather than presented as equally strong.",
+    `${SECURITY_LAYERS.filter((l) => l.strength === "enforcement boundary").length} of them are ` +
+    "enforcement boundaries: the OS sandbox (applied by the OS, unbypassable by application code) " +
+    "and capability-scoped execution (applied by the main process — the only path any action can " +
+    "run through). The rest are policy and first-pass checks, and are labelled as such rather " +
+    "than presented as equally strong.",
 
   /**
    * Verified against src/lib/shell-command-tiers.js, src/core/command-validator.js,
@@ -317,7 +324,7 @@ export const security = {
         "Asked every time, unless you turn on autoApproveLowRiskShell. With it off — the default — a low-risk command shows the same dialog as any other.",
       autoApprove:
         "Only behind the opt-in autoApproveLowRiskShell setting, which defaults to off. Nothing is granted at startup.",
-      examples: ["ls", "cat", "pwd", "find", "grep", "echo", "NAVIGATE"],
+      examples: ["ls", "cat", "pwd", "find", "grep", "echo"],
       limit:
         "The setting covers the whole low tier rather than named commands, so turning it on is a decision about a category. It is also independent of the MCP tool path: shell commands read autoApproveLowRiskShell from the permission store, MCP tool calls read a separate security_autoApproveLowRisk key, both default to off, and enabling one does not enable the other.",
     },
@@ -333,7 +340,7 @@ export const security = {
     {
       id: "high",
       approvalMethod:
-        "Asked every time, then offered as Allow Once / Always / Deny.",
+        "Asked every time, then offered as Allow Once / Deny — the Always button is not offered for the destructive commands in this tier (every example here matches a destructive pattern, so the Always button is always absent in practice).",
       autoApprove:
         "Only if a grant exists for that exact command line, or a SHELL_HIGH / SHELL_ALL grant was made deliberately.",
       examples: ["chmod", "find . -delete", "kill", "dd", "mount", "iptables", "shutdown"],
@@ -417,7 +424,7 @@ export const security = {
     "Seatbelt profiles start from (deny default): an operation class the profile does not explicitly grant is denied, unknown-unknowns included. Three plumbing grants keep real commands working — sysctl-read (read-only introspection), mach-lookup (Mach service-name discovery, so node/python/shell keep working), and file-ioctl (bounded by the file allowlist) — while everything else the old default-allow baseline left open (foreign process-info, user preferences, host-level mach ops) is now denied.",
     "Apple Events cannot be filtered by the current sandbox-exec — probing it rejects a deny rule with \"unbound variable: apple-events\", so the operation is not exposed at all — and a sandboxed command could still ask another app to act on its behalf.",
     "The WiFi sync server (3004) binds every network interface on purpose — the phone reaches it over the LAN — so the LAN exposure itself is the limit: the upgrade refuses foreign Origins and Host headers that do not name this machine, every sync action (unpair included) requires the device's short-lived access token, and AARTIQ_WIFI_SYNC_HOST narrows the bind when that exposure is not wanted. See network.servers.",
-    "The session tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts, and each listener now also accepts per-client credentials — mint one with the primary token (POST /clients), revoke just that one (POST /clients/revoke), peers and primary untouched — but remote mode is still not a finished design: there is no pairing UI, nothing writes a credential to a remote client, and the binds are not operator-named.",
+    "The local access tokens for the MCP bridge, the Agent API and the native bridge persist in mode-0600 files in your home directory (~/.aartiq-mcp-token, ~/.aartiq-agent-token, ~/.aartiq-token), so a client configured once keeps working across restarts, and each listener now also accepts per-client credentials — mint one with the primary token (POST /clients), revoke just that one (POST /clients/revoke), peers and primary untouched — but remote mode is still not a finished design: there is no pairing UI, nothing writes a credential to a remote client, and the binds are not operator-named.",
     '"Allow Always" is keyed on the full normalised command line, which is narrower than before but is still text matching — it records what the command says, not what it will do — and every grant now expires after 30 days, swept with an audit-log entry, so the dialog asks again. See aartiq-browser/docs-audit/issues/allow-always-granularity.md.',
     "An Allow Always grant requires a binary that appears in the classifier's table. One that does not — including anything we have never seen — is offered Allow Once only, because a grant that repeats a command nobody can describe is a promise about behaviour rather than about the text. Local writes such as cp, mv, mkdir and touch are in the table and keep exact-match Always grants, which expire after 30 days.",
   ],
@@ -449,7 +456,7 @@ export const network = {
       bindsAllInterfacesWhen:
         "the phone reaches this over the LAN, so all interfaces is the default; `AARTIQ_WIFI_SYNC_HOST` narrows the bind to an address you name (127.0.0.1 closes it to this machine)",
       auth: "Short-lived 15-minute access tokens and 7-day refresh tokens bound to device ID. Every sync action — unpair included — requires an active, unexpired token, with brute-force lockout. The WebSocket upgrade itself refuses foreign Origins and Host headers that do not name this machine (DNS rebinding).",
-      note: "All sync messages require an authenticated session token; the pairing code gates the handshake, and Host and Origin are checked at the upgrade with the same rules the HTTP listeners use. Brute-force protection locks out failed attempts after 5 tries for 15 minutes.",
+      note: "All sync messages require an authenticated access token; the pairing code gates the handshake, and Host and Origin are checked at the upgrade with the same rules the HTTP listeners use. Brute-force protection locks out failed attempts after 5 tries for 15 minutes.",
     },
     {
       id: "native-bridge",
@@ -553,12 +560,12 @@ export const ci = {
     nodeVersion: "24",
   },
   latestRun: {
-    id: 37817113470,
-    runNumber: 94,
-    url: "https://github.com/Latestinssan/Aartiq/actions/runs/37817113470",
+    id: 38147731942,
+    runNumber: 95,
+    url: "https://github.com/Latestinssan/Aartiq/actions/runs/38147731942",
     event: "pull_request",
-    headSha: "8132937a",
-    date: "2026-10-08",
+    headSha: "9cc2a8fa",
+    date: "2026-10-11",
     conclusion: "success",
   },
   /** Per-job jest summary lines, read from the run's job logs. */
@@ -573,7 +580,7 @@ export const ci = {
    * every published count carries its environment.
    *
    * This must not restate a current count. The per-job figures belong to
-   * run 37817113470 at 8132937a, and the local macOS suite can grow any day —
+   * run 38147731942 at 9cc2a8fa, and the local macOS suite can grow any day —
    * so a second set of numbers here reads as a present-tense claim and
    * contradicts the generated line beside it. Point at the generated number
    * instead of repeating one that has expired.
@@ -643,58 +650,58 @@ export const benchmarks = {
    * corpus, numbers copied verbatim from the JSON output.
    */
   hotPaths: {
-    date: "2026-10-07",
+    date: "2026-10-11",
     machine: "Apple M4 Pro (12-core), 24 GB, Node v24.14.0, darwin/arm64",
     method: "median of 5 repetitions over a fixed corpus",
     results: [
       {
         metric: "Shell command classifier",
-        value: "835 ns",
-        spread: "29.9%",
+        value: "840.8 ns",
+        spread: "38.4%",
         source: "src/lib/shell-command-tiers.js",
         notes: "classifyShellCommand — tier, capability, URL and destructive rules for one command line",
       },
       {
         metric: "Always-grant eligibility",
-        value: "407 ns",
-        spread: "25.8%",
+        value: "429.8 ns",
+        spread: "26.0%",
         source: "src/lib/shell-command-tiers.js",
         notes: "alwaysApprovalEligibility — may Allow Always be offered, and why not",
       },
       {
         metric: "Grant gate lookup",
-        value: "163 ns",
-        spread: "15.3%",
+        value: "181.9 ns",
+        spread: "12.9%",
         source: "src/lib/permission-store.js",
         notes: "normalizeCommandPattern + canAutoExecute — half the corpus granted, half not",
       },
       {
         metric: "Local auth gate",
-        value: "625 ns",
-        spread: "20.2%",
+        value: "648.0 ns",
+        spread: "22.1%",
         source: "src/lib/local-server-auth.js",
         notes: "checkLocalRequest — Host, Origin, lockout map, URL parse, constant-time token compare",
       },
       {
         metric: "Path allowlist check",
-        value: "97.2 µs",
-        spread: "3.1%",
+        value: "91.56 µs",
+        spread: "7.9%",
         source: "src/core/directory-allowlist.js",
         notes: "isPathAllowed — realpath canonicalize, sensitive-path deny, allowlist walk",
       },
       {
         metric: "Key derivation — PBKDF2, 600k",
-        value: "44.1 ms",
-        spread: "0.8%",
+        value: "44.68 ms",
+        spread: "1.7%",
         source: "node:crypto (documented parameters)",
         notes: "PBKDF2 with 600,000 iterations, SHA-256 — the unlock cost the E2EE docs specify",
       },
       {
-        metric: "Key derivation — MasterPIN, 100k",
-        value: "7.38 ms",
-        spread: "1.5%",
+        metric: "Key derivation — MasterPIN, 600k",
+        value: "45.07 ms",
+        spread: "0.8%",
         source: "src/lib/MasterPINService.js",
-        notes: "MasterPINService.hashPin — unlock path, matches the Flutter side",
+        notes: "MasterPINService.hashPin — PBKDF2 with 600,000 iterations, SHA-256 (unlock path, matches the Flutter side)",
       },
     ],
   },
@@ -821,13 +828,13 @@ export const legal = {
   table: [
     { component: "Aartiq Browser — desktop, mobile, and core code", license: "Apache-2.0", licenseFile: "LICENSE + aartiq-browser/LICENSE.txt", status: "verified" as const },
     { component: "Aartiq MCP Server — aartiq-mcp/", license: "MIT", licenseFile: "aartiq-mcp/LICENSE", status: "verified" as const },
-    { component: "Landing page / documentation site", license: "Unlicensed (private repository)", licenseFile: "none", status: "verified" as const },
+    { component: "Landing page / documentation site", license: "Unlicensed (no LICENSE file)", licenseFile: "none", status: "verified" as const },
   ],
   trademark: {
     mark: "Aartiq™",
     owner: "Latestinssan",
     paragraph:
-      "Aartiq™ is a trademark of Latestinssan. The open-source licence permits use, modification, and redistribution of the source code. It does not grant permission to use the Aartiq name, logo, trademarks, or visual identity. Modified distributions must be rebranded under a different name and must not present themselves as official Aartiq releases.",
+      "Aartiq™ is a trademark of Latestinssan. Apache-2.0 permits use, modification, and redistribution of the source code but grants no right to the trademark. Trademark policy: a modified distribution must not present itself as an official Aartiq release or use the Aartiq name, logo, or visual identity in a way that implies it is one.",
   },
 } as const;
 
@@ -864,7 +871,7 @@ export const skills = {
     {
       term: "Enforcement boundary",
       definition:
-        "A control the OS applies, which application code cannot bypass. Only OS sandboxing and capability scoping qualify.",
+        "A boundary no action can bypass without re-authoring it: the OS sandbox (applied by the OS) and capability scoping (applied by the main process — the only execution path). Only these two qualify; policy and first-pass layers do not.",
     },
     {
       term: "Fail-closed",

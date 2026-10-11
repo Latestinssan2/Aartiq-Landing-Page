@@ -321,9 +321,9 @@ const commands = [
     category: "shell",
     description: "Execute terminal commands on the host operating system. With the default settings every command waits for an explicit approval before it runs.",
     format: "JSON",
-    riskLevel: "High",
+    riskLevel: "Tiered per command line — low / medium / high / critical",
     requiresApproval: true,
-    approvalType: "QR + PIN (high) / Allow Once, Always Allow, Deny",
+    approvalType: "Dialog: Allow Once / Always Allow / Deny per tier (destructive commands never offer Always); remote-origin commands require QR + PIN ticket redemption",
     parameters: [
       { name: "command", type: "string", required: true, description: "The shell command to execute" },
       { name: "shell", type: "string", required: false, description: "Shell type: bash, zsh, powershell, cmd" }
@@ -333,7 +333,7 @@ const commands = [
       "Every command line is classified into one of four risk tiers and checked by checkShellPermission against the permission store — with no store configured the gate denies (fail-closed), src/core/command-validator.js:78",
       "The approval dialog offers Allow Once / Always Allow / Deny; Shift+Tab is the keyboard shortcut for Allow Once (ClickPermissionModal.tsx:306)",
       "An Always Allow answer is keyed on the full normalised command line and carries a 30-day lifetime, after which the gate asks again (docs-audit/issues/allow-always-granularity.md)",
-      "High-risk commands require QR + PIN from a paired mobile (ClickPermissionModal.tsx)",
+      "A command arriving from a remote origin is refused at the policy gate and reaches the user only as a single-use QR + PIN ticket on the paired mobile (ClickPermissionModal.tsx, src/main/handlers/sync-handlers.js:342-346)",
       "Executed inside the fail-closed OS sandbox — Seatbelt / bubblewrap / AppContainer (sandbox-executor.js)",
       "Every run is logged for audit (ActionLogsStore.ts)"
     ],
@@ -1513,7 +1513,13 @@ export default function AICommandsPage() {
           <code className="font-mono text-rose-400/80"> RUN_SHELL</code>); every shell command line is
           classified into <strong className="text-rose-400/80">four risk tiers</strong> and has to pass
           <code className="font-mono text-sky-400/80"> checkShellPermission</code>. With the default
-          settings, nothing runs until the approval dialog is answered — one command at a time.
+          settings, commands marked <strong className="text-emerald-400/90">Instant</strong> in this
+          reference run without a dialog — read-only browser and UI actions with no
+          <code className="font-mono text-sky-400/80"> requiredPermission</code>; everything else waits
+          until the approval dialog is answered — one command at a time. The
+          {commandCount}-command count is the size of COMMAND_REGISTRY; two of the entries are aliases
+          (ANALYZE_TABS and SUMMARIZE_TABS normalize to the ANALYSE_TABS flow), so the reference below
+          documents {commandCount - 2} distinct canonical commands.
         </p>
 
         <div className="mt-8 rounded-2xl border border-sky-500/20 bg-sky-500/5 p-6 text-sm leading-relaxed text-white/60">

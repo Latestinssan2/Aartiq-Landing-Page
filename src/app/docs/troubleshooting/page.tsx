@@ -171,7 +171,7 @@ const faqs = [
   {
     category: "sync",
     question: "QR code scanning fails on mobile",
-    answer: "Ensure the camera has permission in the mobile app. Hold the phone steady and ensure good lighting. The QR code has a 60-second expiry for security.",
+    answer: "Ensure the camera has permission in the mobile app. Hold the phone steady and ensure good lighting. Each approval shows a fresh QR; the ticket it carries is single-use, and an open approval dialog auto-denies after 60 seconds — start a new approval to get a fresh code.",
     solutions: [
       "Grant camera permission to Aartiq app",
       "Clean the camera lens",
@@ -187,7 +187,7 @@ const faqs = [
     solutions: [
       "Enable clipboard sync in Settings > Sync",
       "Reconnect the mobile device",
-      "Check if clipboard content is too large (>1MB)",
+      "Toggle clipboard sync off and on, then copy the content again",
       "Restart both apps"
     ]
   },
@@ -216,12 +216,12 @@ const faqs = [
   {
     category: "pdf",
     question: "PDF won't open on mobile after sync",
-    answer: "The PDF sync happens over local network. Ensure mobile is connected to the same WiFi and the sync is complete. PDFs are synced to ~/Documents/Aartiq/PDFs/.",
+    answer: "Generated documents land in ~/Documents/Aartiq (the default output folder). To move one to a paired device, use the file-sync relay for images, PDFs and documents — both devices must be on the same network while the transfer completes.",
     solutions: [
-      "Wait for sync to complete (check notification)",
-      "Open PDFs app to refresh file list",
-      "Manually trigger sync from desktop Settings",
-      "Check if PDF file size is under mobile storage limits"
+      "Use the file-sync relay on the paired device and select the PDF",
+      "Keep both devices on the same WiFi until the transfer finishes",
+      "Reopen the file list in the mobile app to refresh it",
+      "Check the file size against available storage on the device"
     ]
   },
   {
