@@ -423,7 +423,7 @@ export default function OverviewPage() {
         {/* Launch Time */}
         <div className="mb-6 rounded-[2rem] border border-white/5 bg-white/[0.02] p-6">
           <p className="mb-3 text-sm font-medium text-white/50">
-            Measures the elapsed time from launching the application to the first visible application window. This is not a measurement of full renderer initialization, AI service readiness, or feature availability. Aartiq displays the Chromium window immediately while background services (AI providers, MCP bridge, sync, OCR, etc.) continue initializing asynchronously.
+            Measures the elapsed time from launching the application to the first visible application window. This is not a measurement of full renderer initialization, AI service readiness, or feature availability. Aartiq shows the window first and starts background services (AI providers, MCP bridge, sync, OCR, etc.) asynchronously, so the interface is usable before every subsystem has finished starting.
           </p>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">

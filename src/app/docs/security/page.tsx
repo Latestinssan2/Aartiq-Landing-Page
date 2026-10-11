@@ -102,12 +102,12 @@ const securityLayers = [
     level: 1,
     description: "The AI perceives web pages as sanitized extractions of the rendered page — DOM text through the accessibility snapshot and the DOM-extraction pipeline, plus screenshots + OCR for image commands — never raw, unprocessed HTML. This significantly reduces DOM-based manipulation attacks, but it is a mitigation, not an absolute guarantee.",
     howItWorks: [
-      "Most commands read the page as text: navigation, search and page reads go through the accessibility snapshot and the DOM-extraction pipeline (src/lib/web-extractor.js, Readability-based), with extraction after load at src/lib/mcp-browser-server.js:1395-1435. Screenshots (Electron webContents.capturePage — src/main/handlers/browser-handlers.js) and Tesseract.js OCR (src/lib/tesseract-service.js) serve the image commands (OCR_SCREEN and vision reads). The AI never runs inside the page's JavaScript realm.",
+      "Most commands read the page as text: navigation, search and page reads go through the accessibility snapshot and the DOM-extraction pipeline (src/lib/web-extractor.js, Readability-based), with extraction after load at src/lib/mcp-browser-server.js:1395-1435. Screenshots (Electron webContents.capturePage — src/main/handlers/browser-handlers.js) and the OCR pipeline serve the image commands (OCR_SCREEN and vision reads): uniOCR first, then RustO!/PaddleOCR, then platform-native OCR (macOS @cherrystudio/mac-system-ocr, Windows and Linux native), with Tesseract.js as the last-resort fallback (src/lib/tesseract-service.js). The AI never runs inside the page's JavaScript realm.",
       "SecureDOMReader (src/components/ai/SecureDOMReader.ts) provides a text fallback path. It blocks script/style/iframe/object/embed/form/input/button tags and nav/footer/header/modal/overlay/ads classes before text extraction.",
       "PII redaction: emails, phone numbers, card numbers, bearer tokens, session IDs, and password/api-key assignments are replaced with [REDACTED] placeholders before content reaches the model.",
       "SecureDOMParser (src/lib/Security.ts) runs the extracted content against shell-primitive, encoding, and injection pattern groups, decodes base64/hex payloads, and rewrites dangerous matches to [BLOCKED: LAYER].",
       "AI Fortress masks API keys and secrets before content reaches the LLM (src/lib/Security.ts, src/components/AIChatSidebar.tsx).",
-      "The AI context is explicitly built as read-only: the model cannot modify the DOM; interaction is limited to approved click/fill commands (FIND_AND_CLICK / CLICK_ELEMENT).",
+      "The AI context is explicitly built as read-only: the model cannot modify the DOM; interaction happens only through approved interaction commands — click (FIND_AND_CLICK / CLICK_ELEMENT / CLICK_AT), fill (FILL_FORM / MULTI_FILL_FORM), open-app (OPEN_APP), and shell (SHELL_COMMAND) — each gated by its own approval policy.",
       "Source files: src/lib/Security.ts, src/lib/html-sanitizer.js, src/components/ai/SecureDOMReader.ts"
     ],
     benefits: [
@@ -296,7 +296,7 @@ const securityLayers = [
       "Network exfiltration is blocked by default-deny networking inside the sandbox (macOS/Linux/Windows), not by firewall rules"
     ],
     notGuaranteed: [
-      `On Windows before v${version.semver} the Job Object confined processes only; AppContainer (v${version.semver}) adds OS-layer filesystem (package-SID ACL grants) and network (zero capabilities) isolation. The Windows runtime matrix runs in CI on windows-latest and is currently ${ci.latestRun.conclusion} — the full three-sandbox Jest matrix on Windows (${windowsJob.passed} passing, ${windowsJob.skipped} platform-skipped of ${windowsJob.declared}) completes green, and every runtime containment test (suspended AppContainer start, verified job assignment, grandchild containment, secret isolation, OS-enforced ACL allowlist denial, KILL_ON_JOB_CLOSE) returns a verified sandbox result. The documentation claims the process is created suspended with SECURITY_CAPABILITIES on CreateProcessW, then the Job Object is assigned and verified via IsProcessInJob before resuming. This is the right design — you should verify the actual PowerShell/C++/Node implementation (src/core/win-job-runner.ps1) rather than trusting the documentation alone.`,
+      `On Windows before v${version.firstAppContainerVersion} the Job Object confined processes only; AppContainer (v${version.firstAppContainerVersion}) adds OS-layer filesystem (package-SID ACL grants) and network (zero capabilities) isolation. The Windows runtime matrix runs in CI on windows-latest and is currently ${ci.latestRun.conclusion} — the full three-sandbox Jest matrix on Windows (${windowsJob.passed} passing, ${windowsJob.skipped} platform-skipped of ${windowsJob.declared}) completes green, and the runtime containment tests in CI verify each of these behaviours: suspended AppContainer start (SECURITY_CAPABILITIES on CreateProcessW), verified Job Object assignment via IsProcessInJob before resume, grandchild containment, secret isolation, OS-enforced ACL allowlist denial, and KILL_ON_JOB_CLOSE. The implementation lives in src/core/win-job-runner.ps1.`,
       "A sandbox confines what a command can do. It does not make a malicious command safe, and it does not decide what the AI asks for. Human approval is a social control, not a cryptographic one; a coerced or careless approval still executes.",
       "Seatbelt and bubblewrap constrain the process, not the data it is handed. If you allowlist a directory that contains secrets, the sandboxed command can read them. Allowlists are trust boundaries you draw — only as good as where you draw them.",
       "These guarantees apply to code executed through executeSandboxed(). The Electron main process, the renderer, native modules, and helper apps are NOT inside the sandbox. Sandboxing reduces blast radius; it is not a substitute for least-privilege OS accounts, patched dependencies, or simply not running untrusted code.",
@@ -355,7 +355,7 @@ const threatScenarios = [
   {
     threat: "Unauthorized Shell Execution",
     scenario: "AI executes a destructive shell command",
-    defense: "Human-in-the-Loop requires explicit approval for all shell commands. High-risk commands require QR approval via the paired mobile device.",
+    defense: "Human-in-the-Loop requires explicit approval for all shell commands. Local high-risk shell commands are offered Allow Once / Deny in the desktop dialog (no Always button for destructive patterns); commands originating from a remote device require single-use, input-hash-bound QR + PIN ticket redemption on the paired mobile device.",
     layer: "HITL"
   },
   {
@@ -482,7 +482,7 @@ export default function SecurityPage() {
         </h1>
 
         <p className="max-w-3xl text-xl font-medium leading-relaxed text-white/50">
-          Aartiq uses a defense-in-depth model with six layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution — but only two of them are enforcement boundaries (the OS sandbox and capability-scoped execution, applied by the OS); the other four reduce blast radius without being boundaries. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
+          Aartiq uses a defense-in-depth model with six layers: visual sandbox, syntactic firewall, human-in-the-loop authorization, directory allowlist, OS-level sandboxing, and capability-scoped execution — but only two of them are enforcement boundaries (the OS sandbox, applied by the OS, and capability-scoped execution, applied by the main process); the other four reduce blast radius without being boundaries. Source implementations: src/lib/Security.ts, src/lib/SecurityValidator.js, src/core/command-validator.js, src/core/directory-allowlist.js, src/core/sandbox-executor.js
         </p>
 
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-sm leading-relaxed text-white/40">
@@ -507,7 +507,7 @@ export default function SecurityPage() {
           <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-center">
             <Layers size={32} className="mx-auto mb-4 text-emerald-400" />
             <h3 className="text-3xl font-black text-emerald-400">2</h3>
-            <p className="text-sm text-white/50">Enforcement Boundaries (OS-applied), of six layers</p>
+            <p className="text-sm text-white/50">Enforcement Boundaries — 1 OS-applied + 1 main-process, of six layers</p>
           </div>
           <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-6 text-center">
             <Key size={32} className="mx-auto mb-4 text-amber-400" />
@@ -933,7 +933,7 @@ export default function SecurityPage() {
               {[
                 "QR codes are single-use only",
                 "Each QR code is cryptographically unique",
-                "PIN codes are generated per-session",
+                "PIN codes are generated per-approval (one per QR ticket)",
                 "Mobile must be paired via secure handshake",
                 "Failed attempts are logged with timestamps",
                 "All approvals are logged with timestamps"

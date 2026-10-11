@@ -47,6 +47,8 @@ const suiteFocus: Record<string, string> = {
   "tab-intelligence": "Tab intelligence, domain grouping, smart icons",
   "dom-engine": "DOM interaction engine, click/fill strategies",
   "component-tests": "React component behavior and props",
+  "client-credentials": "Per-client credential minting (random 64-hex token returned exactly once, only its sha256 stored), per-listener revocation retiring one client while peers and the primary token keep working",
+  "crx-url-binding": "Web Store installs bind the download URL's declared id (…x=id%3D<32-char id>…) to the verified package's crx_id — a URL promising one extension can only install that exact extension (17 tests, runs everywhere)",
   "webauthn-service": "WebAuthn / FIDO2 challenge-response flow",
   automation: "OS automation layer (click / scroll / app launch)",
   "dom-handlers": "Browser DOM IPC handlers",
@@ -101,6 +103,7 @@ const suiteFocus: Record<string, string> = {
   "ai-command-parser-plan": "PLAN and THINK payload field extraction, bracket form parsing, reasoning note capture so plan and thinking text stays populated",
   "approval-gate": "Approval ticket race prevention, one-time consumption, sequential replay refusal, mismatched input burning",
   "markdown-render": "Currency text kept literal in chat markdown, dollar amounts preserved across sentences, double dollar math still rendered",
+  "master-pin-pbkdf2": "Master PIN KDF cost and its migration — new records hash at 600,000 PBKDF2-SHA256 iterations; records without an iteration field are legacy 100k records that verify at their stored cost, so an existing PIN never lockouts on upgrade",
 };
 
 const testSuites = tests.perSuite.map((s) => ({

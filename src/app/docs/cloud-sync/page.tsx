@@ -153,7 +153,7 @@ const syncItems = [
 const securityFeatures = [
   {
     title: "Pairing code",
-    description: "A six-digit code is generated per session and checked during the handshake; a device presenting the wrong code is refused",
+    description: "A six-digit code that survives desktop restarts and is checked during the handshake; a device presenting the wrong code is refused",
     icon: Key,
     source: "src/lib/WiFiSyncService.ts"
   },

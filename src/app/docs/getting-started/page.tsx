@@ -63,7 +63,7 @@ const steps = [
           "If prompted, click 'Open' to confirm",
           "Launch Aartiq from Launchpad or Spotlight"
         ],
-        note: "You may need to allow the app in System Preferences > Security & Privacy."
+        note: "You may need to allow the app in System Preferences > Security & Privacy. If macOS reports that Aartiq cannot be opened because it is from an unidentified developer, run `sudo xattr -cr /Applications/Aartiq.app` and try again."
       },
       linux: {
         steps: [

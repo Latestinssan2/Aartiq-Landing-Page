@@ -402,7 +402,7 @@ const platformIntegrations = [
     blurb: "Siri Shortcuts, AppleScript, Vision Kit, Voice Control",
     href: "/docs/apple-integration",
     items: [
-      "App Intents (12 shortcuts)",
+      "App Intents (20 shortcuts)",
       "URL scheme: aartiq://",
       "Voice: Dictation + TTS",
       "OCR: Vision framework",
