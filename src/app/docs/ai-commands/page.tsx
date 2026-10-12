@@ -321,7 +321,10 @@ const commands = [
     category: "shell",
     description: "Execute terminal commands on the host operating system. With the default settings every command waits for an explicit approval before it runs.",
     format: "JSON",
-    riskLevel: "Tiered per command line — low / medium / high / critical",
+    // Shell commands are tiered per command line. The badge below needs a concrete
+    // tier key (commandStatus only has Low/Medium/High); the tiering itself is stated
+    // in approvalType. Labelling the card High is the conservative reading.
+    riskLevel: "High",
     requiresApproval: true,
     approvalType: "Dialog: Allow Once / Always Allow / Deny per tier (destructive commands never offer Always); remote-origin commands require QR + PIN ticket redemption",
     parameters: [

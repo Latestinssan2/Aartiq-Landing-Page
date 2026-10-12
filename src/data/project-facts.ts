@@ -360,27 +360,6 @@ export const security = {
   ] satisfies RiskTier[],
 
   /**
-   * TODO(verify) — the figures "22 gated / 9 monitoring-only IPC channels" could not be
-   * verified and do NOT appear in docs-audit/action-inventory.md. That file contains no
-   * count of either kind, and its wildcard rows (`clipboard-*`, `window-*`, `store-*`)
-   * make an exact IPC-channel count underivable from it. Do not publish these numbers.
-   */
-  monitoringOnlyChannels: {
-    status: "TODO(verify)" as const,
-    claimedGated: 22,
-    claimedMonitoringOnly: 9,
-    verified: false,
-    /** What action-inventory.md actually contains, re-read 2026-10-03. */
-    actual: [
-      "§2a lists 24 command types under 'No Permission Gate — Executes Immediately'.",
-      "§2b lists 7 command types under 'Has Permission Dialog (requestActionPermission())'.",
-      "The single 'Monitoring-only' row is SecureDOMParser.analyze() — a renderer function, not an IPC channel.",
-    ],
-    resolution:
-      "Either re-derive the counts from IPC registration in preload.js, or drop the figures. They are not used on any page.",
-  },
-
-  /**
    * Two defaults are live at the same time. Stating both is the honest description;
    * collapsing them would misreport what the app enforces.
    */
